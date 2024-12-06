@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 //import TiketkuImage from "../../assets/img/BG-Tiketku.png";
+import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 
 export const Route = createLazyFileRoute("/auth/forget-pass-req")({
   component: ResetRequest,
@@ -29,7 +30,9 @@ function ResetRequest() {
           className="d-none d-md-block"
         >
           <img
-            src="BG-Tiketku.png"
+
+            src={BgTiketkuImage}
+
             alt="Tiketku"
             style={{
               maxWidth: "100%",
