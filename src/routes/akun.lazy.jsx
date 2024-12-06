@@ -42,7 +42,7 @@ function AccountSettings() {
             <ListGroup variant="flush">
               <ListGroup.Item action>
                 <FaPen className="me-2" style={{ color: '#9b59b6' }} />
-                Ubah Profil
+                Ubah Profile
               </ListGroup.Item>
               <ListGroup.Item action>
                 <FaSignOutAlt className="me-2" style={{ color: '#9b59b6' }} />
