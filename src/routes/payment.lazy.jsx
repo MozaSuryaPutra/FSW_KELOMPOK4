@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import FlightDetail from "../components/payment/flightDetail";
+import { useNavigate } from "@tanstack/react-router";
 import "../components/payment/payment.css";
 
 export const Route = createLazyFileRoute("/payment")({
@@ -8,6 +9,7 @@ export const Route = createLazyFileRoute("/payment")({
 });
 
 function RouteComponent() {
+  const navigate = useNavigate();
   return (
     <div className="payment-display">
       <div
@@ -123,6 +125,7 @@ function RouteComponent() {
           <div className="btn-bayar container">
             <button
               class="btn text-white fw-medium py-3 fs-5"
+              onClick={() => navigate({ to: "/payment-success" })}
               style={{ backgroundColor: "#7126B5", width: "100%" }}
               type="button"
             >

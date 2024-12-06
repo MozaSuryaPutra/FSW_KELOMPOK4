@@ -9,13 +9,18 @@ import OneDatePopup from "../OneDatePopup/OneDatePopup";
 import PassengersPopup from "../PassengersPopup/PassengeresPopup";
 import ReturnPopup from "../ReturnPopup/ReturnPopup";
 import { format, parseISO } from "date-fns";
+
+import { useNavigate } from "@tanstack/react-router";
+
 import FromImage from "../../../public/plane.png";
 import ReturnImage from "../../../public/return.png";
 import VectorImage from "../../../public/Vector.png";
 import PenumpangImage from "../../../public/penumpang.png";
 
+
 import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jika diperlukan
 const SearchBox = () => {
+  const navigate = useNavigate();
   const [modalShow, setModalShow] = useState(false); // State untuk modal destinasi
   const [returnmodalShow, setReturnModalShow] = useState(false); // State untuk modal destinasi
   const [dateModalShow, setDateModalShow] = useState(false); // State untuk modal tanggal
@@ -385,6 +390,7 @@ const SearchBox = () => {
                   >
                     <Button
                       className="w-100"
+                      onClick={() => navigate({ to: "/choose" })}
                       style={{
                         backgroundColor: "#7126B5",
                         borderRadius: "0 0 5px 5px",
