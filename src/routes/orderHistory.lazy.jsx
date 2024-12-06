@@ -9,7 +9,7 @@ import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css"; // CSS utama
 import "react-date-range/dist/theme/default.css"; // Tema default
 import { useState } from "react";
-import NotFoundPict from "../assets/NotFoundHistory.png";
+//import NotFoundPict from "../assets/NotFoundHistory.png";
 
 export const Route = createLazyFileRoute("/orderHistory")({
   component: OrderHistory,
@@ -200,12 +200,9 @@ let data = [
 
 // data =[];
 
-
 function OrderHistory() {
-  const isTablet = useMediaQuery({ query: "(max-width: 992px)" }); 
+  const isTablet = useMediaQuery({ query: "(max-width: 992px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" }); // Deteksi tablet
-
-
 
   const [showModal, setShowModal] = useState(false);
   const [dateRange, setDateRange] = useState([
@@ -251,15 +248,15 @@ function OrderHistory() {
           </Col>
         </Row>
         <Row className="align-items-center mb-3">
-          <Col xs={7} sm={8} md={isTablet?"9":"10"} className="text-start">
+          <Col xs={7} sm={8} md={isTablet ? "9" : "10"} className="text-start">
             <Button
               style={{
                 backgroundColor: "#9b59b6",
                 color: "#fff",
                 borderRadius: "10px",
                 border: "none",
-                width:"100%",
-                textAlign:"left",
+                width: "100%",
+                textAlign: "left",
               }}
             >
               <div className="text-left">
@@ -268,7 +265,12 @@ function OrderHistory() {
               </div>
             </Button>
           </Col>
-          <Col xs={4} sm={3} md={isTablet?"2":"1"} className=" d-flex justify-content-center ps-0 pe-0">
+          <Col
+            xs={4}
+            sm={3}
+            md={isTablet ? "2" : "1"}
+            className=" d-flex justify-content-center ps-0 pe-0"
+          >
             <Button
               variant="outline-secondary"
               className="p-2 ps-3 pe-3"
@@ -284,7 +286,8 @@ function OrderHistory() {
             </Button>
           </Col>
           <Col xs={1} md={1} className=" d-flex justify-content-center">
-            <Button className="p-1"
+            <Button
+              className="p-1"
               style={{
                 borderRadius: "50%",
                 backgroundColor: "#fff",
@@ -297,12 +300,18 @@ function OrderHistory() {
         </Row>
 
         {/* Main Content */}
-        <Row className={isMobile?"d-flex justify-content-center":"ms-5 me-5 d-flex justify-content-center"}>
+        <Row
+          className={
+            isMobile
+              ? "d-flex justify-content-center"
+              : "ms-5 me-5 d-flex justify-content-center"
+          }
+        >
           {filteredData.length === 0 ? (
             // Jika data kosong
             <div className="text-center mt-5">
               <img
-                src={NotFoundPict}
+                src="NotFoundHistory.png"
                 alt="No Orders"
                 className="img-fluid mb-3"
               />
@@ -325,14 +334,14 @@ function OrderHistory() {
           ) : (
             <>
               {/* Order Items */}
-              <Col xs={12} md={isTablet?"12":"7"}>
+              <Col xs={12} md={isTablet ? "12" : "7"}>
                 <OrderItem
                   data={filteredData}
                   onSelectOrder={handleSelectOrder}
                 />
               </Col>
 
-              <Col xs={12} md={isTablet?"12":"5"}>
+              <Col xs={12} md={isTablet ? "12" : "5"}>
                 {selectedOrder ? (
                   <OrderDetail data={[selectedOrder]} />
                 ) : (

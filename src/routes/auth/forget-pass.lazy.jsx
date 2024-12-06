@@ -1,7 +1,7 @@
 import React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Row, Col, Form, Button } from "react-bootstrap";
-import TiketkuImage from "../../assets/img/BG-Tiketku.png";
+//import TiketkuImage from "../../assets/img/BG-Tiketku.png";
 
 export const Route = createLazyFileRoute("/auth/forget-pass")({
   component: ResetPassword,
@@ -20,7 +20,8 @@ function ResetPassword() {
       <div
         style={{
           flex: 1,
-          backgroundImage: `url(${TiketkuImage})`,
+
+          backgroundImage: "url(BG-Tiketku.png)",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

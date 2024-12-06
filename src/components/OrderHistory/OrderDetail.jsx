@@ -1,9 +1,8 @@
 import PropTypes from "prop-types";
 import { Card, Row, Col, Button } from "react-bootstrap";
-import logoIcon from "../../assets/info-icon.png"
+//import logoIcon from "../../assets/info-icon.png";
 
 const OrderDetail = ({ data }) => {
-
   return (
     <div>
       {data.map((order) => (
@@ -56,7 +55,11 @@ const OrderDetail = ({ data }) => {
             <hr />
             <Row className="mb-2">
               <Col xs={1} md={1} className="p-0 align-content-center">
-              <img src={logoIcon} alt="logo Info" className=" img-fluid w-100 align-content-center" />
+                <img
+                  src="info-icon.png"
+                  alt="logo Info"
+                  className=" img-fluid w-100 align-content-center"
+                />
               </Col>
               <Col>
                 <p>

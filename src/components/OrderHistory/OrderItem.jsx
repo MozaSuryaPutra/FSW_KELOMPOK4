@@ -1,8 +1,8 @@
 import { useState, useEffect, memo } from "react";
 import PropTypes from "prop-types";
 import { Card, Badge, Row, Col } from "react-bootstrap";
-import Arrow from "../../assets/Arrow.png";
-import LocationMark from "../../assets/location-icon.png";
+//import Arrow from "../../assets/Arrow.png";
+//import LocationMark from "../../assets/location-icon.png";
 import { useMediaQuery } from "react-responsive";
 
 const OrderItem = ({ data, onSelectOrder }) => {
@@ -60,7 +60,7 @@ const OrderItem = ({ data, onSelectOrder }) => {
                 transition: "transform 0.2s ease-in-out",
                 padding: "10px",
                 width: "100%",
-                fontSize:isMiniMobile?"11px": "12px",
+                fontSize: isMiniMobile ? "11px" : "12px",
               }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.transform = "scale(1.02)")
@@ -81,12 +81,12 @@ const OrderItem = ({ data, onSelectOrder }) => {
                 <Row className="align-items-center">
                   <Col xs={1} className="text-center p-1 mb-4">
                     <img
-                      src={LocationMark}
+                      src="location-icon.png"
                       alt="Location-icons"
                       className="img-fluid w-75"
                     />{" "}
                   </Col>
-                  <Col xs={isMiniMobile?4:3}>
+                  <Col xs={isMiniMobile ? 4 : 3}>
                     <div>
                       <p
                         className="fw-bold mb-1"
@@ -98,18 +98,21 @@ const OrderItem = ({ data, onSelectOrder }) => {
                       <p className="mb-0 ">{booking.departure?.time}</p>
                     </div>
                   </Col>
-                  <Col xs={isMiniMobile?2:4} className={isMiniMobile?"text-center p-0":"text-center"}>
+                  <Col
+                    xs={isMiniMobile ? 2 : 4}
+                    className={isMiniMobile ? "text-center p-0" : "text-center"}
+                  >
                     <div>{booking.duration}</div>
-                    <img src={Arrow} alt="Arrow" className="img-fluid" />
+                    <img src="Arrow.png" alt="Arrow" className="img-fluid" />
                   </Col>
                   <Col xs={1} className="text-center p-1 mb-4">
                     <img
-                      src={LocationMark}
+                      src="location-icon.png"
                       alt="Location-icons"
                       className="img-fluid w-75"
                     />{" "}
                   </Col>
-                  <Col xs={isMiniMobile?4:3}>
+                  <Col xs={isMiniMobile ? 4 : 3}>
                     <div>
                       <p
                         className="fw-bold mb-1"
@@ -128,11 +131,11 @@ const OrderItem = ({ data, onSelectOrder }) => {
                 <Row>
                   <Col>
                     <p className="fw-bold mb-1">Booking Code:</p>
-                    <p >{booking.bookingCode}</p>
+                    <p>{booking.bookingCode}</p>
                   </Col>
                   <Col>
                     <p className="fw-bold mb-1 ">Class:</p>
-                    <p >{booking.class}</p>
+                    <p>{booking.class}</p>
                   </Col>
                   <Col className="text-end">
                     <h6 className="text-primary fw-bold">
