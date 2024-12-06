@@ -17,7 +17,6 @@ import ReturnImage from "../../../public/return.png";
 import VectorImage from "../../../public/Vector.png";
 import PenumpangImage from "../../../public/penumpang.png";
 
-
 import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jika diperlukan
 const SearchBox = () => {
   const navigate = useNavigate();

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Button, Col, Container, Row, Modal } from "react-bootstrap";
 import { FaArrowLeft, FaFilter, FaSearch } from "react-icons/fa";
@@ -9,6 +10,8 @@ import { addDays } from "date-fns";
 import "react-date-range/dist/styles.css"; // CSS utama
 import "react-date-range/dist/theme/default.css"; // Tema default
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "@tanstack/react-router";
 //import NotFoundPict from "../assets/NotFoundHistory.png";
 
 export const Route = createLazyFileRoute("/orderHistory")({
@@ -215,7 +218,14 @@ function OrderHistory() {
   const [selectedOrder, setSelectedOrder] = useState(data[0] || null); // Default ke item pertama atau null jika data kosong
 
   const [filteredData, setFilteredData] = useState(data); // State untuk data yang difilter
+  const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
 
+  useEffect(() => {
+    if (!token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
   const handleSelect = (ranges) => {
     setDateRange([ranges.selection]);
   };

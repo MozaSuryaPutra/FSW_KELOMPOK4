@@ -11,7 +11,9 @@ import {
 import { FaPen, FaSignOutAlt, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "@tanstack/react-router";
 import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { setUser, setToken } from "../redux/slices/auth";
+import { useEffect } from "react";
 export const Route = createLazyFileRoute("/akun")({
   component: AccountSettings,
 });
@@ -19,6 +21,13 @@ export const Route = createLazyFileRoute("/akun")({
 function AccountSettings() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
+
+  useEffect(() => {
+    if (!token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
 
   const handleLogout = () => {
     dispatch(setUser(null));

@@ -44,9 +44,7 @@ function OTPInputUI() {
         }}
       >
         <div style={{ textAlign: "left" }}>
-
           <img src={BgTiketkuImage} alt="Tiketku" style={{ height: "120x" }} />
-
         </div>
       </header>
 

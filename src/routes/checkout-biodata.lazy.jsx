@@ -7,6 +7,8 @@ import AlertDanger from "../components/payment/alertDanger";
 import BreadCrumb from "../components/payment/breadCrumbs";
 import PassangerSeat from "../components/payment/passangerSeat";
 import { useNavigate } from "@tanstack/react-router";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
 import "../components/payment/payment.css";
 
 export const Route = createLazyFileRoute("/checkout-biodata")({
@@ -15,6 +17,13 @@ export const Route = createLazyFileRoute("/checkout-biodata")({
 
 function Index() {
   const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
+
+  useEffect(() => {
+    if (!token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
   return (
     <div className="row g-3 m-0">
       <div

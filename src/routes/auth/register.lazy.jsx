@@ -7,11 +7,9 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
 
-
 import { useSelector } from "react-redux";
 
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
-
 
 export const Route = createLazyFileRoute("/auth/register")({
   component: Register,

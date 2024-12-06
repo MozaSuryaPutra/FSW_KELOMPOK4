@@ -83,9 +83,7 @@ function Login() {
           style={{ position: "relative", overflow: "hidden" }}
         >
           <img
-
             src={BgTiketkuImage}
-
             alt="Logo"
             style={{ height: "100vh", width: "100%", objectFit: "cover" }}
           />

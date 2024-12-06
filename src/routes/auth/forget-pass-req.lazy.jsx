@@ -30,9 +30,7 @@ function ResetRequest() {
           className="d-none d-md-block"
         >
           <img
-
             src={BgTiketkuImage}
-
             alt="Tiketku"
             style={{
               maxWidth: "100%",
