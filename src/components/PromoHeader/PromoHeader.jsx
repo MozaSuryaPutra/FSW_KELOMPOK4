@@ -5,12 +5,12 @@ import { Image } from "react-bootstrap";
 import FavoriteDestination from "../FavoriteDestination/FavoriteDestination";
 
 function PromoHeader() {
-  const promoHeaderContainer = document.getElementById(
-    "promo-header-container"
-  );
-  if (!promoHeaderContainer) return null; // Pastikan elemen ada
+  // const promoHeaderContainer = document.getElementById(
+  //   "promo-header-container"
+  // );
+  // if (!promoHeaderContainer) return null; // Pastikan elemen ada
 
-  return ReactDOM.createPortal(
+  return (
     <div className="promo-header pt-3    ">
       <div
         className="row d-flex align-items-center"
@@ -61,8 +61,8 @@ function PromoHeader() {
           }}
         ></div>
       </div>
-    </div>,
-    promoHeaderContainer
+    </div>
+    // promoHeaderContainer
   );
 }
 

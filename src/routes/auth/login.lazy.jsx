@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Row, Col, Form, Button } from "react-bootstrap";
@@ -6,9 +6,12 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { login } from "../../services/auth/auth";
 //import logo from "../../assets/img/BG-Tiketku.png";
 import { useDispatch } from "react-redux";
+
+import { setToken, setUser } from "../../redux/slices/auth";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 export const Route = createLazyFileRoute("/auth/login")({
   component: Login,
 });
@@ -22,25 +25,34 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  if (token) {
-    navigate({ to: "/" });
-  }
-
   const { mutate: loginUser } = useMutation({
     mutationFn: (body) => {
+      console.log("Login mutation called with body:", body); // Debugging log
       return login(body);
     },
     onSuccess: (data) => {
-      dispatch(setToken(data?.token));
-      dispatch(setUser(data?.user));
-
-      // redirect to home
-      navigate({ to: "/" });
+      console.log("Data on success:", data); // Debugging log
+      if (data?.token) {
+        console.log("Data on success:", data?.token); // Debugging log
+        console.log("Data on success:", data?.user); // Debugging log
+        dispatch(setToken(data?.token));
+        dispatch(setUser(data?.user));
+        navigate({ to: "/" });
+      } else {
+        console.error("Token or user not found in response");
+      }
     },
     onError: (err) => {
+      console.error("Login error:", err.message);
       toast.error(err?.message);
     },
   });
+
+  useEffect(() => {
+    if (token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -48,7 +60,7 @@ function Login() {
       email,
       password,
     };
-
+    console.log(body);
     // hit the login API with the data
     loginUser(body);
   };

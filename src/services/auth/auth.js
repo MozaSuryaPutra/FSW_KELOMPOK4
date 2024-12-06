@@ -14,9 +14,11 @@ export const login = async (request) => {
   );
 
   const result = await response.json();
-  if (!result?.success) {
+  console.log(result); // Debugging log
+  console.log(response);
+  if (!response.ok) {
     throw new Error(result?.message);
   }
 
-  return result?.data;
+  return result;
 };

@@ -6,6 +6,7 @@ import DataPassangers from "../data/data.json";
 import AlertDanger from "../components/payment/alertDanger";
 import BreadCrumb from "../components/payment/breadCrumbs";
 import PassangerSeat from "../components/payment/passangerSeat";
+import { useNavigate } from "@tanstack/react-router";
 import "../components/payment/payment.css";
 
 export const Route = createLazyFileRoute("/checkout-biodata")({
@@ -13,6 +14,7 @@ export const Route = createLazyFileRoute("/checkout-biodata")({
 });
 
 function Index() {
+  const navigate = useNavigate();
   return (
     <div className="row g-3 m-0">
       <div
@@ -49,6 +51,7 @@ function Index() {
             <div className="container pt-3">
               <button
                 type="button"
+                onClick={() => navigate({ to: "/payment" })}
                 class="btn btn-kirim fw-bolder"
                 style={{
                   backgroundColor: "#7126B5",
