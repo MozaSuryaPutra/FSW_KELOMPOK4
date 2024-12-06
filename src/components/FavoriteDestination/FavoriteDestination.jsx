@@ -10,7 +10,7 @@ const destinationData = {
       date: "20 - 30 Maret 2023",
       price: "IDR 950.000",
       tag: "Limited!",
-      img: "./public/bangkok.png",
+      img: "bangkok.png",
     },
     {
       title: "Jakarta -> Sydney",
@@ -18,7 +18,7 @@ const destinationData = {
       date: "5 - 25 Maret 2023",
       price: "IDR 3.650.000",
       tag: "50% OFF",
-      img: "./public/bangkok.png",
+      img: "bangkok.png",
     },
   ],
   Asia: [
@@ -28,7 +28,7 @@ const destinationData = {
       date: "20 - 30 Maret 2023",
       price: "IDR 950.000",
       tag: "Limited!",
-      img: "./public/bangkok.png",
+      img: "bangkok.png",
     },
   ],
   Australia: [
@@ -38,7 +38,7 @@ const destinationData = {
       date: "5 - 25 Maret 2023",
       price: "IDR 3.650.000",
       tag: "50% OFF",
-      img: "./public/bangkok.png",
+      img: "bangkok.png",
     },
   ],
   Amerika: [],
@@ -71,7 +71,7 @@ const FavoriteDestination = () => {
                 color: selectedCategory === region ? "#fff" : "#000",
               }}
             >
-              <img src="./public/fi_search.png" alt="" /> {region}
+              <img src="fi_search.png" alt="" /> {region}
             </Button>
           </Col>
         ))}
