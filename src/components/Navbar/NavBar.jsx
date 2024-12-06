@@ -14,12 +14,6 @@ const NavBar = () => {
     setIsLoggedIn(true);
   };
 
-  useEffect(() => {
-    if (!token) {
-      navigate({ to: "/auth/login" });
-    }
-  });
-
   return (
     <Navbar bg="white" expand="lg" className="shadow-sm">
       <Container>

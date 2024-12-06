@@ -1,5 +1,7 @@
-import React from "react";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import React, { useEffect } from "react";
+import { createLazyFileRoute, Navigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { useSelector } from "react-redux";
 import { Row, Col, Form, Button } from "react-bootstrap";
 //import TiketkuImage from "../../assets/img/BG-Tiketku.png";
 
@@ -8,6 +10,13 @@ export const Route = createLazyFileRoute("/auth/forget-pass")({
 });
 
 function ResetPassword() {
+  const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth);
+  useEffect(() => {
+    if (token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
   return (
     <div
       style={{
