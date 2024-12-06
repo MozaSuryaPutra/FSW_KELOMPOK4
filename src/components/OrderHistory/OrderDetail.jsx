@@ -56,7 +56,7 @@ const OrderDetail = ({ data }) => {
             <Row className="mb-2">
               <Col xs={1} md={1} className="p-0 align-content-center">
                 <img
-                  src="info-icon.png"
+                  src="Info-icon.png"
                   alt="logo Info"
                   className=" img-fluid w-100 align-content-center"
                 />
