@@ -9,6 +9,11 @@ import OneDatePopup from "../OneDatePopup/OneDatePopup";
 import PassengersPopup from "../PassengersPopup/PassengeresPopup";
 import ReturnPopup from "../ReturnPopup/ReturnPopup";
 import { format, parseISO } from "date-fns";
+import FromImage from "../../../public/plane.png";
+import ReturnImage from "../../../public/return.png";
+import VectorImage from "../../../public/Vector.png";
+import PenumpangImage from "../../../public/penumpang.png";
+
 import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jika diperlukan
 const SearchBox = () => {
   const [modalShow, setModalShow] = useState(false); // State untuk modal destinasi
@@ -93,7 +98,7 @@ const SearchBox = () => {
                   >
                     <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                       <img
-                        src="public/plane.png"
+                        src={FromImage}
                         alt=""
                         style={{
                           width: "16px",
@@ -127,7 +132,7 @@ const SearchBox = () => {
                   sm={12}
                   className="d-flex justify-content-center align-items-center"
                 >
-                  <img src="public/return.png" alt="" />
+                  <img src={ReturnImage} alt="" />
                 </Col>
                 <Col md={5} sm={12}>
                   <Form.Group
@@ -137,7 +142,7 @@ const SearchBox = () => {
                   >
                     <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                       <img
-                        src="public/plane.png"
+                        src={FromImage}
                         alt=""
                         style={{
                           width: "16px",
@@ -170,7 +175,7 @@ const SearchBox = () => {
                 <Col md={5} className="d-flex align-items-center ">
                   <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                     <img
-                      src="public/Vector.png"
+                      src={VectorImage}
                       alt=""
                       style={{
                         width: "16px",
@@ -280,7 +285,7 @@ const SearchBox = () => {
                 <Col md={5} className="d-flex align-items-center ">
                   <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                     <img
-                      src="public/penumpang.png"
+                      src={PenumpangImage}
                       alt=""
                       style={{
                         width: "16px",

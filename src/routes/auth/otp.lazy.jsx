@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-//import TiketkuImage from "../../assets/img/Logo-Tiketku.png";
+import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 import { OtpInput } from "reactjs-otp-input";
 export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
@@ -36,11 +36,7 @@ function OTPInputUI() {
         }}
       >
         <div style={{ textAlign: "left" }}>
-          <img
-            src="/src/Logo-Tiketku.png"
-            alt="Tiketku"
-            style={{ height: "120x" }}
-          />
+          <img src={BgTiketkuImage} alt="Tiketku" style={{ height: "120x" }} />
         </div>
       </header>
 

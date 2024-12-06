@@ -6,7 +6,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
-//import TiketkuImage from "../../assets/img/BG-Tiketku.png";
+import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 
 export const Route = createLazyFileRoute("/auth/register")({
   component: Register,
@@ -35,7 +35,7 @@ function Register() {
       <Row className="g-0 h-100">
         <Col xs={12} md={6} className="p-0">
           <img
-            src="/src/BG-Tiketku.png"
+            src={BgTiketkuImage}
             alt="Background"
             className="img-fluid w-100 h-100"
             style={{ objectFit: "cover" }}

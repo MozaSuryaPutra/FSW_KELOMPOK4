@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { Row, Col, Container, Form, Button } from "react-bootstrap";
 //import TiketkuImage from "../../assets/img/BG-Tiketku.png";
+import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 
 export const Route = createLazyFileRoute("/auth/forget-pass-req")({
   component: ResetRequest,
@@ -20,7 +21,7 @@ function ResetRequest() {
           className="d-none d-md-block"
         >
           <img
-            src="/src/BG-Tiketku.png"
+            src={BgTiketkuImage}
             alt="Tiketku"
             style={{
               maxWidth: "100%",
