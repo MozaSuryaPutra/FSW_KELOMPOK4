@@ -29,7 +29,7 @@ function PromoHeader() {
         <div
           className="col-10 d-flex rounded img-fluid "
           style={{
-            backgroundImage: "url(imgbanner.png)",
+            backgroundImage: "url(public/imgbanner.png)",
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             objectPosition: "center",
