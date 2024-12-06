@@ -3,7 +3,11 @@ import { Link } from "@tanstack/react-router";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 import { login } from "../../services/auth/auth";
+
+import BgTiketkuImage from "../../../public/BG-Tiketku.png";
+
 //import logo from "../../assets/img/BG-Tiketku.png";
 import { useDispatch } from "react-redux";
 
@@ -79,7 +83,7 @@ function Login() {
           style={{ position: "relative", overflow: "hidden" }}
         >
           <img
-            src="BG-Tiketku.png"
+            src={BgTiketkuImage}
             alt="Logo"
             style={{ height: "100vh", width: "100%", objectFit: "cover" }}
           />

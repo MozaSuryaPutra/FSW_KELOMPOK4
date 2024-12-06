@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-//import TiketkuImage from "../../assets/img/Logo-Tiketku.png";
+import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 import { OtpInput } from "reactjs-otp-input";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
@@ -44,11 +44,7 @@ function OTPInputUI() {
         }}
       >
         <div style={{ textAlign: "left" }}>
-          <img
-            src="Logo-Tiketku.png"
-            alt="Tiketku"
-            style={{ height: "120x" }}
-          />
+          <img src={BgTiketkuImage} alt="Tiketku" style={{ height: "120x" }} />
         </div>
       </header>
 
