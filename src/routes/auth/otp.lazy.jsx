@@ -37,7 +37,7 @@ function OTPInputUI() {
       >
         <div style={{ textAlign: "left" }}>
           <img
-            src="/src/Logo-Tiketku.png"
+            src="Logo-Tiketku.png"
             alt="Tiketku"
             style={{ height: "120x" }}
           />

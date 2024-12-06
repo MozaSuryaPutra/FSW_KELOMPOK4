@@ -20,7 +20,7 @@ function ResetRequest() {
           className="d-none d-md-block"
         >
           <img
-            src="/src/BG-Tiketku.png"
+            src="BG-Tiketku.png"
             alt="Tiketku"
             style={{
               maxWidth: "100%",

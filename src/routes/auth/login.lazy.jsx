@@ -3,14 +3,55 @@ import { Link } from "@tanstack/react-router";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Row, Col, Form, Button } from "react-bootstrap";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { login } from "../../services/auth/auth";
 //import logo from "../../assets/img/BG-Tiketku.png";
-
+import { useDispatch } from "react-redux";
+import { useNavigate } from "@tanstack/react-router";
+import { useSelector } from "react-redux";
+import { useMutation } from "@tanstack/react-query";
 export const Route = createLazyFileRoute("/auth/login")({
   component: Login,
 });
 
 function Login() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+
+  const { token } = useSelector((state) => state.auth);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  if (token) {
+    navigate({ to: "/" });
+  }
+
+  const { mutate: loginUser } = useMutation({
+    mutationFn: (body) => {
+      return login(body);
+    },
+    onSuccess: (data) => {
+      dispatch(setToken(data?.token));
+      dispatch(setUser(data?.user));
+
+      // redirect to home
+      navigate({ to: "/" });
+    },
+    onError: (err) => {
+      toast.error(err?.message);
+    },
+  });
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    const body = {
+      email,
+      password,
+    };
+
+    // hit the login API with the data
+    loginUser(body);
+  };
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
@@ -26,7 +67,7 @@ function Login() {
           style={{ position: "relative", overflow: "hidden" }}
         >
           <img
-            src="/src/BG-Tiketku.png"
+            src="BG-Tiketku.png"
             alt="Logo"
             style={{ height: "100vh", width: "100%", objectFit: "cover" }}
           />
@@ -36,7 +77,10 @@ function Login() {
           md={12}
           className="d-flex flex-column align-items-center justify-content-center"
         >
-          <Form style={{ width: "100%", maxWidth: "452px", padding: "20px" }}>
+          <Form
+            onSubmit={onSubmit}
+            style={{ width: "100%", maxWidth: "452px", padding: "20px" }}
+          >
             <h1
               className="mb-4"
               style={{
@@ -56,6 +100,8 @@ function Login() {
                 placeholder="Enter Email"
                 name="email"
                 style={{ borderRadius: "16px" }}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
               />
             </Form.Group>
             <Form.Group controlId="password" className="mb-3">
@@ -79,6 +125,8 @@ function Login() {
                   placeholder="Enter password"
                   name="password"
                   style={{ paddingRight: "3rem", borderRadius: "16px" }}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
                 />
                 <div
                   style={{
