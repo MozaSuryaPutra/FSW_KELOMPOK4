@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Button, Col, Container, Row, Modal, Form } from "react-bootstrap";
 import { FaArrowLeft, FaFilter, FaSearch } from "react-icons/fa";
@@ -9,16 +10,17 @@ import { DateRangePicker } from "react-date-range";
 import { addDays, differenceInMinutes } from "date-fns";
 import "react-date-range/dist/styles.css"; // CSS utama
 import "react-date-range/dist/theme/default.css"; // Tema default
-import { useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query'
 import NotFoundPict from "../../public/NotFoundHistory.png";
 import { getOrderHistoryById } from "../services/OrderHistory";
+import { useSelector } from "react-redux";
+import { useNavigate } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/orderHistory")({
   component: OrderHistory,
 });
 
-let data = [
+let historyData = [
   {
     transactionId: 1,
     status: "Issued",
@@ -172,6 +174,19 @@ function OrderHistory() {
   const isTablet = useMediaQuery({ query: "(max-width: 992px)" });
   const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
+  // let {
+  //   data: historyData,
+  //   isSuccess: historySuccess,
+  //   isPending: historyPending,
+  // } = useQuery({
+  //   queryKey: ['history'],
+  //   queryFn: () => getOrderHistoryById(),
+  // })
+
+  // useEffect(() => {
+  //   if (historySuccess) setHistory(historyData)
+  //   },[historyData,historySuccess]);
+
   const [showModal, setShowModal] = useState(false);
   const [dateRange, setDateRange] = useState([
     {
@@ -181,8 +196,10 @@ function OrderHistory() {
     },
   ]);
   const [history,setHistory] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(data[0] || null);
-  const [filteredData, setFilteredData] = useState(data);
+  const [selectedOrder, setSelectedOrder] = useState(historyData[0] || null);
+  const [filteredData, setFilteredData] = useState(historyData);
+  const navigate = useNavigate();
+  const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
 
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -192,18 +209,7 @@ function OrderHistory() {
   ]);
 
     // Fetch data using react-query
-    const {
-      data: historyData,
-      isSuccess: historySuccess,
-      isPending: historyPending,
-    } = useQuery({
-      queryKey: ['history'],
-      queryFn: () => getOrderHistoryById(),
-    })
 
-    useEffect(() => {
-      if (historySuccess) setHistory(historyData)
-      },[historyData,historySuccess]);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -214,7 +220,7 @@ function OrderHistory() {
       setRecentSearches([searchQuery, ...recentSearches].slice(0, 5));
     }
 
-    const filteredSearchData = data.filter((item) =>
+    const filteredSearchData = historyData.filter((item) =>
       item.bookingCode.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -233,6 +239,11 @@ function OrderHistory() {
   };
   
 
+  useEffect(() => {
+    if (!token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
   const handleSelect = (ranges) => {
     setDateRange([ranges.selection]);
   };
@@ -250,7 +261,7 @@ function OrderHistory() {
     const start = dateRange[0].startDate;
     const end = dateRange[0].endDate;
 
-    const filtered = data.filter((item) => {
+    const filtered = historyData.filter((item) => {
       const itemDate = new Date(item.flight.departure.date);
       return itemDate >= start && itemDate <= end;
     });
@@ -270,7 +281,7 @@ function OrderHistory() {
     return `${hours}h ${remainingMinutes}m`;
   }
 
-  data = data.map((item) => {
+  historyData = historyData.map((item) => {
     const duration = calculateDuration(
       item.flight.departure.time,
       item.flight.arrival.time
@@ -340,7 +351,7 @@ function OrderHistory() {
 
         {/* Main Content */}
         <Row className={isMobile ? "d-flex justify-content-center" : "ms-5 me-5 d-flex justify-content-center"}>
-        {data.length === 0 ? (
+        {historyData.length === 0 ? (
   // Kasus 1: Tidak ada data sama sekali
   <div className="text-center mt-5">
     <img src={NotFoundPict} alt="No Orders" className="img-fluid mb-3" />

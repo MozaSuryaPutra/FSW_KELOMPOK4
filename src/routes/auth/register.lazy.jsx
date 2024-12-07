@@ -1,11 +1,14 @@
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
+
+import { useSelector } from "react-redux";
+
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 
 export const Route = createLazyFileRoute("/auth/register")({
@@ -15,6 +18,7 @@ export const Route = createLazyFileRoute("/auth/register")({
 function Register() {
   const navigate = useNavigate();
 
+  const { token } = useSelector((state) => state.auth);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -29,6 +33,12 @@ function Register() {
       navigate({ to: "/" });
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
 
   return (
     <Container fluid className="h-100" style={{ backgroundColor: "#F8F8F8" }}>

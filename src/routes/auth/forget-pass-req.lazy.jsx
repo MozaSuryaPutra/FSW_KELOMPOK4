@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { Row, Col, Container, Form, Button } from "react-bootstrap";
+import { useSelector } from "react-redux";
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 //import TiketkuImage from "../../assets/img/BG-Tiketku.png";
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 
@@ -9,9 +12,15 @@ export const Route = createLazyFileRoute("/auth/forget-pass-req")({
 });
 
 function ResetRequest() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-
+  const { token } = useSelector((state) => state.auth);
+  useEffect(() => {
+    if (token) {
+      navigate({ to: "/" });
+    }
+  }, [token, navigate]);
   return (
     <>
       <Row style={{ overflow: "hidden", height: "100vh", width: "100vw" }}>

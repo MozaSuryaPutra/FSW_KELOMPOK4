@@ -10,6 +10,7 @@ import {
 } from "react-bootstrap";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { useNavigate } from "@tanstack/react-router";
 // Data dummy penerbangan
 const flightData = [
   {
@@ -240,6 +241,7 @@ const flightData = [
 ];
 
 function ChooseFlight() {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
   const [sortedFlights, setSortedFlights] = useState(flightData);
@@ -347,6 +349,7 @@ function ChooseFlight() {
           <Col md={3} className="d-flex justify-content-end align-items-end ">
             <Button
               variant="success"
+              onClick={() => navigate({ to: "/" })}
               className="w-100"
               style={{ backgroundColor: "rgba(115, 202, 92, 1)" }}
             >
@@ -457,7 +460,7 @@ function ChooseFlight() {
                                   style={{ gap: "1px" }}
                                 >
                                   <div style={{ fontWeight: "bold" }}>
-                                    07.00
+                                    {flight.departureTime}
                                   </div>
                                   <div>JKT</div>
                                 </Col>
@@ -490,7 +493,7 @@ function ChooseFlight() {
                                   style={{ gap: "1px" }}
                                 >
                                   <div style={{ fontWeight: "bold" }}>
-                                    07.00
+                                    {flight.arrivalTime}
                                   </div>
                                   <div>JKT</div>
                                 </Col>
@@ -510,7 +513,11 @@ function ChooseFlight() {
                         style={{ marginTop: "5%" }}
                       >
                         <strong>IDR {flight.price.toLocaleString()}</strong>
-                        <Button variant="primary" classNa>
+                        <Button
+                          onClick={() => navigate({ to: "/checkout-biodata" })}
+                          variant="primary"
+                          classNa
+                        >
                           Pilih
                         </Button>
                       </div>

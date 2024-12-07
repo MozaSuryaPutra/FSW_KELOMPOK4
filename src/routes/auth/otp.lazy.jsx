@@ -4,17 +4,25 @@ import { useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 import { OtpInput } from "reactjs-otp-input";
+import { useNavigate } from "@tanstack/react-router";
+import { useSelector } from "react-redux";
 export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
 });
 
 function OTPInputUI() {
+  const navigate = useNavigate();
+
+  const { token } = useSelector((state) => state.auth);
   const [otp, setOtp] = useState("");
   const [counter, setCounter] = useState(60);
 
   useEffect(() => {
+    if (token) {
+      navigate({ to: "/" });
+    }
     counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
-  }, [counter]);
+  }, [counter, token, navigate]);
 
   const handleChange = (otp) => setOtp(otp);
   return (
