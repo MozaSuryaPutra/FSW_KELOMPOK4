@@ -1,15 +1,18 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { Button, Col, Container, Row, Modal } from "react-bootstrap";
+import { Button, Col, Container, Row, Modal, Form } from "react-bootstrap";
 import { FaArrowLeft, FaFilter, FaSearch } from "react-icons/fa";
+import { HiX } from "react-icons/hi";
 import OrderItem from "../components/OrderHistory/OrderItem"; // Komponen Riwayat Pesanan
 import OrderDetail from "../components/OrderHistory/OrderDetail"; // Komponen Detail Pesanan
 import { useMediaQuery } from "react-responsive";
 import { DateRangePicker } from "react-date-range";
-import { addDays } from "date-fns";
+import { addDays, differenceInMinutes } from "date-fns";
 import "react-date-range/dist/styles.css"; // CSS utama
 import "react-date-range/dist/theme/default.css"; // Tema default
-import { useState } from "react";
-//import NotFoundPict from "../assets/NotFoundHistory.png";
+import { useEffect, useState } from "react";
+import { useQuery } from '@tanstack/react-query'
+import NotFoundPict from "../../public/NotFoundHistory.png";
+import { getOrderHistoryById } from "../services/OrderHistory";
 
 export const Route = createLazyFileRoute("/orderHistory")({
   component: OrderHistory,
@@ -17,192 +20,157 @@ export const Route = createLazyFileRoute("/orderHistory")({
 
 let data = [
   {
-    id: 1,
+    transactionId: 1,
     status: "Issued",
-    bookingCode: "6723y2GHK",
-    duration: "4h 0m",
-    class: "Economy",
-    departure: {
-      city: "Jakarta",
-      date: "5 Maret 2023",
-      time: "19:10",
+    bookingCode: "YXZ76382",
+    seatClass: "Economy",
+    flight: {
+      departure: {
+        city: "Medan",
+        date: "2024-11-15T14:30:00.000Z",
+        time: "2024-11-15T14:30:00.000Z",
+        airport: "Kualanamu International Airport - Terminal 1",
+      },
+      arrival: {
+        city: "Kuala Lumpur",
+        date: "2024-11-15T18:15:00.000Z",
+        time: "2024-11-15T18:15:00.000Z",
+        airport: "KLIA International Airport",
+      },
     },
-    departureAirport: "Soekarno Hatta - Terminal 1A Domestik",
-    airline: "Jet Air - Economy",
-    flightCode: "JT - 203",
-    passengers: [
-      { name: "Mr. Harry Potter", id: "1234567" },
-      { name: "Miss Hermione", id: "789658" },
-    ],
-    arrival: {
-      city: "Melbourne",
-      date: "5 Maret 2023",
-      time: "23:10",
-    },
-    arrivalAirport: "Melbourne International Airport",
+    airline: "AirAsia - Economy",
+    flightCode: "AK - 123",
+    passengers: [{ name: "Ms. Dora Aulia", id: "7895423" }],
     pricing: {
-      adults: "IDR 9,550,000",
-      baby: "IDR 0",
-      tax: "IDR 300,000",
-      total: "IDR 9,850,000",
-    },
-  },
-  {
-    id: 1,
-    status: "Issued",
-    bookingCode: "6723y2GHK",
-    duration: "4h 0m",
-    class: "Economy",
-    departure: {
-      city: "Jakarta",
-      date: "5 Maret 2023",
-      time: "19:10",
-    },
-    departureAirport: "Soekarno Hatta - Terminal 1A Domestik",
-    airline: "Jet Air - Economy",
-    flightCode: "JT - 203",
-    passengers: [
-      { name: "Mr. Harry Potter", id: "1234567" },
-      { name: "Miss Hermione", id: "789658" },
-    ],
-    arrival: {
-      city: "Melbourne",
-      date: "5 Maret 2023",
-      time: "23:10",
-    },
-    arrivalAirport: "Melbourne International Airport",
-    pricing: {
-      adults: "IDR 9,550,000",
-      baby: "IDR 0",
-      tax: "IDR 300,000",
-      total: "IDR 9,850,000",
-    },
-  },
-  {
-    id: 2,
-    status: "Unpaid",
-    bookingCode: "46TY834LJ",
-    duration: "7h 30m",
-    class: "Business",
-    departure: {
-      city: "Bali",
-      date: "12 April 2023",
-      time: "14:00",
-    },
-    departureAirport: "Ngurah Rai International Airport",
-    airline: "Garuda Indonesia - Business",
-    flightCode: "GA - 520",
-    passengers: [{ name: "Mr. John Doe", id: "987654" }],
-    arrival: {
-      city: "Singapore",
-      date: "12 April 2023",
-      time: "17:30",
-    },
-    arrivalAirport: "Changi Airport",
-    pricing: {
-      adults: "IDR 4,000,000",
-      baby: "IDR 0",
-      tax: "IDR 150,000",
-      total: "IDR 4,150,000",
-    },
-  },
-  {
-    id: 3,
-    status: "Cancelled",
-    bookingCode: "88JKH23FD",
-    duration: "1h 20m",
-    class: "First Class",
-    departure: {
-      city: "Yogyakarta",
-      date: "10 Mei 2023",
-      time: "09:30",
-    },
-    departureAirport: "Adisutjipto International Airport",
-    airline: "Lion Air - First Class",
-    flightCode: "LA - 301",
-    passengers: [{ name: "Mrs. Jane Smith", id: "11223344" }],
-    arrival: {
-      city: "Jakarta",
-      date: "10 Mei 2023",
-      time: "10:50",
-    },
-    arrivalAirport: "Soekarno Hatta - Terminal 2",
-    pricing: {
-      adults: "IDR 2,500,000",
+      adults: "IDR 1,200,000",
       baby: "IDR 0",
       tax: "IDR 100,000",
-      total: "IDR 2,600,000",
+      total: "IDR 1,300,000",
     },
   },
   {
-    id: 4,
-    status: "Issued",
-    bookingCode: "JFK8329OP",
-    duration: "5h 45m",
-    class: "Economy",
-    departure: {
-      city: "Surabaya",
-      date: "20 Juni 2023",
-      time: "08:15",
-    },
-    departureAirport: "Juanda International Airport",
-    airline: "Air Asia - Economy",
-    flightCode: "AA - 123",
-    passengers: [
-      { name: "Mr. Luke Skywalker", id: "135790" },
-      { name: "Miss Leia Organa", id: "246810" },
-    ],
-    arrival: {
-      city: "Bangkok",
-      date: "20 Juni 2023",
-      time: "14:00",
-    },
-    arrivalAirport: "Suvarnabhumi Airport",
-    pricing: {
-      adults: "IDR 3,800,000",
-      baby: "IDR 0",
-      tax: "IDR 200,000",
-      total: "IDR 4,000,000",
-    },
-  },
-  {
-    id: 5,
+    transactionId: 2,
     status: "Unpaid",
-    bookingCode: "NB1245ZX",
-    duration: "2h 15m",
-    class: "Economy",
-    departure: {
-      city: "Medan",
-      date: "1 Juli 2023",
-      time: "06:00",
+    bookingCode: "KLP85329",
+    seatClass: "Business",
+    flight: {
+      departure: {
+        city: "Denpasar",
+        date: "2024-12-21T06:45:00.000Z",
+        time: "2024-12-21T06:45:00.000Z",
+        airport: "Ngurah Rai International Airport - Terminal 2",
+      },
+      arrival: {
+        city: "Seoul",
+        date: "2024-12-21T14:45:00.000Z",
+        time: "2024-12-21T14:45:00.000Z",
+        airport: "Incheon International Airport",
+      },
     },
-    departureAirport: "Kualanamu International Airport",
-    airline: "Sriwijaya Air - Economy",
-    flightCode: "SJ - 789",
-    passengers: [
-      { name: "Mr. Tony Stark", id: "101112" },
-      { name: "Miss Pepper Potts", id: "131415" },
-    ],
-    arrival: {
-      city: "Jakarta",
-      date: "1 Juli 2023",
-      time: "08:15",
-    },
-    arrivalAirport: "Soekarno Hatta - Terminal 1C",
+    airline: "Korean Air - Business",
+    flightCode: "KE - 456",
+    passengers: [{ name: "Mr. John Doe", id: "1478523" }],
     pricing: {
-      adults: "IDR 1,500,000",
+      adults: "IDR 8,500,000",
       baby: "IDR 0",
-      tax: "IDR 50,000",
-      total: "IDR 1,550,000",
+      tax: "IDR 500,000",
+      total: "IDR 9,000,000",
+    },
+  },
+  {
+    transactionId: 3,
+    status: "Issued",
+    bookingCode: "LOP52934",
+    seatClass: "First Class",
+    flight: {
+      departure: {
+        city: "Surabaya",
+        date: "2024-10-05T20:00:00.000Z",
+        time: "2024-10-05T20:00:00.000Z",
+        airport: "Juanda International Airport",
+      },
+      arrival: {
+        city: "Hong Kong",
+        date: "2024-10-06T01:30:00.000Z",
+        time: "2024-10-06T01:30:00.000Z",
+        airport: "Hong Kong International Airport",
+      },
+    },
+    airline: "Cathay Pacific - First Class",
+    flightCode: "CX - 789",
+    passengers: [{ name: "Mr. Steve Lee", id: "6543217" }],
+    pricing: {
+      adults: "IDR 15,000,000",
+      baby: "IDR 0",
+      tax: "IDR 1,200,000",
+      total: "IDR 16,200,000",
+    },
+  },
+  {
+    transactionId: 4,
+    status: "Unpaid",
+    bookingCode: "MBT73952",
+    seatClass: "Economy",
+    flight: {
+      departure: {
+        city: "Bandung",
+        date: "2024-09-18T08:00:00.000Z",
+        time: "2024-09-18T08:00:00.000Z",
+        airport: "Husein Sastranegara Airport",
+      },
+      arrival: {
+        city: "Amsterdam",
+        date: "2024-09-18T20:10:00.000Z",
+        time: "2024-09-18T20:10:00.000Z",
+        airport: "Schiphol International Airport",
+      },
+    },
+    airline: "KLM Airlines - Economy",
+    flightCode: "KL - 234",
+    passengers: [{ name: "Ms. Angela Parker", id: "8527413" }],
+    pricing: {
+      adults: "IDR 11,200,000",
+      baby: "IDR 0",
+      tax: "IDR 700,000",
+      total: "IDR 11,900,000",
+    },
+  },
+  {
+    transactionId: 5,
+    status: "Issued",
+    bookingCode: "GTR85472",
+    seatClass: "Economy",
+    flight: {
+      departure: {
+        city: "Makassar",
+        date: "2024-08-12T02:15:00.000Z",
+        time: "2024-08-12T02:15:00.000Z",
+        airport: "Sultan Hasanuddin International Airport",
+      },
+      arrival: {
+        city: "Tokyo",
+        date: "2024-08-12T10:00:00.000Z",
+        time: "2024-08-12T10:00:00.000Z",
+        airport: "Narita International Airport",
+      },
+    },
+    airline: "Japan Airlines - Economy",
+    flightCode: "JL - 512",
+    passengers: [{ name: "Mr. Peter Quill", id: "9632147" }],
+    pricing: {
+      adults: "IDR 13,000,000",
+      baby: "IDR 0",
+      tax: "IDR 600,000",
+      total: "IDR 13,600,000",
     },
   },
 ];
 
-// data =[];
+// data = [];
 
 function OrderHistory() {
   const isTablet = useMediaQuery({ query: "(max-width: 992px)" });
-  const isMobile = useMediaQuery({ query: "(max-width: 768px)" }); // Deteksi tablet
+  const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
   const [showModal, setShowModal] = useState(false);
   const [dateRange, setDateRange] = useState([
@@ -212,35 +180,110 @@ function OrderHistory() {
       key: "selection",
     },
   ]);
-  const [selectedOrder, setSelectedOrder] = useState(data[0] || null); // Default ke item pertama atau null jika data kosong
+  const [history,setHistory] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(data[0] || null);
+  const [filteredData, setFilteredData] = useState(data);
 
-  const [filteredData, setFilteredData] = useState(data); // State untuk data yang difilter
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [recentSearches, setRecentSearches] = useState([
+    "1234ABC",
+    "7UY71912",
+  ]);
+
+    // Fetch data using react-query
+    const {
+      data: historyData,
+      isSuccess: historySuccess,
+      isPending: historyPending,
+    } = useQuery({
+      queryKey: ['history'],
+      queryFn: () => getOrderHistoryById(),
+    })
+
+    useEffect(() => {
+      if (historySuccess) setHistory(historyData)
+      },[historyData,historySuccess]);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    if (searchQuery && !recentSearches.includes(searchQuery)) {
+      setRecentSearches([searchQuery, ...recentSearches].slice(0, 5));
+    }
+
+    const filteredSearchData = data.filter((item) =>
+      item.bookingCode.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    setFilteredData(filteredSearchData);
+    setShowSearchModal(false);
+  };
+
+  const handleRemoveSearch = (search) => {
+    setRecentSearches(recentSearches.filter((item) => item !== search));
+  };
+
+  const handleRemoveAllSearch = () => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus semua pencarian?")) {
+      setRecentSearches([]);
+    }
+  };
+  
 
   const handleSelect = (ranges) => {
     setDateRange([ranges.selection]);
   };
 
   const handleSelectOrder = (order) => {
-    setSelectedOrder(order); // Perbarui state dengan order yang dipilih
+    setSelectedOrder(order);
   };
 
-  // Fungsi untuk memfilter data berdasarkan rentang tanggal
+  const handleCloseModal = () => {
+    setShowSearchModal(false);
+    setSearchQuery("");
+  };
+
   const handleFilter = () => {
     const start = dateRange[0].startDate;
     const end = dateRange[0].endDate;
 
     const filtered = data.filter((item) => {
-      const itemDate = new Date(item.departure.date);
+      const itemDate = new Date(item.flight.departure.date);
       return itemDate >= start && itemDate <= end;
     });
 
-    setFilteredData(filtered); // Update state dengan data yang telah difilter
-    setShowModal(false); // Tutup modal setelah filter diterapkan
+    setFilteredData(filtered);
+    setShowModal(false);
   };
+
+  function calculateDuration(departureTime, arrivalTime) {
+    const minutes = differenceInMinutes(
+      new Date(arrivalTime),
+      new Date(departureTime)
+    );
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    return `${hours}h ${remainingMinutes}m`;
+  }
+
+  data = data.map((item) => {
+    const duration = calculateDuration(
+      item.flight.departure.time,
+      item.flight.arrival.time
+    );
+    return {
+      ...item,
+      duration,
+    };
+  });
 
   return (
     <Container className="mt-3">
-      <Container className="">
+      <Container>
         {/* Header */}
         <Row className="align-items-center mb-3">
           <Col xs={12}>
@@ -265,12 +308,7 @@ function OrderHistory() {
               </div>
             </Button>
           </Col>
-          <Col
-            xs={4}
-            sm={3}
-            md={isTablet ? "2" : "1"}
-            className=" d-flex justify-content-center ps-0 pe-0"
-          >
+          <Col xs={4} sm={3} md={isTablet ? "2" : "1"} className=" d-flex justify-content-center ps-0 pe-0">
             <Button
               variant="outline-secondary"
               className="p-2 ps-3 pe-3"
@@ -279,13 +317,13 @@ function OrderHistory() {
                 display: "flex",
                 alignItems: "center",
               }}
-              onClick={() => setShowModal(true)} // Menampilkan modal filter
+              onClick={() => setShowModal(true)}
             >
               <FaFilter />
               Filter
             </Button>
           </Col>
-          <Col xs={1} md={1} className=" d-flex justify-content-center">
+          <Col xs={1} md={1} className="d-flex justify-content-center">
             <Button
               className="p-1"
               style={{
@@ -293,65 +331,59 @@ function OrderHistory() {
                 backgroundColor: "#fff",
                 border: "none",
               }}
+              onClick={() => setShowSearchModal(true)}
             >
-              <FaSearch className=" fs-3" style={{ color: "#9b59b6" }} />
+              <FaSearch className="fs-3" style={{ color: "#9b59b6" }} />
             </Button>
           </Col>
         </Row>
 
         {/* Main Content */}
-        <Row
-          className={
-            isMobile
-              ? "d-flex justify-content-center"
-              : "ms-5 me-5 d-flex justify-content-center"
-          }
-        >
-          {filteredData.length === 0 ? (
-            // Jika data kosong
-            <div className="text-center mt-5">
-              <img
-                src="NotFoundHistory.png"
-                alt="No Orders"
-                className="img-fluid mb-3"
-              />
-              <h5 style={{ color: "#673AB7", fontWeight: "bold" }}>
-                Oops! Riwayat pemesanan kosong!
-              </h5>
-              <p>Anda belum memiliki riwayat pemesanan.</p>
-              <Button
-                style={{
-                  backgroundColor: "#673AB7",
-                  color: "#fff",
-                  borderRadius: "10px",
-                  padding: "10px 20px",
-                  border: "none",
-                }}
-              >
-                Cari Penerbangan
-              </Button>
-            </div>
-          ) : (
-            <>
-              {/* Order Items */}
-              <Col xs={12} md={isTablet ? "12" : "7"}>
-                <OrderItem
-                  data={filteredData}
-                  onSelectOrder={handleSelectOrder}
-                />
-              </Col>
+        <Row className={isMobile ? "d-flex justify-content-center" : "ms-5 me-5 d-flex justify-content-center"}>
+        {data.length === 0 ? (
+  // Kasus 1: Tidak ada data sama sekali
+  <div className="text-center mt-5">
+    <img src={NotFoundPict} alt="No Orders" className="img-fluid mb-3" />
+    <h5 style={{ color: "#673AB7", fontWeight: "bold" }}>
+      Oops! Riwayat pemesanan kosong!
+    </h5>
+    <p>Anda belum memiliki riwayat pemesanan.</p>
+    <Button
+      style={{
+        backgroundColor: "#673AB7",
+        color: "#fff",
+        borderRadius: "10px",
+        padding: "10px 20px",
+        border: "none",
+      }}
+    >
+      Cari Penerbangan
+    </Button>
+  </div>
+) : filteredData.length === 0 ? (
+  // Kasus 2: Data ada, tetapi hasil filter kosong
+  <div className="text-center mt-5">
+    <h5 style={{ color: "#FF5722", fontWeight: "bold" }}>
+      Pesanan tidak ditemukan!
+    </h5>
+    <p>Pesanan dengan kriteria yang Anda cari tidak tersedia.</p>
+  </div>
+) : (
+  // Kasus 3: Data hasil filter ditemukan
+  <>
+    <Col xs={12} md={isTablet ? "12" : "7"}>
+      <OrderItem data={filteredData} onSelectOrder={handleSelectOrder} />
+    </Col>
+    <Col xs={12} md={isTablet ? "12" : "5"}>
+      {selectedOrder ? (
+        <OrderDetail data={[selectedOrder]} />
+      ) : (
+        <p className="text-center">Klik pesanan untuk melihat detail.</p>
+      )}
+    </Col>
+  </>
+)}
 
-              <Col xs={12} md={isTablet ? "12" : "5"}>
-                {selectedOrder ? (
-                  <OrderDetail data={[selectedOrder]} />
-                ) : (
-                  <p className="text-center">
-                    Klik pesanan untuk melihat detail.
-                  </p>
-                )}
-              </Col>
-            </>
-          )}
         </Row>
 
         {/* Modal untuk memilih tanggal */}
@@ -364,12 +396,58 @@ function OrderHistory() {
               ranges={dateRange}
               onChange={handleSelect}
               moveRangeOnFirstSelection={false}
-              rangeColors={["#9b59b6"]} // Warna highlight
+              rangeColors={["#9b59b6"]}
             />
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={handleFilter}>
               Terapkan Filter
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
+        {/* Modal Pencarian */}
+        <Modal show={showSearchModal} onHide={handleCloseModal} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Masukkan Nomor Penerbangan</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Control
+              type="text"
+              placeholder="Masukkan Nomor Penerbangan"
+              value={searchQuery}
+              onChange={handleSearchChange}
+            />
+            <div className="mt-3">
+              <div className=" d-flex justify-content-between">
+              <h6 className="mb-4">Pencarian Terkini</h6>
+              <p
+      style={{ color:"#FF0000",cursor: "pointer" }}
+      onClick={handleRemoveAllSearch}
+    >
+      Hapus
+    </p>
+              </div>
+              <ul className="p-0">
+                {recentSearches.map((search, index) => (
+                  <li
+                    key={index}
+                    className="d-flex justify-content-between align-items-center border-bottom"
+                  >
+                    <p className="mb-2">{search}</p>
+                    <HiX
+                      className="text-secondary"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleRemoveSearch(search)}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={handleSearchSubmit}>
+              Cari
             </Button>
           </Modal.Footer>
         </Modal>

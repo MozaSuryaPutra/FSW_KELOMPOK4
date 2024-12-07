@@ -1,8 +1,18 @@
 import PropTypes from "prop-types";
 import { Card, Row, Col, Button } from "react-bootstrap";
-//import logoIcon from "../../assets/info-icon.png";
+import logoIcon from "../../../public/info-icon.png"
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 const OrderDetail = ({ data }) => {
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
+  };
+
+  const formatTime = (dateString) => {
+    return format(new Date(dateString), "HH:mm"); // Contoh hasil: "06:00"
+  };
+  
   return (
     <div>
       {data.map((order) => (
@@ -43,23 +53,19 @@ const OrderDetail = ({ data }) => {
             <Row className="mb-2">
               <Col>
                 <div className="mb-0 d-flex justify-content-between">
-                  <strong className="mb-0">{order.departure.time}</strong>
+                  <strong className="mb-0">{formatTime(order.flight.departure.time)}</strong>
                   <p className="mb-0" style={{ color: "#A06ECE" }}>
                     Keberangkatan
                   </p>
                 </div>
-                <p className="mb-0">{order.departure.date}</p>
-                <p>{order.departureAirport}</p>
+                <p className="mb-0">{formatDate(order.flight.departure.date)}</p>
+                <p>{order.flight.departure.airport}</p>
               </Col>
             </Row>
             <hr />
             <Row className="mb-2">
               <Col xs={1} md={1} className="p-0 align-content-center">
-                <img
-                  src="Info-icon.png"
-                  alt="logo Info"
-                  className=" img-fluid w-100 align-content-center"
-                />
+              <img src={logoIcon} alt="logo Info" className=" img-fluid w-100 align-content-center" />
               </Col>
               <Col>
                 <p>
@@ -84,13 +90,13 @@ const OrderDetail = ({ data }) => {
             <Row className="mb-2">
               <Col>
                 <div className="mb-0 d-flex justify-content-between">
-                  <strong className="mb-0">{order.arrival.time}</strong>
+                  <strong className="mb-0">{formatTime(order.flight.arrival.time)}</strong>
                   <p className="mb-0" style={{ color: "#A06ECE" }}>
                     Kedatangan
                   </p>
                 </div>
-                <p className="mb-0">{order.arrival.date}</p>
-                <p>{order.arrivalAirport}</p>
+                <p className="mb-0">{formatDate(order.flight.arrival.date)}</p>
+                <p>{order.flight.arrival.airport}</p>
               </Col>
             </Row>
             <hr />
@@ -99,20 +105,20 @@ const OrderDetail = ({ data }) => {
                 <p>
                   <strong>Rincian Harga</strong>
                 </p>
-                <div className="d-flex justify-content-between mb-0">
-                  <p>2 Adults </p>
-                  <p>{order.pricing.adults}</p>
+                <div className="d-flex justify-content-between">
+                  <p className="m-0">2 Adults </p>
+                  <p className="m-0">{order.pricing.adults}</p>
                 </div>
-                <div className="d-flex justify-content-between mb-0">
-                  <p>1 baby </p>
-                  <p>{order.pricing.baby}</p>
+                <div className="d-flex justify-content-between">
+                  <p className="m-0">1 baby </p>
+                  <p className="m-0">{order.pricing.baby}</p>
                 </div>
-                <div className="d-flex justify-content-between mb-0">
-                  <p>Tax </p>
-                  <p>{order.pricing.tax}</p>
+                <div className="d-flex justify-content-between">
+                  <p className="m-0">Tax </p>
+                  <p className="m-0">{order.pricing.tax}</p>
                 </div>
                 <hr />
-                <div className="d-flex justify-content-between mb-0">
+                <div className="d-flex justify-content-between">
                   <strong>Total</strong>
                   <strong style={{ color: "#9b59b6", fontSize: "20px" }}>
                     {order.pricing.total}

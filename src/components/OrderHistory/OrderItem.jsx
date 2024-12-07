@@ -1,22 +1,23 @@
 import { useState, useEffect, memo } from "react";
 import PropTypes from "prop-types";
 import { Card, Badge, Row, Col } from "react-bootstrap";
-//import Arrow from "../../assets/Arrow.png";
-//import LocationMark from "../../assets/location-icon.png";
+import Arrow from "../../../public/Arrow.png";
+import LocationMark from "../../../public/location-icon.png";
 import { useMediaQuery } from "react-responsive";
+import { format, parse } from "date-fns";
+import { id } from "date-fns/locale";
 
 const OrderItem = ({ data, onSelectOrder }) => {
   const [displayedData, setDisplayedData] = useState(data);
-  const isMiniMobile = useMediaQuery({ query: "(max-width: 484px)" }); // Deteksi tablet
+  const isMiniMobile = useMediaQuery({ query: "(max-width: 508px)" }); // Deteksi tablet
 
-  // Grup data berdasarkan bulan dan tahun
   const groupByMonthYear = (bookings) => {
     return bookings.reduce((acc, booking) => {
-      const departureDate = booking.departure?.date;
+      const departureDate = booking.flight.departure?.date;
       if (!departureDate) return acc;
 
-      const [day, month, year] = departureDate.split(" ");
-      const groupKey = `${month} ${year}`;
+      // Format bulan dan tahun dengan date-fns
+      const groupKey = format(new Date(departureDate), "MMMM yyyy", { locale: id }); // Contoh hasil: "Desember 2024"
 
       if (!acc[groupKey]) acc[groupKey] = [];
       acc[groupKey].push(booking);
@@ -25,6 +26,14 @@ const OrderItem = ({ data, onSelectOrder }) => {
     }, {});
   };
 
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
+  };
+
+  const formatTime = (dateString) => {
+    return format(new Date(dateString), "HH:mm"); // Contoh hasil: "06:00"
+  };
+  
   const getBadgeClass = (status) => {
     switch (status) {
       case "Issued":
@@ -38,13 +47,21 @@ const OrderItem = ({ data, onSelectOrder }) => {
 
   const groupedBookings = groupByMonthYear(displayedData);
 
+  // Menyortir berdasarkan urutan bulan dan tahun
+  const sortedGroupedBookings = Object.entries(groupedBookings)
+    .sort((a, b) => {
+      const dateA = parse(a[0], "MMMM yyyy", new Date(), { locale: id });
+      const dateB = parse(b[0], "MMMM yyyy", new Date(), { locale: id });
+      return dateA - dateB;
+    });
+
   useEffect(() => {
     setDisplayedData(data);
   }, [data]);
 
   return (
     <div style={{ margin: "0 auto", maxWidth: "100%" }}>
-      {Object.entries(groupedBookings).map(([monthYear, bookings], index) => (
+      {sortedGroupedBookings.map(([monthYear, bookings], index) => (
         <div key={index} style={{ marginBottom: "20px" }}>
           <h5 className="text-primary fw-bold mt-3 fs-5">{monthYear}</h5>
 
@@ -81,10 +98,10 @@ const OrderItem = ({ data, onSelectOrder }) => {
                 <Row className="align-items-center">
                   <Col xs={1} className="text-center p-1 mb-4">
                     <img
-                      src="location-icon.png"
+                      src={LocationMark}
                       alt="Location-icons"
                       className="img-fluid w-75"
-                    />{" "}
+                    />
                   </Col>
                   <Col xs={isMiniMobile ? 4 : 3}>
                     <div>
@@ -92,25 +109,22 @@ const OrderItem = ({ data, onSelectOrder }) => {
                         className="fw-bold mb-1"
                         style={{ fontSize: isMiniMobile ? "11px" : "15px" }}
                       >
-                        {booking.departure?.city}
+                        {booking.flight.departure?.city}
                       </p>
-                      <p className="mb-1">{booking.departure?.date}</p>
-                      <p className="mb-0 ">{booking.departure?.time}</p>
+                      <p className="mb-1">{formatDate(booking.flight.departure?.date)}</p>
+                      <p className="mb-0 ">{formatTime(booking.flight.departure?.time)}</p>
                     </div>
                   </Col>
-                  <Col
-                    xs={isMiniMobile ? 2 : 4}
-                    className={isMiniMobile ? "text-center p-0" : "text-center"}
-                  >
+                  <Col xs={isMiniMobile ? 2 : 4} className={isMiniMobile ? "text-center p-0" : "text-center"}>
                     <div>{booking.duration}</div>
-                    <img src="Arrow.png" alt="Arrow" className="img-fluid" />
+                    <img src={Arrow} alt="Arrow" className="img-fluid" />
                   </Col>
                   <Col xs={1} className="text-center p-1 mb-4">
                     <img
-                      src="location-icon.png"
+                      src={LocationMark}
                       alt="Location-icons"
                       className="img-fluid w-75"
-                    />{" "}
+                    />
                   </Col>
                   <Col xs={isMiniMobile ? 4 : 3}>
                     <div>
@@ -118,10 +132,10 @@ const OrderItem = ({ data, onSelectOrder }) => {
                         className="fw-bold mb-1"
                         style={{ fontSize: isMiniMobile ? "11px" : "15px" }}
                       >
-                        {booking.arrival?.city}
+                        {booking.flight.arrival?.city}
                       </p>
-                      <p className="mb-1">{booking.arrival?.date}</p>
-                      <p className="mb-0">{booking.arrival?.time}</p>
+                      <p className="mb-1">{formatDate(booking.flight.arrival?.date)}</p>
+                      <p className="mb-0">{formatTime(booking.flight.arrival?.time)}</p>
                     </div>
                   </Col>
                 </Row>
@@ -135,7 +149,7 @@ const OrderItem = ({ data, onSelectOrder }) => {
                   </Col>
                   <Col>
                     <p className="fw-bold mb-1 ">Class:</p>
-                    <p>{booking.class}</p>
+                    <p>{booking.seatClass}</p>
                   </Col>
                   <Col className="text-end">
                     <h6 className="text-primary fw-bold">
@@ -156,19 +170,21 @@ OrderItem.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       status: PropTypes.string.isRequired,
-      departure: PropTypes.shape({
-        city: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        time: PropTypes.string.isRequired,
-      }).isRequired,
-      arrival: PropTypes.shape({
-        city: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        time: PropTypes.string.isRequired,
-      }).isRequired,
+      flight: PropTypes.shape({
+        departure: PropTypes.shape({
+          city: PropTypes.string.isRequired,
+          date: PropTypes.string.isRequired,
+          time: PropTypes.string.isRequired,
+        }).isRequired,
+        arrival: PropTypes.shape({
+          city: PropTypes.string.isRequired,
+          date: PropTypes.string.isRequired,
+          time: PropTypes.string.isRequired,
+        }).isRequired,
+      }).isRequired, 
       duration: PropTypes.string.isRequired,
       bookingCode: PropTypes.string.isRequired,
-      class: PropTypes.string.isRequired,
+      seatClass: PropTypes.string.isRequired,
       pricing: PropTypes.shape({
         total: PropTypes.string.isRequired,
       }).isRequired,
