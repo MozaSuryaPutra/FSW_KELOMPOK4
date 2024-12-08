@@ -10,35 +10,6 @@ export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
 });
 
-  return (
-    <div className="otp-container">
-      <h1>Verify Your OTP</h1>
-      <p>Enter the OTP sent to your registered email address.</p>
-      
-      {/* Input OTP */}
-      <input
-        type="text"
-        placeholder="Enter OTP"
-        value={otp}
-        onChange={handleInputChange}
-        className="otp-input"
-      />
-
-      {/* Tombol Submit */}
-      <button onClick={handleOtpVerification} className="otp-button" disabled={isLoading}>
-        {isLoading ? 'Verifying...' : 'Verify'}
-      </button>
-
-      {/* Pesan Error */}
-      {error && <p className="error-message">{error}</p>}
-
-      {/* Pesan Sukses */}
-      {message && <p className="success-message">{message}</p>}
-    </div>
-  );
-};
-
-
 function OTPInputUI() {
   const navigate = useNavigate();
 
