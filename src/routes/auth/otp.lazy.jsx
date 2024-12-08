@@ -10,21 +10,70 @@ export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
 });
 
+  return (
+    <div className="otp-container">
+      <h1>Verify Your OTP</h1>
+      <p>Enter the OTP sent to your registered email address.</p>
+      
+      {/* Input OTP */}
+      <input
+        type="text"
+        placeholder="Enter OTP"
+        value={otp}
+        onChange={handleInputChange}
+        className="otp-input"
+      />
+
+      {/* Tombol Submit */}
+      <button onClick={handleOtpVerification} className="otp-button" disabled={isLoading}>
+        {isLoading ? 'Verifying...' : 'Verify'}
+      </button>
+
+      {/* Pesan Error */}
+      {error && <p className="error-message">{error}</p>}
+
+      {/* Pesan Sukses */}
+      {message && <p className="success-message">{message}</p>}
+    </div>
+  );
+};
+
+
 function OTPInputUI() {
   const navigate = useNavigate();
 
   const { token } = useSelector((state) => state.auth);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState('');
+  const [userId, setUserId] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [counter, setCounter] = useState(60);
 
-  useEffect(() => {
-    if (token) {
-      navigate({ to: "/" });
-    }
-    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
-  }, [counter, token, navigate]);
+  const handleInputChange = (e) => {
+    setOtp(e.target.value);
+    setError('');
+  };
 
-  const handleChange = (otp) => setOtp(otp);
+  const handleOtpVerification = async () => {
+    if (!otp || !userId) {
+      setError('OTP and User ID are required');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.post('/auth/verify-otp', { userId, otp }); //???
+      setMessage(response.data.message);
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong');
+      setMessage('');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div
       style={{
@@ -50,8 +99,8 @@ function OTPInputUI() {
 
       <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>Masukkan OTP</h1>
       <p style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
-        Ketik 6 digit kode yang dikirimkan ke <b>J*****@gmail.com</b>
-      </p>
+        Ketik 6 digit kode yang dikirimkan ke <b>J*****@gmail.com</b> 
+      </p> 
 
       <div
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}

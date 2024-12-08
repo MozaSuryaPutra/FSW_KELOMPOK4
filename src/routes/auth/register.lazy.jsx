@@ -1,44 +1,52 @@
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Container from "react-bootstrap/Container";
-
-import { useSelector } from "react-redux";
-
+import React, { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
+import { setUser } from "../../redux/slices/auth";
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
-
-export const Route = createLazyFileRoute("/auth/register")({
-  component: Register,
-});
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { register } from "../../services/auth/auth";
 
 function Register() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const { token } = useSelector((state) => state.auth);
+  //Register Form Data
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const { mutate: registerUser } = useMutation({
+    mutationFn: (body) => register(body),
+    onSuccess: (data) => {
+      toast.success("Registration successful! Please log in.");
+      dispatch(setUser(data.user));
+      navigate({ to: "/login" });
+    },
+    onError: (err) => {
+      console.error("Registration error:", err);
+      toast.error(err.message || "Failed to register. Please try again.");
+    },
+  });
 
   const onSubmit = (event) => {
     event.preventDefault();
-
-    const isSuccess = true;
-
-    if (isSuccess) {
-      navigate({ to: "/" });
-    }
+    const body = {
+      name,
+      email,
+      phoneNumber,
+      password,
+    };
+    registerUser(body);
   };
-
-  useEffect(() => {
-    if (token) {
-      navigate({ to: "/" });
-    }
-  }, [token, navigate]);
 
   return (
     <Container fluid className="h-100" style={{ backgroundColor: "#F8F8F8" }}>
@@ -65,8 +73,8 @@ function Register() {
               Daftar
             </h3>
             <Form onSubmit={onSubmit}>
-              <Form.Group className="mb-3" controlId="formName">
-                <Form.Label style={{ fontWeight: "500" }}>Nama</Form.Label>
+              <Form.Group className="mb-3" controlId="name">
+                <Form.Label>Nama</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Nama Lengkap"
@@ -76,8 +84,8 @@ function Register() {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formEmail">
-                <Form.Label style={{ fontWeight: "500" }}>Email</Form.Label>
+              <Form.Group className="mb-3" controlId="email">
+                <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
                   placeholder="Contoh: johndoe@gmail.com"
@@ -87,10 +95,8 @@ function Register() {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formPhoneNumber">
-                <Form.Label style={{ fontWeight: "500" }}>
-                  Nomor Telepon
-                </Form.Label>
+              <Form.Group className="mb-3" controlId="phoneNumber">
+                <Form.Label>Nomor Telepon</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="+62"
@@ -100,17 +106,24 @@ function Register() {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formPassword">
-                <Form.Label style={{ fontWeight: "500" }}>
-                  Buat Password
-                </Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Buat Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ borderRadius: "12px" }}
-                />
+              <Form.Group className="mb-3" controlId="password">
+                <Form.Label>Buat Password</Form.Label>
+                <div className="d-flex align-items-center">
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Buat Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ borderRadius: "12px" }}
+                  />
+                  <Button
+                    variant="link"
+                    onClick={togglePassword}
+                    style={{ textDecoration: "none" }}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </Button>
+                </div>
               </Form.Group>
 
               <Button
@@ -138,5 +151,3 @@ function Register() {
     </Container>
   );
 }
-
-export default Register;
