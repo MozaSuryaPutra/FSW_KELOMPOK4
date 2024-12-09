@@ -9,22 +9,33 @@ import {
   Col,
   InputGroup,
 } from "react-bootstrap";
+import { useQuery } from "@tanstack/react-query";
+import { getCities } from "../../services/homepage/homepage";
+import { useEffect } from "react";
 import { FaSearch } from "react-icons/fa"; // Import icon search dari react-icons
 
 const DestinationPopup = ({ show, handleClose, onSelectCity }) => {
   const [searchText, setSearchText] = useState("");
-  const [recentSearches, setRecentSearches] = useState([
-    "Jakarta",
-    "Bandung",
-    "Surabaya",
-  ]);
+  const [recentSearches, setRecentSearches] = useState([]);
 
   // Daftar kota untuk pencarian
-  const cities = ["Jakarta", "Bandung", "Surabaya", "Bali", "Yogyakarta"];
+  const [cities, setCities] = useState([]);
 
+  const { data, isSuccess, isPending } = useQuery({
+    queryKey: ["cities"],
+    queryFn: () => getCities(),
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      setCities(data);
+    }
+  }, [data, isSuccess]);
+  console.log(data);
+  console.log(cities);
   // Filter daftar kota berdasarkan input pencarian
   const filteredCities = cities.filter((city) =>
-    city.toLowerCase().includes(searchText.toLowerCase())
+    city.name.toLowerCase().includes(searchText.toLowerCase())
   );
 
   const handleSearchChange = (event) => {
@@ -34,20 +45,22 @@ const DestinationPopup = ({ show, handleClose, onSelectCity }) => {
   const handleCitySelect = (city) => {
     onSelectCity(city); // Kirim kota yang dipilih ke komponen utama
     setRecentSearches((prevSearches) => {
-      if (!prevSearches.includes(city)) {
-        return [city, ...prevSearches]; // Tambahkan kota ke pencarian terbaru
+      // Tambahkan kota jika belum ada dalam riwayat
+      if (!prevSearches.includes(city.name)) {
+        return [city.name, ...prevSearches];
       }
       return prevSearches;
     });
     handleClose(); // Tutup modal setelah memilih kota
   };
-
   const handleClearSearches = () => {
     setRecentSearches([]);
   };
 
-  const handleDeleteSearch = (city) => {
-    setRecentSearches(recentSearches.filter((item) => item !== city));
+  const handleDeleteSearch = (cityName) => {
+    setRecentSearches((prevSearches) =>
+      prevSearches.filter((item) => item !== cityName)
+    );
   };
 
   return (
@@ -96,18 +109,18 @@ const DestinationPopup = ({ show, handleClose, onSelectCity }) => {
         </Row>
 
         <ListGroup className="mb-3 list-group-flush">
-          {recentSearches.map((city, index) => (
+          {recentSearches.map((cityName, index) => (
             <ListGroup.Item
               key={index}
               className="d-flex justify-content-between align-items-center text-start"
-              onClick={() => handleCitySelect(city)}
+              onClick={() => setSearchText(cityName)} // Set pencarian jika riwayat dipilih
               style={{ cursor: "pointer" }}
             >
-              {city}
+              {cityName}
               <CloseButton
                 onClick={(e) => {
                   e.stopPropagation(); // Hindari trigger saat mengklik tombol delete
-                  handleDeleteSearch(city);
+                  handleDeleteSearch(cityName);
                 }}
                 className="text-danger"
               />
@@ -125,7 +138,7 @@ const DestinationPopup = ({ show, handleClose, onSelectCity }) => {
               onClick={() => handleCitySelect(city)}
               style={{ cursor: "pointer" }}
             >
-              {city}
+              {city.name}
             </ListGroup.Item>
           ))}
         </ListGroup>
