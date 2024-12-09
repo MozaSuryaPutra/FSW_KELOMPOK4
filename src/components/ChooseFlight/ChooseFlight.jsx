@@ -278,12 +278,14 @@ function ChooseFlight() {
     passengersAmount,
     isReturnEnabled,
   };
+
   const {
     data: flightsData,
     isSuccess,
     isLoading,
     error,
   } = useQuery({
+
     queryKey: [
       "flight",
       selectedDepartureCity,
@@ -335,6 +337,7 @@ function ChooseFlight() {
     },
   });
   console.log({ selectedPassengers });
+
   console.log("isi dari : ", isReturnEnabled);
   useEffect(() => {
     if (isSuccess && flightsData) {
@@ -343,6 +346,7 @@ function ChooseFlight() {
       console.error("Error fetching flight data:", error);
     }
   }, [flightsData, isSuccess, error]);
+
 
   if (isLoading) {
     return <p>Loading flights...</p>;
@@ -360,7 +364,9 @@ function ChooseFlight() {
       flightIds: JSON.stringify({
         // Mengonversi flightIds menjadi JSON string
         departure: flightId, // Menggunakan flightId yang dipilih untuk departure
+
         return: 0,
+
       }),
     };
 
@@ -369,6 +375,7 @@ function ChooseFlight() {
 
     // Mengirim data ke API
     chooseCheckouts(body);
+
   };
 
   const chooseReturn = async (event, flightId) => {
@@ -388,7 +395,71 @@ function ChooseFlight() {
         passengersAmount,
       },
     });
+
   };
+  // if (!flightList?.departureFlights?.length) {
+  //   return <p>No flights found.</p>;
+  // }
+
+  //console.log(flightList.departureFlights.map((flight) => flight.id));
+  // Mappingnya gini
+  // Function untuk mengonversi durasi ke menit
+  // const durationToMinutes = (duration) => {
+  //   const [hours, minutes] = duration
+  //     .split(" ")[0]
+  //     .split("jam")
+  //     .map((time) => parseInt(time) || 0);
+  //   return hours * 60 + minutes;
+  // };
+
+  // Sorting logic
+  // const handleSortChange = (sortType) => {
+  //   let sortedData = [...flightData];
+  //   switch (sortType) {
+  //     case "Harga - Termurah":
+  //       sortedData.sort((a, b) => a.price - b.price);
+  //       break;
+  //     case "Durasi - Terpendek":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           durationToMinutes(a.duration) - durationToMinutes(b.duration)
+  //       );
+  //       break;
+  //     case "Keberangkatan - Paling Awal":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${a.departureTime}`) -
+  //           new Date(`1970/01/01 ${b.departureTime}`)
+  //       );
+  //       break;
+  //     case "Keberangkatan - Paling Akhir":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${b.departureTime}`) -
+  //           new Date(`1970/01/01 ${a.departureTime}`)
+  //       );
+  //       break;
+  //     case "Kedatangan - Paling Awal":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${a.arrivalTime}`) -
+  //           new Date(`1970/01/01 ${b.arrivalTime}`)
+  //       );
+  //       break;
+  //     case "Kedatangan - Paling Akhir":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${b.arrivalTime}`) -
+  //           new Date(`1970/01/01 ${a.arrivalTime}`)
+  //       );
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  //   setSortedFlights(sortedData);
+  //   setSelectedSort(sortType);
+  //   setShowModal(false);
+  // };
 
   const formatDate = (date) => {
     return format(new Date(date), "d MMMM yyyy", { locale: id });
@@ -609,6 +680,7 @@ function ChooseFlight() {
                         >
                           <strong>IDR {flight.price.toLocaleString()}</strong>
                           <Button
+
                             onClick={(event) => {
                               if (isReturnEnabled) {
                                 chooseReturn(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
@@ -616,6 +688,7 @@ function ChooseFlight() {
                                 onSubmit(event, flight.id); // Panggil onSubmit jika isReturnEnabled false
                               }
                             }}
+
                             variant="primary"
                           >
                             Pilih
@@ -674,7 +747,9 @@ function ChooseFlight() {
                                   fontWeight: "bold",
                                 }}
                               >
+
                                 <li>Jet Air - {flightsData.class}</li>
+
                                 <li>{flight.airplane.airplaneCode}</li>
                               </ul>
                             </div>
