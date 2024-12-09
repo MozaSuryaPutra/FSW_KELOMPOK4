@@ -24,18 +24,19 @@ function Register() {
   };
 
   const { mutate: registerUser } = useMutation({
-    mutationFn: (body) => register(body),
-    onSuccess: (data) => {
-      toast.success("Registration successful! Please log in.");
-      dispatch(setUser(data.user));
-      navigate({ to: "/login" });
+    mutationFn: (body) => {
+      console.log("Register body:", body);
+      return register(body); // Ensure register is correctly defined and returns a Promise
     },
-    onError: (err) => {
-      console.error("Registration error:", err);
-      toast.error(err.message || "Failed to register. Please try again.");
+    onSuccess: (data) => {
+      console.log("Success:", data);
+      // Your success logic
+    },
+    onError: (error) => {
+      console.error("Error:", error);
     },
   });
-
+  
   const onSubmit = (event) => {
     event.preventDefault();
     const body = {
