@@ -20,6 +20,7 @@ import { Route as PaymentSuccessImport } from './routes/payment-success'
 const PaymentLazyImport = createFileRoute('/payment')()
 const OrderHistoryLazyImport = createFileRoute('/orderHistory')()
 const NotificationsLazyImport = createFileRoute('/notifications')()
+const ChooseReturnLazyImport = createFileRoute('/choose-return')()
 const ChooseLazyImport = createFileRoute('/choose')()
 const CheckoutBiodataLazyImport = createFileRoute('/checkout-biodata')()
 const AkunLazyImport = createFileRoute('/akun')()
@@ -49,6 +50,12 @@ const NotificationsLazyRoute = NotificationsLazyImport.update({
   path: '/notifications',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/notifications.lazy').then((d) => d.Route))
+
+const ChooseReturnLazyRoute = ChooseReturnLazyImport.update({
+  id: '/choose-return',
+  path: '/choose-return',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/choose-return.lazy').then((d) => d.Route))
 
 const ChooseLazyRoute = ChooseLazyImport.update({
   id: '/choose',
@@ -155,6 +162,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChooseLazyImport
       parentRoute: typeof rootRoute
     }
+    '/choose-return': {
+      id: '/choose-return'
+      path: '/choose-return'
+      fullPath: '/choose-return'
+      preLoaderRoute: typeof ChooseReturnLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/notifications': {
       id: '/notifications'
       path: '/notifications'
@@ -222,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/akun': typeof AkunLazyRoute
   '/checkout-biodata': typeof CheckoutBiodataLazyRoute
   '/choose': typeof ChooseLazyRoute
+  '/choose-return': typeof ChooseReturnLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
   '/payment': typeof PaymentLazyRoute
@@ -238,6 +253,7 @@ export interface FileRoutesByTo {
   '/akun': typeof AkunLazyRoute
   '/checkout-biodata': typeof CheckoutBiodataLazyRoute
   '/choose': typeof ChooseLazyRoute
+  '/choose-return': typeof ChooseReturnLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
   '/payment': typeof PaymentLazyRoute
@@ -255,6 +271,7 @@ export interface FileRoutesById {
   '/akun': typeof AkunLazyRoute
   '/checkout-biodata': typeof CheckoutBiodataLazyRoute
   '/choose': typeof ChooseLazyRoute
+  '/choose-return': typeof ChooseReturnLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
   '/payment': typeof PaymentLazyRoute
@@ -273,6 +290,7 @@ export interface FileRouteTypes {
     | '/akun'
     | '/checkout-biodata'
     | '/choose'
+    | '/choose-return'
     | '/notifications'
     | '/orderHistory'
     | '/payment'
@@ -288,6 +306,7 @@ export interface FileRouteTypes {
     | '/akun'
     | '/checkout-biodata'
     | '/choose'
+    | '/choose-return'
     | '/notifications'
     | '/orderHistory'
     | '/payment'
@@ -303,6 +322,7 @@ export interface FileRouteTypes {
     | '/akun'
     | '/checkout-biodata'
     | '/choose'
+    | '/choose-return'
     | '/notifications'
     | '/orderHistory'
     | '/payment'
@@ -320,6 +340,7 @@ export interface RootRouteChildren {
   AkunLazyRoute: typeof AkunLazyRoute
   CheckoutBiodataLazyRoute: typeof CheckoutBiodataLazyRoute
   ChooseLazyRoute: typeof ChooseLazyRoute
+  ChooseReturnLazyRoute: typeof ChooseReturnLazyRoute
   NotificationsLazyRoute: typeof NotificationsLazyRoute
   OrderHistoryLazyRoute: typeof OrderHistoryLazyRoute
   PaymentLazyRoute: typeof PaymentLazyRoute
@@ -336,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   AkunLazyRoute: AkunLazyRoute,
   CheckoutBiodataLazyRoute: CheckoutBiodataLazyRoute,
   ChooseLazyRoute: ChooseLazyRoute,
+  ChooseReturnLazyRoute: ChooseReturnLazyRoute,
   NotificationsLazyRoute: NotificationsLazyRoute,
   OrderHistoryLazyRoute: OrderHistoryLazyRoute,
   PaymentLazyRoute: PaymentLazyRoute,
@@ -361,6 +383,7 @@ export const routeTree = rootRoute
         "/akun",
         "/checkout-biodata",
         "/choose",
+        "/choose-return",
         "/notifications",
         "/orderHistory",
         "/payment",
@@ -385,6 +408,9 @@ export const routeTree = rootRoute
     },
     "/choose": {
       "filePath": "choose.lazy.jsx"
+    },
+    "/choose-return": {
+      "filePath": "choose-return.lazy.jsx"
     },
     "/notifications": {
       "filePath": "notifications.lazy.jsx"

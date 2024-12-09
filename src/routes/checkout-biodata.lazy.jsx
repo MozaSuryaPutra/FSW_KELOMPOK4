@@ -32,7 +32,19 @@ function Index() {
     selectedClass,
     selectedPassengers,
   } = location.state || {}; // Menggunakan default object jika state tidak ada
-  console.log(data.transaction.id);
+  if (!data || !data.transaction) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
   const {
     data: details,
     isSuccess,
@@ -105,7 +117,7 @@ function Index() {
                   width: "30rem",
                 }}
               >
-                Simpan
+                {data.transaction.id}
               </button>
             </div>
           </div>

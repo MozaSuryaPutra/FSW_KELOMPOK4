@@ -247,7 +247,7 @@ const flightData = [
   },
 ];
 
-function ChooseFlight() {
+function ReturnFlight() {
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
   const [showModal, setShowModal] = useState(false);
@@ -266,6 +266,7 @@ function ChooseFlight() {
     customFunction,
     passengersAmount,
     isReturnEnabled,
+    flightId,
   } = location.state || {}; // Mendapatkan data dari state
   const dataToSend = {
     selectedDepartureCity,
@@ -348,7 +349,7 @@ function ChooseFlight() {
     return <p>Loading flights...</p>;
   }
 
-  const onSubmit = async (event, flightId) => {
+  const onSubmit = async (event, flightIds) => {
     event.preventDefault();
 
     const selectedPassengersJson = JSON.stringify(selectedPassengers);
@@ -360,7 +361,7 @@ function ChooseFlight() {
       flightIds: JSON.stringify({
         // Mengonversi flightIds menjadi JSON string
         departure: flightId, // Menggunakan flightId yang dipilih untuk departure
-        return: 0,
+        return: flightIds,
       }),
     };
 
@@ -371,24 +372,16 @@ function ChooseFlight() {
     chooseCheckouts(body);
   };
 
-  const chooseReturn = async (event, flightId) => {
-    event.preventDefault();
+  //   const chooseReturn = async (event, flightId) => {
+  //     event.preventDefault();
 
-    navigate({
-      to: "/choose-return",
-      state: {
-        flightId,
-        selectedDepartureCity,
-        selectedReturnCity,
-        selectedDepartureDate,
-        selectedReturnDate,
-        selectedClass,
-        selectedPassengers,
-        isReturnEnabled,
-        passengersAmount,
-      },
-    });
-  };
+  //     navigate({
+  //       to: "/checkout-biodata",
+  //       state: {
+  //         flightId,
+  //       },
+  //     });
+  //   };
 
   const formatDate = (date) => {
     return format(new Date(date), "d MMMM yyyy", { locale: id });
@@ -517,8 +510,8 @@ function ChooseFlight() {
 
             {/* Accordion for Flights */}
 
-            {flightList?.departureFlights?.length > 0 ? (
-              flightList.departureFlights.map((flight, idx) => (
+            {flightList?.returnFlights?.length > 0 ? (
+              flightList.returnFlights.map((flight, idx) => (
                 <Accordion key={flight.id}>
                   <Accordion.Item eventKey={idx} className="mb-3">
                     <Accordion.Header>
@@ -609,13 +602,7 @@ function ChooseFlight() {
                         >
                           <strong>IDR {flight.price.toLocaleString()}</strong>
                           <Button
-                            onClick={(event) => {
-                              if (isReturnEnabled) {
-                                chooseReturn(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
-                              } else {
-                                onSubmit(event, flight.id); // Panggil onSubmit jika isReturnEnabled false
-                              }
-                            }}
+                            onClick={(event) => onSubmit(event, flight.id)}
                             variant="primary"
                           >
                             Pilih
@@ -789,4 +776,4 @@ function ChooseFlight() {
   );
 }
 
-export default ChooseFlight;
+export default ReturnFlight;
