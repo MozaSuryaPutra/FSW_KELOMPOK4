@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Row,
@@ -10,7 +10,14 @@ import {
 } from "react-bootstrap";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useLocation } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+
+import { useSelector } from "react-redux";
+import { useMutation } from "@tanstack/react-query";
+import { chooseCheckout } from "../../services/checkout/checkout";
+import { getSearchedFlight } from "../../services/homepage/homepage";
+import { toast } from "react-toastify";
 // Data dummy penerbangan
 const flightData = [
   {
@@ -242,74 +249,190 @@ const flightData = [
 
 function ChooseFlight() {
   const navigate = useNavigate();
+  const { user, token } = useSelector((state) => state.auth);
   const [showModal, setShowModal] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
   const [sortedFlights, setSortedFlights] = useState(flightData);
   const [selectedDay, setSelectedDay] = useState("2023-03-01");
-
-  // Function untuk mengonversi durasi ke menit
-  const durationToMinutes = (duration) => {
-    const [hours, minutes] = duration
-      .split(" ")[0]
-      .split("jam")
-      .map((time) => parseInt(time) || 0);
-    return hours * 60 + minutes;
+  const [flightList, setFlight] = useState([]);
+  const location = useLocation();
+  const {
+    selectedDepartureCity,
+    selectedReturnCity,
+    selectedDepartureDate,
+    selectedReturnDate,
+    selectedClass,
+    selectedPassengers,
+    customFunction,
+    passengersAmount,
+    isReturnEnabled,
+  } = location.state || {}; // Mendapatkan data dari state
+  const dataToSend = {
+    selectedDepartureCity,
+    selectedReturnCity,
+    selectedDepartureDate,
+    selectedReturnDate,
+    selectedClass,
+    selectedPassengers,
+    customFunction,
+    passengersAmount,
+    isReturnEnabled,
   };
+  const { data, isSuccess, isLoading, error } = useQuery({
+    queryKey: [
+      "flight",
+      selectedDepartureCity,
+      selectedReturnCity,
+      selectedDepartureDate,
+      selectedReturnDate,
+      passengersAmount,
+      selectedClass,
+    ],
+    queryFn: () =>
+      getSearchedFlight(
+        selectedDepartureCity,
+        selectedReturnCity,
+        selectedDepartureDate,
+        selectedReturnDate,
+        passengersAmount, // Menggunakan modifiedPassengers yang sudah diproses
+        selectedClass
+      ),
+    enabled: !!selectedDepartureCity && !!selectedReturnCity, // Pastikan ada parameter yang diperlukan sebelum menjalankan query
+  });
+
+  const { mutate: chooseCheckouts } = useMutation({
+    mutationFn: (body) => {
+      console.log("Login mutation called with body:", body); // Debugging log
+      return chooseCheckout(body); // Fungsi untuk melakukan request
+    },
+    onSuccess: (data) => {
+      if (data) {
+        console.log("Data on success:", data); // Pastikan data sudah ada sebelum navigasi
+        navigate({
+          to: "/checkout-biodata",
+          state: {
+            data,
+            selectedDepartureCity,
+            selectedReturnCity,
+            selectedDepartureDate,
+            selectedReturnDate,
+            selectedClass,
+            selectedPassengers,
+          },
+        }); // Kirim flightList dan data
+      } else {
+        console.error("Token or user not found in response");
+      }
+    },
+    onError: (err) => {
+      console.error("error:", err.message);
+      toast.error(err?.message);
+    },
+  });
+  console.log({ selectedPassengers });
+  useEffect(() => {
+    if (isSuccess && data) {
+      setFlight(data);
+    } else if (error) {
+      console.error("Error fetching flight data:", error);
+    }
+  }, [data, isSuccess, error]);
+
+  if (isLoading) {
+    return <p>Loading flights...</p>;
+  }
+
+  const onSubmit = async (event, flightId) => {
+    event.preventDefault();
+
+    const selectedPassengersJson = JSON.stringify(selectedPassengers);
+
+    const body = {
+      passengers: selectedPassengersJson, // Menggunakan selectedPassengers dalam format JSON
+      userId: 1,
+      pp: isReturnEnabled,
+      flightIds: JSON.stringify({
+        // Mengonversi flightIds menjadi JSON string
+        departure: flightId, // Menggunakan flightId yang dipilih untuk departure
+        return: isReturnEnabled ? 1 : 0,
+      }),
+    };
+
+    console.log(body);
+    console.log(JSON.parse(body.flightIds)); // Menampilkan flightIds sebagai objek untuk pengecekan
+
+    // Mengirim data ke API
+    chooseCheckouts(body);
+  };
+  // if (!flightList?.departureFlights?.length) {
+  //   return <p>No flights found.</p>;
+  // }
+
+  //console.log(flightList.departureFlights.map((flight) => flight.id));
+  // Mappingnya gini
+  // Function untuk mengonversi durasi ke menit
+  // const durationToMinutes = (duration) => {
+  //   const [hours, minutes] = duration
+  //     .split(" ")[0]
+  //     .split("jam")
+  //     .map((time) => parseInt(time) || 0);
+  //   return hours * 60 + minutes;
+  // };
 
   // Sorting logic
-  const handleSortChange = (sortType) => {
-    let sortedData = [...flightData];
-    switch (sortType) {
-      case "Harga - Termurah":
-        sortedData.sort((a, b) => a.price - b.price);
-        break;
-      case "Durasi - Terpendek":
-        sortedData.sort(
-          (a, b) =>
-            durationToMinutes(a.duration) - durationToMinutes(b.duration)
-        );
-        break;
-      case "Keberangkatan - Paling Awal":
-        sortedData.sort(
-          (a, b) =>
-            new Date(`1970/01/01 ${a.departureTime}`) -
-            new Date(`1970/01/01 ${b.departureTime}`)
-        );
-        break;
-      case "Keberangkatan - Paling Akhir":
-        sortedData.sort(
-          (a, b) =>
-            new Date(`1970/01/01 ${b.departureTime}`) -
-            new Date(`1970/01/01 ${a.departureTime}`)
-        );
-        break;
-      case "Kedatangan - Paling Awal":
-        sortedData.sort(
-          (a, b) =>
-            new Date(`1970/01/01 ${a.arrivalTime}`) -
-            new Date(`1970/01/01 ${b.arrivalTime}`)
-        );
-        break;
-      case "Kedatangan - Paling Akhir":
-        sortedData.sort(
-          (a, b) =>
-            new Date(`1970/01/01 ${b.arrivalTime}`) -
-            new Date(`1970/01/01 ${a.arrivalTime}`)
-        );
-        break;
-      default:
-        break;
-    }
-    setSortedFlights(sortedData);
-    setSelectedSort(sortType);
-    setShowModal(false);
-  };
+  // const handleSortChange = (sortType) => {
+  //   let sortedData = [...flightData];
+  //   switch (sortType) {
+  //     case "Harga - Termurah":
+  //       sortedData.sort((a, b) => a.price - b.price);
+  //       break;
+  //     case "Durasi - Terpendek":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           durationToMinutes(a.duration) - durationToMinutes(b.duration)
+  //       );
+  //       break;
+  //     case "Keberangkatan - Paling Awal":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${a.departureTime}`) -
+  //           new Date(`1970/01/01 ${b.departureTime}`)
+  //       );
+  //       break;
+  //     case "Keberangkatan - Paling Akhir":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${b.departureTime}`) -
+  //           new Date(`1970/01/01 ${a.departureTime}`)
+  //       );
+  //       break;
+  //     case "Kedatangan - Paling Awal":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${a.arrivalTime}`) -
+  //           new Date(`1970/01/01 ${b.arrivalTime}`)
+  //       );
+  //       break;
+  //     case "Kedatangan - Paling Akhir":
+  //       sortedData.sort(
+  //         (a, b) =>
+  //           new Date(`1970/01/01 ${b.arrivalTime}`) -
+  //           new Date(`1970/01/01 ${a.arrivalTime}`)
+  //       );
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  //   setSortedFlights(sortedData);
+  //   setSelectedSort(sortType);
+  //   setShowModal(false);
+  // };
 
   const formatDate = (date) => {
     return format(new Date(date), "d MMMM yyyy", { locale: id });
   };
 
-  // Filter flights based on the selected date
+  //Filter flights based on the selected date
   const filteredFlights = sortedFlights.filter(
     (flight) => flight.date === selectedDay
   );
@@ -334,9 +457,10 @@ function ChooseFlight() {
       <Container className="mt-4">
         {/* Header */}
 
-        <Row style={{ fontSize: 20, fontWeight: "bold" }} className="mb-5">
-          Pilih Penerbangan
-        </Row>
+        <Row
+          style={{ fontSize: 20, fontWeight: "bold" }}
+          className="mb-5"
+        ></Row>
         <Row className="d-flex justify-content-between align-items-center mb-3 ">
           <Col md={9}>
             <Button
@@ -430,128 +554,13 @@ function ChooseFlight() {
             </div>
 
             {/* Accordion for Flights */}
-            {filteredFlights.map((flight, idx) => (
-              <Accordion>
-                <Accordion.Item eventKey={idx} key={flight.id} className="mb-3">
-                  <Accordion.Header>
-                    <div className="d-flex justify-content-between w-100 flex-wrap">
-                      <div className="d-flex align-items-start gap-2">
-                        <img
-                          src="Thumbnail.png"
-                          alt="Thumbnail"
-                          style={{
-                            width: "20px",
-                            height: "20px",
-                          }}
-                        />
-                        <div>
-                          <ul
-                            className="mb-0 ps-0"
-                            style={{ listStyle: "none" }}
-                          >
-                            <li>Jet Air - Economy</li>
-                            <br />
-                            <li>
-                              <Row className="d-flex" style={{ width: "100%" }}>
-                                <Col
-                                  md={2}
-                                  sm={12}
-                                  className="d-flex flex-column custom-col"
-                                  style={{ gap: "1px" }}
-                                >
-                                  <div style={{ fontWeight: "bold" }}>
-                                    {flight.departureTime}
-                                  </div>
-                                  <div>JKT</div>
-                                </Col>
 
-                                <Col
-                                  md={7}
-                                  className="d-flex flex-column align-items-center"
-                                >
-                                  <div style={{ fontWeight: "bold" }}>
-                                    4h 0m
-                                  </div>
-                                  <div
-                                    style={{ fontWeight: "bold", margin: 0 }}
-                                  >
-                                    <img
-                                      src="Arrow.png"
-                                      alt="Arrow"
-                                      style={{
-                                        maxWidth: "100%",
-                                        height: "auto",
-                                      }}
-                                    />
-                                  </div>
-                                  <div>Direct</div>
-                                </Col>
-                                <Col
-                                  md={2}
-                                  sm={12}
-                                  className="d-flex flex-column custom-col"
-                                  style={{ gap: "1px" }}
-                                >
-                                  <div style={{ fontWeight: "bold" }}>
-                                    {flight.arrivalTime}
-                                  </div>
-                                  <div>JKT</div>
-                                </Col>
-                                <Col
-                                  md={1}
-                                  className="d-flex justify-content-center align-items-center"
-                                >
-                                  <img src="bagasi.png" alt="" />
-                                </Col>
-                              </Row>
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                      <div
-                        className="d-flex flex-column gap-1 custom-div "
-                        style={{ marginTop: "5%" }}
-                      >
-                        <strong>IDR {flight.price.toLocaleString()}</strong>
-                        <Button
-                          onClick={() => navigate({ to: "/checkout-biodata" })}
-                          variant="primary"
-                          classNa
-                        >
-                          Pilih
-                        </Button>
-                      </div>
-                    </div>
-                  </Accordion.Header>
-                  <Accordion.Body>
-                    <Row>
-                      <Col>
-                        <p style={{ color: "rgba(75, 25, 121, 1)" }}>
-                          <strong>Detail Penerbangan</strong>
-                        </p>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="d-flex">
-                        <p>
-                          <strong>{flight.departureTime}</strong>
-                        </p>
-                        <p
-                          style={{ color: "rgba(160, 110, 206, 1)" }}
-                          className="ms-auto"
-                        >
-                          Keberangkatan
-                        </p>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <p>{formatDate(flight.date)}</p>
-                      <p>{flight.departureAirport}</p>
-                      <hr style={{ width: "50%", margin: "0 auto" }}></hr>
-                    </Row>
-                    <Row className="d-flex flex-column">
-                      {/* Baris untuk nama maskapai dan nomor penerbangan */}
-                      <Col>
+            {flightList?.departureFlights?.length > 0 ? (
+              flightList.departureFlights.map((flight, idx) => (
+                <Accordion key={flight.id}>
+                  <Accordion.Item eventKey={idx} className="mb-3">
+                    <Accordion.Header>
+                      <div className="d-flex justify-content-between w-100 flex-wrap">
                         <div className="d-flex align-items-start gap-2">
                           <img
                             src="Thumbnail.png"
@@ -559,69 +568,209 @@ function ChooseFlight() {
                             style={{
                               width: "20px",
                               height: "20px",
-                              opacity: "0",
                             }}
                           />
                           <div>
                             <ul
                               className="mb-0 ps-0"
-                              style={{ listStyle: "none", fontWeight: "bold" }}
-                            >
-                              <li>Jet Air - Economy</li>
-                              <li>JT - 203</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </Col>
-                      <br></br>
-
-                      {/* Baris untuk ikon dan informasi */}
-                      <Col>
-                        <div className="d-flex align-items-start gap-2">
-                          <img
-                            src="Thumbnail.png"
-                            alt="Thumbnail"
-                            style={{ width: "20px", height: "20px" }}
-                          />
-                          <div>
-                            <strong className="d-block mb-1">
-                              Informasi :
-                            </strong>
-                            <ul
-                              className="mb-0 ps-0"
                               style={{ listStyle: "none" }}
                             >
-                              <li>Baggage 20 kg</li>
-                              <li>Cabin baggage 7 kg</li>
-                              <li>In Flight Entertainment</li>
+                              <li>Jet Air - Economy</li>
+                              <br />
+                              <li>
+                                <Row
+                                  className="d-flex"
+                                  style={{ width: "100%" }}
+                                >
+                                  <Col
+                                    md={2}
+                                    sm={12}
+                                    className="d-flex flex-column custom-col"
+                                    style={{ gap: "1px" }}
+                                  >
+                                    <div style={{ fontWeight: "bold" }}>
+                                      {flight.departureDate
+                                        .toString()
+                                        .substring(11, 16)}
+                                    </div>
+                                    <div>JKT</div>
+                                  </Col>
+
+                                  <Col
+                                    md={7}
+                                    className="d-flex flex-column align-items-center"
+                                  >
+                                    <div style={{ fontWeight: "bold" }}>
+                                      4h 0m
+                                    </div>
+                                    <div
+                                      style={{ fontWeight: "bold", margin: 0 }}
+                                    >
+                                      <img
+                                        src="Arrow.png"
+                                        alt="Arrow"
+                                        style={{
+                                          maxWidth: "100%",
+                                          height: "auto",
+                                        }}
+                                      />
+                                    </div>
+                                    <div>Direct</div>
+                                  </Col>
+                                  <Col
+                                    md={2}
+                                    sm={12}
+                                    className="d-flex flex-column custom-col"
+                                    style={{ gap: "1px" }}
+                                  >
+                                    <div style={{ fontWeight: "bold" }}>
+                                      {flight.arrivalDate
+                                        .toString()
+                                        .substring(11, 16)}
+                                    </div>
+                                    <div>JKT</div>
+                                  </Col>
+                                  <Col
+                                    md={1}
+                                    className="d-flex justify-content-center align-items-center"
+                                  >
+                                    <img src="bagasi.png" alt="" />
+                                  </Col>
+                                </Row>
+                              </li>
                             </ul>
                           </div>
                         </div>
-                      </Col>
-                      <br></br>
-                      <hr style={{ width: "50%", margin: "0 auto" }}></hr>
-                    </Row>
-                    <Row>
-                      <Col className="d-flex">
-                        <p>
-                          <strong>{flight.arrivalTime}</strong>
-                        </p>
-                        <p
-                          style={{ color: "rgba(160, 110, 206, 1)" }}
-                          className="ms-auto"
+                        <div
+                          className="d-flex flex-column gap-1 custom-div "
+                          style={{ marginTop: "5%" }}
                         >
-                          Kedatangan
-                        </p>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <p>{formatDate(flight.date)}</p>
-                      <p>{flight.arrivalAirport}</p>
-                    </Row>
-                  </Accordion.Body>
-                </Accordion.Item>
-              </Accordion>
-            ))}
+                          <strong>IDR {flight.price.toLocaleString()}</strong>
+                          <Button
+                            onClick={(event) => onSubmit(event, flight.id)}
+                            variant="primary"
+                          >
+                            Pilih
+                          </Button>
+                        </div>
+                      </div>
+                    </Accordion.Header>
+                    <Accordion.Body>
+                      <Row>
+                        <Col>
+                          <p style={{ color: "rgba(75, 25, 121, 1)" }}>
+                            <strong>Detail Penerbangan</strong>
+                          </p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col className="d-flex">
+                          <p>
+                            <strong>
+                              {flight.departureDate
+                                .toString()
+                                .substring(11, 16)}
+                            </strong>
+                          </p>
+                          <p
+                            style={{ color: "rgba(160, 110, 206, 1)" }}
+                            className="ms-auto"
+                          >
+                            Keberangkatan
+                          </p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <p>{formatDate(flight.departureDate)}</p>
+                        <p>{flight.departureAirport.name}</p>
+                        <hr style={{ width: "50%", margin: "0 auto" }}></hr>
+                      </Row>
+                      <Row className="d-flex flex-column">
+                        {/* Baris untuk nama maskapai dan nomor penerbangan */}
+                        <Col>
+                          <div className="d-flex align-items-start gap-2">
+                            <img
+                              src="Thumbnail.png"
+                              alt="Thumbnail"
+                              style={{
+                                width: "20px",
+                                height: "20px",
+                                opacity: "0",
+                              }}
+                            />
+                            <div>
+                              <ul
+                                className="mb-0 ps-0"
+                                style={{
+                                  listStyle: "none",
+                                  fontWeight: "bold",
+                                }}
+                              >
+                                <li>Jet Air - {data.class}</li>
+                                <li>{flight.airplane.airplaneCode}</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </Col>
+                        <br></br>
+
+                        {/* Baris untuk ikon dan informasi */}
+                        <Col>
+                          <div className="d-flex align-items-start gap-2">
+                            <img
+                              src="Thumbnail.png"
+                              alt="Thumbnail"
+                              style={{ width: "20px", height: "20px" }}
+                            />
+                            <div>
+                              <strong className="d-block mb-1">
+                                Informasi :
+                              </strong>
+                              <ul
+                                className="mb-0 ps-0"
+                                style={{ listStyle: "none" }}
+                              >
+                                <li>Baggage {flight.airplane.baggage} kg</li>
+                                <li>
+                                  Cabin baggage {flight.airplane.cabinBaggage}{" "}
+                                  kg
+                                </li>
+                                <li>In Flight Entertainment</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </Col>
+                        <br></br>
+                        <hr style={{ width: "50%", margin: "0 auto" }}></hr>
+                      </Row>
+                      <Row>
+                        <Col className="d-flex">
+                          <p>
+                            <strong>
+                              {flight.arrivalDate.toString().substring(11, 16)}
+                            </strong>
+                          </p>
+                          <p
+                            style={{ color: "rgba(160, 110, 206, 1)" }}
+                            className="ms-auto"
+                          >
+                            Kedatangan
+                          </p>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <p>{formatDate(flight.arrivalDate)}</p>
+                        <p>{flight.destinationAirport.id}</p>
+                      </Row>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                </Accordion>
+              ))
+            ) : (
+              <div className="text-center mt-4">
+                <strong>Data pesawat kosong</strong>
+              </div>
+            )}
           </Col>
         </Row>
 

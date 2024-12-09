@@ -8,18 +8,11 @@ import ClassPopup from "../ClassPopup/ClassPopup";
 import OneDatePopup from "../OneDatePopup/OneDatePopup";
 import PassengersPopup from "../PassengersPopup/PassengeresPopup";
 import ReturnPopup from "../ReturnPopup/ReturnPopup";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { format, parseISO } from "date-fns";
-
-import { useNavigate } from "@tanstack/react-router";
-
-import FromImage from "../../../public/plane.png";
-import ReturnImage from "../../../public/return.png";
-import VectorImage from "../../../public/Vector.png";
-import PenumpangImage from "../../../public/penumpang.png";
-
 import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jika diperlukan
 const SearchBox = () => {
-  const navigate = useNavigate();
   const [modalShow, setModalShow] = useState(false); // State untuk modal destinasi
   const [returnmodalShow, setReturnModalShow] = useState(false); // State untuk modal destinasi
   const [dateModalShow, setDateModalShow] = useState(false); // State untuk modal tanggal
@@ -32,13 +25,32 @@ const SearchBox = () => {
   const [selectedReturnDate, setSelectedReturnDate] = useState(""); // State untuk tanggal kembali
   const [selectedClass, setSelectedClass] = useState(""); // Tambahkan state untuk kelas
   const [selectedPassengers, setSelectedPassengers] = useState({
-    dewasa: 0,
-    anak: 0,
-    bayi: 0,
-  }); // State untuk jumlah penumpang
+    adult: 0,
+    child: 0,
+    baby: 0,
+  });
+  const [passengersAmount, setPassengersAmount] = useState(0);
+  const flightSearch = {
+    selectedDepartureCity,
+    selectedReturnCity,
+    selectedDepartureDate,
+    selectedReturnDate,
+    selectedClass,
+    selectedPassengers,
+    passengersAmount,
+    isReturnEnabled,
+  };
+  // State untuk jumlah penumpang
+  const navigate = useNavigate();
 
   const handleSelectCounts = (counts) => {
     setSelectedPassengers(counts); // Update state dengan jumlah penumpang yang dipilih
+  };
+  const swapCities = () => {
+    setSelectedDepartureCity((prevDepartureCity) => {
+      setSelectedReturnCity(selectedDepartureCity); // Set departure ke arrival
+      return selectedReturnCity; // Set arrival ke departure
+    });
   };
   const handleSelectDates = (dates) => {
     const [departure, returnDate] = dates;
@@ -60,8 +72,21 @@ const SearchBox = () => {
     : "Pilih Tanggal";
 
   const getTotalPassengers = () => {
-    return selectedPassengers.dewasa + selectedPassengers.anak;
+    return selectedPassengers.adult + selectedPassengers.child;
   };
+
+  useEffect(() => {
+    // Pastikan selectedPassengers tersedia dan menghitung jumlah penumpang
+    if (selectedPassengers) {
+      const getTotalPassengers = () => {
+        return selectedPassengers.adult + selectedPassengers.child;
+      };
+      const totalPassengers = getTotalPassengers();
+      setPassengersAmount(totalPassengers); // Update state dengan hasil perhitungan
+    }
+  }, [selectedPassengers]);
+
+  console.log(passengersAmount);
   return (
     <>
       {/* <style>{`
@@ -102,7 +127,7 @@ const SearchBox = () => {
                   >
                     <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                       <img
-                        src={FromImage}
+                        src="public/plane.png"
                         alt=""
                         style={{
                           width: "16px",
@@ -118,7 +143,7 @@ const SearchBox = () => {
                       type="text"
                       placeholder="Pilih Kota"
                       readOnly
-                      value={selectedDepartureCity || "Pilih Kota"}
+                      value={selectedDepartureCity.name || "Pilih Kota"}
                       className="border-0 border-bottom flex-grow-1 custom-input"
                       style={{
                         borderRadius: 0,
@@ -136,7 +161,7 @@ const SearchBox = () => {
                   sm={12}
                   className="d-flex justify-content-center align-items-center"
                 >
-                  <img src={ReturnImage} alt="" />
+                  <img onClick={swapCities} src="public/return.png" alt="" />
                 </Col>
                 <Col md={5} sm={12}>
                   <Form.Group
@@ -146,7 +171,7 @@ const SearchBox = () => {
                   >
                     <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                       <img
-                        src={FromImage}
+                        src="public/plane.png"
                         alt=""
                         style={{
                           width: "16px",
@@ -160,7 +185,7 @@ const SearchBox = () => {
                     <Form.Control
                       type="text"
                       placeholder="Pilih Kota"
-                      value={selectedReturnCity || "Pilih Kota"}
+                      value={selectedReturnCity.name || "Pilih Kota"}
                       readOnly
                       className="border-0 border-bottom flex-grow-1  custom-input"
                       style={{
@@ -179,7 +204,7 @@ const SearchBox = () => {
                 <Col md={5} className="d-flex align-items-center ">
                   <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                     <img
-                      src={VectorImage}
+                      src="public/Vector.png"
                       alt=""
                       style={{
                         width: "16px",
@@ -289,7 +314,7 @@ const SearchBox = () => {
                 <Col md={5} className="d-flex align-items-center ">
                   <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
                     <img
-                      src={PenumpangImage}
+                      src="public/penumpang.png"
                       alt=""
                       style={{
                         width: "16px",
@@ -388,8 +413,10 @@ const SearchBox = () => {
                     style={{ bottom: 0, left: 0, right: 0 }}
                   >
                     <Button
+                      onClick={() =>
+                        navigate({ to: "/choose", state: flightSearch })
+                      }
                       className="w-100"
-                      onClick={() => navigate({ to: "/choose" })}
                       style={{
                         backgroundColor: "#7126B5",
                         borderRadius: "0 0 5px 5px",

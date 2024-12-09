@@ -7,9 +7,9 @@ import { faUser, faChild, faBaby } from "@fortawesome/free-solid-svg-icons";
 const PassengersPopup = ({ show, handleClose, onSelectCounts }) => {
   // State untuk menyimpan jumlah Dewasa, Anak, dan Bayi
   const [counts, setCounts] = useState({
-    dewasa: 0,
-    anak: 0,
-    bayi: 0,
+    adult: 0,
+    child: 0,
+    baby: 0,
   });
 
   // Fungsi untuk mengatur jumlah berdasarkan tipe (dewasa, anak, bayi)
@@ -25,9 +25,9 @@ const PassengersPopup = ({ show, handleClose, onSelectCounts }) => {
 
   // Mapping kategori ke ikon
   const categoryIcons = {
-    dewasa: faUser,
-    anak: faChild,
-    bayi: faBaby,
+    adult: faUser,
+    child: faChild,
+    baby: faBaby,
   };
 
   // Mengirim data jumlah penumpang ke komponen parent
@@ -43,7 +43,7 @@ const PassengersPopup = ({ show, handleClose, onSelectCounts }) => {
       </Modal.Header>
       <Modal.Body>
         {/* Pemilihan jumlah penumpang */}
-        {["dewasa", "anak", "bayi"].map((type, index) => (
+        {["adult", "child", "baby"].map((type, index) => (
           <div
             key={index}
             style={{
@@ -58,14 +58,14 @@ const PassengersPopup = ({ show, handleClose, onSelectCounts }) => {
               <FontAwesomeIcon icon={categoryIcons[type]} size="lg" />
               <div>
                 <div style={{ fontWeight: "bold" }}>
-                  {type === "dewasa" && "Dewasa"}
-                  {type === "anak" && "Anak"}
-                  {type === "bayi" && "Bayi"}
+                  {type === "adult" && "Adult"}
+                  {type === "child" && "Child"}
+                  {type === "baby" && "Baby"}
                 </div>
                 <div style={{ fontSize: "0.9em", color: "gray" }}>
-                  {type === "dewasa" && "(12 tahun ke atas)"}
-                  {type === "anak" && "(2 - 11 tahun)"}
-                  {type === "bayi" && "(Di bawah 2 tahun)"}
+                  {type === "adult" && "(12 tahun ke atas)"}
+                  {type === "child" && "(2 - 11 tahun)"}
+                  {type === "baby" && "(Di bawah 2 tahun)"}
                 </div>
               </div>
             </div>

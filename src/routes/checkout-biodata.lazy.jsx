@@ -6,9 +6,12 @@ import DataPassangers from "../data/data.json";
 import AlertDanger from "../components/payment/alertDanger";
 import BreadCrumb from "../components/payment/breadCrumbs";
 import PassangerSeat from "../components/payment/passangerSeat";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useLocation } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getCheckoutByID } from "../services/checkout/checkout";
+import { useState } from "react";
 import "../components/payment/payment.css";
 
 export const Route = createLazyFileRoute("/checkout-biodata")({
@@ -17,13 +20,47 @@ export const Route = createLazyFileRoute("/checkout-biodata")({
 
 function Index() {
   const navigate = useNavigate();
-  const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
+  const location = useLocation();
+  const { token } = useSelector((state) => state.auth);
+  const [flightPassenger, setFlightPassenger] = useState([]);
+  const {
+    data,
+    selectedDepartureCity,
+    selectedReturnCity,
+    selectedDepartureDate,
+    selectedReturnDate,
+    selectedClass,
+    selectedPassengers,
+  } = location.state || {}; // Menggunakan default object jika state tidak ada
+  console.log(data.transaction.id);
+  const {
+    data: details,
+    isSuccess,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["detail", data.transaction.userId, data.transaction.id],
+    queryFn: () =>
+      getCheckoutByID(data.transaction.userId, data.transaction.id),
+    enabled: !!token, // Pastikan ada parameter yang diperlukan sebelum menjalankan query
+  });
 
   useEffect(() => {
     if (!token) {
       navigate({ to: "/" });
     }
-  }, [token, navigate]);
+    if (isSuccess && details) {
+      setFlightPassenger(details);
+    } else if (error) {
+      console.error("Error fetching flight data:", error);
+    }
+  }, [details, isSuccess, error, token, navigate]);
+
+  if (isLoading) {
+    return <p>Loading flights...</p>;
+  }
+
+  console.log(details);
   return (
     <div className="row g-3 m-0">
       <div
@@ -76,7 +113,7 @@ function Index() {
           <div className=" flight-detail-layout w-25">
             <div className="container row">
               <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
-              <FlightDetail />
+              <FlightDetail data={data} />
             </div>
           </div>
         </div>

@@ -6,13 +6,11 @@ const ClassPopup = ({ show, handleClose, onSelectClass }) => {
   const [selectedClass, setSelectedClass] = useState("Economy");
 
   // Data untuk opsi kelas penerbangan
-  const flightClasses = [
-    { name: "Economy", price: "IDR 4.950.000" },
-    { name: "Premium Economy", price: "IDR 7.550.000" },
-    { name: "Business", price: "IDR 29.220.000" },
-    { name: "First Class", price: "IDR 87.620.000" },
-  ];
-
+  const flightClasses = [{ name: "economy" }, { name: "business" }];
+  // { name: "Economy", price: "IDR 4.950.000" },
+  // { name: "Premium Economy", price: "IDR 7.550.000" },
+  // { name: "Business", price: "IDR 29.220.000" },
+  // { name: "First Class", price: "IDR 87.620.000" },
   const handleSave = () => {
     onSelectClass(selectedClass); // Kirim kelas yang dipilih ke komponen induk
     handleClose(); // Tutup modal
