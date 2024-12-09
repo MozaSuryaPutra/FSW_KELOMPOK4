@@ -60,7 +60,6 @@ function Index() {
     return <p>Loading flights...</p>;
   }
 
-  console.log(details);
   return (
     <div className="row g-3 m-0">
       <div
@@ -113,7 +112,7 @@ function Index() {
           <div className=" flight-detail-layout w-25">
             <div className="container row">
               <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
-              <FlightDetail data={data} />
+              <FlightDetail data={details} />
             </div>
           </div>
         </div>
