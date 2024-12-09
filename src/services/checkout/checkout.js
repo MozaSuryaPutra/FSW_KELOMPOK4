@@ -26,15 +26,19 @@ export const getCheckoutByID = async (userid, transactionid) => {
 
   let url = `${import.meta.env.VITE_API_URL}/api/checkout/${userid}/${transactionid}`;
 
+  console.log(url);
+
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
     },
     method: "GET",
   });
+
   console.log("ini reponse : ", response);
   // get data
   const result = await response.json();
   console.log(result);
+
   return result?.data;
 };

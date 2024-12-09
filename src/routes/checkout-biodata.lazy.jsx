@@ -32,7 +32,21 @@ function Index() {
     selectedClass,
     selectedPassengers,
   } = location.state || {}; // Menggunakan default object jika state tidak ada
-  console.log(data.transaction.id);
+
+  if (!data || !data.transaction) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
+
   const {
     data: details,
     isSuccess,
@@ -59,6 +73,9 @@ function Index() {
   if (isLoading) {
     return <p>Loading flights...</p>;
   }
+
+
+  console.log(details);
 
   return (
     <div className="row g-3 m-0">
@@ -104,7 +121,7 @@ function Index() {
                   width: "30rem",
                 }}
               >
-                Simpan
+                {data.transaction.id}
               </button>
             </div>
           </div>
@@ -112,7 +129,9 @@ function Index() {
           <div className=" flight-detail-layout w-25">
             <div className="container row">
               <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
+
               <FlightDetail data={details} />
+
             </div>
           </div>
         </div>
