@@ -172,7 +172,7 @@ function Login() {
             <div className="text-center mt-3">
               <span>
                 Don't have an account?{" "}
-                <Link to="/register" style={{ color: "#7126B5" }}>
+                <Link to="/auth/register" style={{ color: "#7126B5" }}>
                   Register here
                 </Link>
               </span>

@@ -5,9 +5,8 @@ import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { setUser } from "../../redux/slices/auth";
-import BgTiketkuImage from "../../../public/BG-Tiketku.png";
+import BgTiketkuImage from "/BG-Tiketku.png?url";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { register } from "../../services/auth/auth";
 
 function Register() {
   const navigate = useNavigate();

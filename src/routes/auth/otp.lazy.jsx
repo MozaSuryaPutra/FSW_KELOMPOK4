@@ -1,48 +1,56 @@
 import React from "react";
 import { useState } from "react";
-import { useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import BgTiketkuImage from "../../../public/BG-Tiketku.png";
-import { OtpInput } from "reactjs-otp-input";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import Countdown from "react-countdown";
+
 export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
 });
 
 function OTPInputUI() {
   const navigate = useNavigate();
-
   const { token } = useSelector((state) => state.auth);
-  const [otp, setOtp] = useState('');
-  const [userId, setUserId] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [otp, setOtp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [counter, setCounter] = useState(60);
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     setOtp(e.target.value);
-    setError('');
   };
 
   const handleOtpVerification = async () => {
-    if (!otp || !userId) {
-      setError('OTP and User ID are required');
+    if (!otp) {
+      alert("OTP is required");
       return;
     }
-
     setIsLoading(true);
     try {
-      const response = await axios.post('/auth/verify-otp', { userId, otp }); //???
-      setMessage(response.data.message);
-      setError('');
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/otp/verify`,
+        { otp, token }
+      );
+      alert("OTP verified successfully");
+      navigate("/success");
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong');
-      setMessage('');
+      alert(err.response?.data?.message || "OTP verification failed");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleResendOtp = () => {
+    axios
+      .post(`${import.meta.env.VITE_API_URL}/auth/otp/resend`, { token })
+      .then(() => {
+        alert("OTP resent successfully");
+        setCounter(60);
+      })
+      .catch((err) => {
+        alert(err.response?.data?.message || "Failed to resend OTP");
+      });
   };
 
   return (
@@ -55,51 +63,19 @@ function OTPInputUI() {
         padding: "20px",
       }}
     >
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <div style={{ textAlign: "left" }}>
-          <img src={BgTiketkuImage} alt="Tiketku" style={{ height: "120x" }} />
-        </div>
-      </header>
-
       <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>Masukkan OTP</h1>
       <p style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
-        Ketik 6 digit kode yang dikirimkan ke <b>J*****@gmail.com</b> 
-      </p> 
-
+        Ketik 6 digit kode yang dikirimkan ke <b>Email Anda</b>
+      </p>
       <div
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
       >
-        {/* {[...Array(6)].map((_, index) => (
-          <input
-            key={index}
-            type="number"
-            max={9}
-            min={0}
-            maxLength="1"
-            style={{
-              width: "40px",
-              height: "40px",
-              margin: "0 5px",
-              fontSize: "20px",
-              textAlign: "center",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-            }}
-          />
-        ))} */}
-        <OtpInput
+        <input
+          type="text"
+          maxLength="6"
           value={otp}
           onChange={handleChange}
-          numInputs={6}
-          separator={<span> </span>}
-          inputStyle={{
+          style={{
             width: "40px",
             height: "40px",
             margin: "0 5px",
@@ -110,17 +86,11 @@ function OTPInputUI() {
           }}
         />
       </div>
-
-      <p
-        style={{
-          fontSize: "14px",
-          color: "#666",
-        }}
-      >
+      <p style={{ fontSize: "14px", color: "#666" }}>
         Kirim Ulang OTP dalam {counter} detik
       </p>
-
       <button
+        onClick={handleOtpVerification}
         style={{
           backgroundColor: "#6C63FF",
           color: "white",
@@ -132,11 +102,27 @@ function OTPInputUI() {
           cursor: "pointer",
           marginTop: "20px",
         }}
+        disabled={isLoading}
       >
-        Simpan
+        Verifikasi
+      </button>
+      <button
+        onClick={handleResendOtp}
+        style={{
+          backgroundColor: "#ccc",
+          color: "black",
+          fontSize: "16px",
+          fontWeight: "bold",
+          border: "none",
+          borderRadius: "8px",
+          padding: "10px 20px",
+          cursor: "pointer",
+          marginTop: "20px",
+        }}
+        disabled={counter > 0 || isLoading}
+      >
+        Kirim Ulang OTP
       </button>
     </div>
   );
 }
-
-export default OTPInputUI;
