@@ -411,7 +411,9 @@ function ChooseFlight() {
     chooseCheckouts(body);
   };
 
+
   const chooseReturns = (event, flightId) => {
+
     event.preventDefault();
 
     navigate({
