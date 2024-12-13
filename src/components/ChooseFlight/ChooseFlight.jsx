@@ -479,7 +479,9 @@ function ChooseFlight() {
 
   };
 
+
   const chooseReturns = async (event, flightId) => {
+
     event.preventDefault();
 
     navigate({
