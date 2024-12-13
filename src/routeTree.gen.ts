@@ -21,6 +21,7 @@ const PaymentLazyImport = createFileRoute('/payment')()
 const OrderHistoryLazyImport = createFileRoute('/orderHistory')()
 const NotificationsLazyImport = createFileRoute('/notifications')()
 const ChooseLazyImport = createFileRoute('/choose')()
+const CheckoutSuccessLazyImport = createFileRoute('/checkout-success')()
 const CheckoutBiodataLazyImport = createFileRoute('/checkout-biodata')()
 const AkunLazyImport = createFileRoute('/akun')()
 const IndexLazyImport = createFileRoute('/')()
@@ -55,6 +56,14 @@ const ChooseLazyRoute = ChooseLazyImport.update({
   path: '/choose',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/choose.lazy').then((d) => d.Route))
+
+const CheckoutSuccessLazyRoute = CheckoutSuccessLazyImport.update({
+  id: '/checkout-success',
+  path: '/checkout-success',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/checkout-success.lazy').then((d) => d.Route),
+)
 
 const CheckoutBiodataLazyRoute = CheckoutBiodataLazyImport.update({
   id: '/checkout-biodata',
@@ -148,6 +157,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutBiodataLazyImport
       parentRoute: typeof rootRoute
     }
+    '/checkout-success': {
+      id: '/checkout-success'
+      path: '/checkout-success'
+      fullPath: '/checkout-success'
+      preLoaderRoute: typeof CheckoutSuccessLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/choose': {
       id: '/choose'
       path: '/choose'
@@ -221,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/payment-success': typeof PaymentSuccessRoute
   '/akun': typeof AkunLazyRoute
   '/checkout-biodata': typeof CheckoutBiodataLazyRoute
+  '/checkout-success': typeof CheckoutSuccessLazyRoute
   '/choose': typeof ChooseLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
@@ -237,6 +254,7 @@ export interface FileRoutesByTo {
   '/payment-success': typeof PaymentSuccessRoute
   '/akun': typeof AkunLazyRoute
   '/checkout-biodata': typeof CheckoutBiodataLazyRoute
+  '/checkout-success': typeof CheckoutSuccessLazyRoute
   '/choose': typeof ChooseLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
@@ -254,6 +272,7 @@ export interface FileRoutesById {
   '/payment-success': typeof PaymentSuccessRoute
   '/akun': typeof AkunLazyRoute
   '/checkout-biodata': typeof CheckoutBiodataLazyRoute
+  '/checkout-success': typeof CheckoutSuccessLazyRoute
   '/choose': typeof ChooseLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
@@ -272,6 +291,7 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/akun'
     | '/checkout-biodata'
+    | '/checkout-success'
     | '/choose'
     | '/notifications'
     | '/orderHistory'
@@ -287,6 +307,7 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/akun'
     | '/checkout-biodata'
+    | '/checkout-success'
     | '/choose'
     | '/notifications'
     | '/orderHistory'
@@ -302,6 +323,7 @@ export interface FileRouteTypes {
     | '/payment-success'
     | '/akun'
     | '/checkout-biodata'
+    | '/checkout-success'
     | '/choose'
     | '/notifications'
     | '/orderHistory'
@@ -319,6 +341,7 @@ export interface RootRouteChildren {
   PaymentSuccessRoute: typeof PaymentSuccessRoute
   AkunLazyRoute: typeof AkunLazyRoute
   CheckoutBiodataLazyRoute: typeof CheckoutBiodataLazyRoute
+  CheckoutSuccessLazyRoute: typeof CheckoutSuccessLazyRoute
   ChooseLazyRoute: typeof ChooseLazyRoute
   NotificationsLazyRoute: typeof NotificationsLazyRoute
   OrderHistoryLazyRoute: typeof OrderHistoryLazyRoute
@@ -335,6 +358,7 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentSuccessRoute: PaymentSuccessRoute,
   AkunLazyRoute: AkunLazyRoute,
   CheckoutBiodataLazyRoute: CheckoutBiodataLazyRoute,
+  CheckoutSuccessLazyRoute: CheckoutSuccessLazyRoute,
   ChooseLazyRoute: ChooseLazyRoute,
   NotificationsLazyRoute: NotificationsLazyRoute,
   OrderHistoryLazyRoute: OrderHistoryLazyRoute,
@@ -360,6 +384,7 @@ export const routeTree = rootRoute
         "/payment-success",
         "/akun",
         "/checkout-biodata",
+        "/checkout-success",
         "/choose",
         "/notifications",
         "/orderHistory",
@@ -382,6 +407,9 @@ export const routeTree = rootRoute
     },
     "/checkout-biodata": {
       "filePath": "checkout-biodata.lazy.jsx"
+    },
+    "/checkout-success": {
+      "filePath": "checkout-success.lazy.jsx"
     },
     "/choose": {
       "filePath": "choose.lazy.jsx"

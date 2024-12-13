@@ -32,9 +32,38 @@ export const getCheckoutByID = async (userid, transactionid) => {
     },
     method: "GET",
   });
-  console.log("ini reponse : ", response);
+  // console.log("ini reponse : ", response);
   // get data
   const result = await response.json();
-  console.log(result);
+  return result?.data;
+};
+
+export const updatePassanger = async (request) => {
+  const token = localStorage.getItem("token");
+  const urlEncodedData = new URLSearchParams(request).toString();
+  if (!token) {
+    console.error("Token tidak ditemukan");
+    return;
+  }
+
+  let url = `${import.meta.env.VITE_API_URL}/api/checkout`;
+  console.log(url);
+  const response = await fetch(url, {
+    body: urlEncodedData,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Bearer ${token}`,
+    },
+    method: "PUT",
+    // body: formData,
+  });
+
+  // get the data if fetching succeed!
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result?.message);
+  }
+
   return result?.data;
 };

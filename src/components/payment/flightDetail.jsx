@@ -7,8 +7,7 @@ const flightDetail = (details) => {
   // useEffect(() => {
   //   setFlightData(data);
   // }, []);
-
-  console.log("ini detail:", details);
+  // console.log(details.data);
 
   return (
     <div className=" departureFlight">
@@ -56,7 +55,10 @@ const flightDetail = (details) => {
 
         <div className="row pt-2">
           <div className="col-1">
-            <img src={details.data.flights.departure.airplane.airline.logo} />
+            <img
+              style={{ width: "25px", height: "25px" }}
+              src={details.data.flights.departure.airplane.airline.logo}
+            />
           </div>
           <div className="col-11">
             <div className="fw-bolder">Informasi :</div>
@@ -104,20 +106,16 @@ const flightDetail = (details) => {
 
       <div className="detailPrice row px-2 border-bottom border-dark-subtle pb-2">
         <div className="col-12 fw-bolder">Rincian Harga</div>
-        <div className="col-6">
-          {details.data.priceDetails.passenger[0].count}{" "}
-          {details.data.priceDetails.passenger[0].type}
-        </div>
-        <div className="col-6  text-end">
-          IDR {details.data.priceDetails.passenger[0].total}
-        </div>
-        <div className="col-6">
-          {details.data.priceDetails.passenger[1].count}{" "}
-          {details.data.priceDetails.passenger[1].type}
-        </div>
-        <div className="col-6  text-end">
-          IDR {details.data.priceDetails.passenger[1].total}
-        </div>
+
+        {details.data.priceDetails.passenger.map((passenger, index) => (
+          <React.Fragment key={index}>
+            <div className="col-6">
+              {passenger.count} {passenger.type}
+            </div>
+            <div className="col-6 text-end">IDR {passenger.total}</div>
+          </React.Fragment>
+        ))}
+
         <div className="col-6">Tax</div>
         <div className="col-6  text-end">
           IDR {details.data.priceDetails.tax}
