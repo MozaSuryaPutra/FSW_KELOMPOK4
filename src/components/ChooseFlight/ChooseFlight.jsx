@@ -8,6 +8,7 @@ import {
   Accordion,
   Modal,
   ListGroup,
+  Image,
 } from "react-bootstrap";
 
 import { addDays, format } from "date-fns";
@@ -272,8 +273,32 @@ function ChooseFlight() {
     isReturnEnabled,
   } = location.state || {}; // Mendapatkan data dari state
 
-  console.log("ini selectetd departured date : ", selectedDepartureDate);
+  // Memeriksa apakah ada data yang hilang dan menampilkan pesan jika ada
+  if (
+    !selectedDepartureCity ||
+    !selectedReturnCity ||
+    !selectedDepartureDate ||
+    !selectedClass ||
+    !selectedPassengers ||
+    !passengersAmount ||
+    (isReturnEnabled && !selectedReturnDate)
+  ) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
+
+  console.log("ini selectedDepartureDate: ", selectedDepartureDate);
   const [selectedDay, setSelectedDay] = useState(selectedDepartureDate);
+
   const dataToSend = {
     selectedDepartureCity,
     selectedReturnCity,
@@ -285,6 +310,7 @@ function ChooseFlight() {
     passengersAmount,
     isReturnEnabled,
   };
+
   const {
     data: flightsData,
     isSuccess,
@@ -306,7 +332,7 @@ function ChooseFlight() {
         selectedReturnCity,
         selectedDay,
         selectedReturnDate,
-        passengersAmount, // Menggunakan modifiedPassengers yang sudah diproses
+        passengersAmount,
         selectedClass
       ),
     enabled: !!selectedDepartureCity && !!selectedReturnCity, // Pastikan ada parameter yang diperlukan sebelum menjalankan query
@@ -341,8 +367,7 @@ function ChooseFlight() {
       toast.error(err?.message);
     },
   });
-  console.log({ selectedPassengers });
-  console.log("isi dari : ", isReturnEnabled);
+
   useEffect(() => {
     if (isSuccess && flightsData) {
       setFlight(flightsData);
@@ -358,16 +383,11 @@ function ChooseFlight() {
     });
     setFilteredFlights(filtered);
   }, [flightList, selectedDay]);
-  if (isLoading) {
-    return <p>Loading flights...</p>;
-  }
-  // const filteredFlights = flightList.departureFlights?.filter((flight) => {
-  //   const formattedDepartureDate = flight.departureDate
-  //     .toString()
-  //     .substring(0, 10);
-  //   console.log(flight.departureDate.toString().substring(0, 10));
-  //   return formattedDepartureDate === selectedDay;
-  // });
+
+  // if (isLoading) {
+  //   return <p>Loading flights...</p>;
+  // }
+
   const handleSortChange = (criteria) => {
     setSelectedSort(criteria);
 
@@ -457,32 +477,10 @@ function ChooseFlight() {
     return format(new Date(date), "d MMMM yyyy", { locale: id });
   };
 
-  // //Filter flights based on the selected date
-  // const filteredFlights = sortedFlights.filter(
-  //   (flight) => flight.date === selectedDay
-  // );
-  console.log("selectedfiltered : ", filteredFlights);
-  console.log("selectedday : ", selectedDay);
   return (
     <>
-      <style>{`
-  @media (max-width: 768px) {
-  .custom-col {
-    flex-direction: row !important; /* Menonaktifkan flex-column */
-    justify-content : space-between;
-  }
-}
-   @media (max-width: 990px) {
-  .custom-div {
-    width: 100%;
-    text-align: center;
-  }
-}
-  
-`}</style>
       <Container className="mt-4">
         {/* Header */}
-
         <Row
           style={{ fontSize: 20, fontWeight: "bold" }}
           className="mb-5"
@@ -559,7 +557,11 @@ function ChooseFlight() {
             </div>
 
             {/* Accordion for Flights */}
-            {filteredFlights?.length > 0 ? (
+            {isLoading ? (
+              <div className="text-center mt-4">
+                <Image src="ilustrasi (1).png"></Image>
+              </div>
+            ) : filteredFlights?.length > 0 ? (
               filteredFlights.map((flight, idx) => (
                 <Accordion
                   key={flight.id}
@@ -784,7 +786,7 @@ function ChooseFlight() {
               ))
             ) : (
               <div className="text-center mt-4">
-                <strong>Data pesawat kosong</strong>
+                <Image src="ilustrasi.png"></Image>
               </div>
             )}
           </Col>

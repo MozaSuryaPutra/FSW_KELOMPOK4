@@ -7,6 +7,7 @@ import {
   Accordion,
   Modal,
   ListGroup,
+  Image,
 } from "react-bootstrap";
 import { addDays, format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -268,7 +269,28 @@ function ReturnFlight() {
     passengersAmount,
     isReturnEnabled,
     flightId,
-  } = location.state || {}; // Mendapatkan data dari state
+  } = location.state || {};
+
+  if (
+    !selectedDepartureCity ||
+    !selectedReturnCity ||
+    !selectedClass ||
+    !selectedPassengers ||
+    !passengersAmount ||
+    (isReturnEnabled && !selectedReturnDate)
+  ) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  } // Mendapatkan data dari state
   const [selectedDays, setSelectedDay] = useState(selectedReturnDate);
   const dataToSend = {
     selectedDepartureCity,
@@ -354,9 +376,7 @@ function ReturnFlight() {
     });
     setFilteredFlights(filtered);
   }, [flightList, selectedDays]);
-  if (isLoading) {
-    return <p>Loading flights...</p>;
-  }
+
   const handleSortChange = (criteria) => {
     setSelectedSort(criteria);
 
@@ -540,8 +560,11 @@ function ReturnFlight() {
             </div>
 
             {/* Accordion for Flights */}
-
-            {filteredFlights?.length > 0 ? (
+            {isLoading ? (
+              <div className="text-center mt-4">
+                <Image src="ilustrasi (1).png"></Image>
+              </div>
+            ) : filteredFlights?.length > 0 ? (
               filteredFlights.map((flight, idx) => (
                 <Accordion
                   key={flight.id}
