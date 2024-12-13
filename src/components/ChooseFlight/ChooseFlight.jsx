@@ -479,7 +479,9 @@ function ChooseFlight() {
 
   };
 
-  const chooseReturn = async (event, flightId) => {
+
+  const chooseReturns = async (event, flightId) => {
+
     event.preventDefault();
 
     navigate({
@@ -685,7 +687,7 @@ function ChooseFlight() {
 
                             onClick={(event) => {
                               if (isReturnEnabled) {
-                                chooseReturn(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
+                                chooseReturns(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
                               } else {
                                 onSubmit(event, flight.id); // Panggil onSubmit jika isReturnEnabled false
                               }
