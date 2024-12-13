@@ -23,7 +23,9 @@ function Index() {
   const { token } = useSelector((state) => state.auth);
   const [flightPassenger, setFlightPassenger] = useState([]);
 
+
   const { data: routeData } = location.state || {}; // Menggunakan default object jika state tidak ada
+
 
   const {
     data: details,
@@ -82,6 +84,7 @@ function Index() {
     );
   }
 
+
   // Handling error state
   if (isError) {
     return (
@@ -92,6 +95,7 @@ function Index() {
   }
 
   // Render utama
+
   return (
     <div className="row g-3 m-0">
       <div
@@ -135,7 +139,9 @@ function Index() {
                   width: "30rem",
                 }}
               >
+
                 {routeData.transaction.id}
+
               </button>
             </div>
           </div>
@@ -143,7 +149,9 @@ function Index() {
           <div className="flight-detail-layout w-25">
             <div className="container row">
               <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
+
               <FlightDetail flighter={details} />
+
             </div>
           </div>
         </div>
