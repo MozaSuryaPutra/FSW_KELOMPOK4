@@ -7,11 +7,9 @@ import {
   Accordion,
   Modal,
   ListGroup,
-
   Image,
 } from "react-bootstrap";
 import { addDays, format } from "date-fns";
-
 import { id } from "date-fns/locale";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -257,17 +255,13 @@ function ReturnFlight() {
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
   const [sortedFlights, setSortedFlights] = useState(flightData);
 
-
   const [flightList, setFlight] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
-
   const location = useLocation();
   const {
     selectedDepartureCity,
     selectedReturnCity,
-
     selectedDay,
-
     selectedReturnDate,
     selectedClass,
     selectedPassengers,
@@ -275,7 +269,6 @@ function ReturnFlight() {
     passengersAmount,
     isReturnEnabled,
     flightId,
-
   } = location.state || {};
 
   if (
@@ -303,7 +296,6 @@ function ReturnFlight() {
     selectedDepartureCity,
     selectedReturnCity,
     selectedDay,
-
     selectedReturnDate,
     selectedClass,
     selectedPassengers,
@@ -321,10 +313,8 @@ function ReturnFlight() {
       "flight",
       selectedDepartureCity,
       selectedReturnCity,
-
       selectedDay,
       selectedDays,
-
       passengersAmount,
       selectedClass,
     ],
@@ -332,16 +322,14 @@ function ReturnFlight() {
       getSearchedFlight(
         selectedDepartureCity,
         selectedReturnCity,
-
         selectedDay,
         selectedDays,
-
         passengersAmount, // Menggunakan modifiedPassengers yang sudah diproses
         selectedClass
       ),
     enabled: !!selectedDepartureCity && !!selectedReturnCity, // Pastikan ada parameter yang diperlukan sebelum menjalankan query
   });
-
+  console.log(selectedDay);
   const { mutate: chooseCheckouts } = useMutation({
     mutationFn: (body) => {
       console.log("Login mutation called with body:", body); // Debugging log
@@ -356,10 +344,8 @@ function ReturnFlight() {
             data,
             selectedDepartureCity,
             selectedReturnCity,
-
             selectedDay,
             selectedDays,
-
             selectedClass,
             selectedPassengers,
           },
@@ -382,7 +368,6 @@ function ReturnFlight() {
       console.error("Error fetching flight data:", error);
     }
   }, [flightsData, isSuccess, error]);
-
 
   useEffect(() => {
     const filtered = flightList.returnFlights?.filter((flight) => {
@@ -434,7 +419,6 @@ function ReturnFlight() {
     setFilteredFlights(sorted);
     setShowModal(false);
   };
-
   const onSubmit = async (event, flightIds) => {
     event.preventDefault();
 
@@ -474,14 +458,12 @@ function ReturnFlight() {
   };
 
   //Filter flights based on the selected date
-
   // const filteredFlights = sortedFlights.filter(
   //   (flight) => flight.date === selectedDay
   // );
   console.log("fd : ", flightsData);
   console.log("selectedfiltered : ", filteredFlights);
   console.log("selectedday : ", selectedDay);
-
   return (
     <>
       <style>{`
@@ -533,7 +515,6 @@ function ReturnFlight() {
             md={12}
             className="text-center d-flex justify-content-center flex-wrap gap-1"
           >
-
             {[...Array(8)].map((_, idx) => {
               const date = addDays(new Date(selectedReturnDate), idx);
               const formattedDate = format(date, "yyyy-MM-dd");
@@ -555,7 +536,6 @@ function ReturnFlight() {
                 </Button>
               );
             })}
-
           </Col>
         </Row>
 
@@ -580,8 +560,9 @@ function ReturnFlight() {
             </div>
 
             {/* Accordion for Flights */}
-
-            {isLoading ? (
+            {error ? (
+              <div className="text-center mt-4">Tunggu Sebentar</div>
+            ) : isLoading ? (
               <div className="text-center mt-4">
                 <Image src="ilustrasi (1).png"></Image>
               </div>
@@ -593,7 +574,6 @@ function ReturnFlight() {
                   className="mb-3"
                 >
                   <Accordion.Item eventKey={idx}>
-
                     <Accordion.Header>
                       <div className="d-flex justify-content-between w-100 flex-wrap">
                         <div className="d-flex align-items-start gap-2">
@@ -741,9 +721,7 @@ function ReturnFlight() {
                                   fontWeight: "bold",
                                 }}
                               >
-
                                 <li>Jet Air - {flight.class}</li>
-
                                 <li>{flight.airplane.airplaneCode}</li>
                               </ul>
                             </div>
@@ -826,10 +804,8 @@ function ReturnFlight() {
                   label: "Paling Akhir",
                   value: "Keberangkatan - Paling Akhir",
                 },
-
                 { label: "K. Awal", value: "Kedatangan - Paling Awal" },
                 { label: "K. Akhir", value: "Kedatangan - Paling Akhir" },
-
               ].map((sortOption, idx) => (
                 <ListGroup.Item
                   key={idx}
@@ -841,9 +817,7 @@ function ReturnFlight() {
                       : "d-flex justify-content-between align-items-center"
                   }
                 >
-
                   {sortOption.label}
-
                   {selectedSort === sortOption.value && (
                     <span className="text-success ms-2">✔</span>
                   )}

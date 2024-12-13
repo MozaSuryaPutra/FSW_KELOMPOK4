@@ -252,12 +252,8 @@ const flightData = [
 
 function ChooseFlight() {
   const navigate = useNavigate();
-  const { user, token } = useSelector((state) => state.auth);
   const [showModal, setShowModal] = useState(false);
-
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
-  const [sortedFlights, setSortedFlights] = useState(flightData);
-
   const [flightList, setFlight] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
   const location = useLocation();
@@ -271,33 +267,9 @@ function ChooseFlight() {
     customFunction,
     passengersAmount,
     isReturnEnabled,
-  } = location.state || {}; // Mendapatkan data dari state
+  } = location.state || {};
 
-  // Memeriksa apakah ada data yang hilang dan menampilkan pesan jika ada
-  if (
-    !selectedDepartureCity ||
-    !selectedReturnCity ||
-    !selectedDepartureDate ||
-    !selectedClass ||
-    !selectedPassengers ||
-    !passengersAmount ||
-    (isReturnEnabled && !selectedReturnDate)
-  ) {
-    return (
-      <div className="text-center">
-        <h1>Anda harus memilih terlebih dahulu</h1>
-        <button
-          className="btn btn-primary mt-3"
-          onClick={() => navigate({ to: "/" })}
-        >
-          Kembali ke Beranda
-        </button>
-      </div>
-    );
-  }
-
-  console.log("ini selectedDepartureDate: ", selectedDepartureDate);
-  const [selectedDay, setSelectedDay] = useState(selectedDepartureDate);
+  const [selectedDay, setSelectedDay] = useState(selectedDepartureDate || "");
 
   const dataToSend = {
     selectedDepartureCity,
@@ -317,7 +289,6 @@ function ChooseFlight() {
     isLoading,
     error,
   } = useQuery({
-
     queryKey: [
       "flight",
       selectedDepartureCity,
@@ -336,17 +307,13 @@ function ChooseFlight() {
         passengersAmount,
         selectedClass
       ),
-    enabled: !!selectedDepartureCity && !!selectedReturnCity, // Pastikan ada parameter yang diperlukan sebelum menjalankan query
+    enabled: !!selectedDepartureCity && !!selectedReturnCity,
   });
 
   const { mutate: chooseCheckouts } = useMutation({
-    mutationFn: (body) => {
-      console.log("Login mutation called with body:", body); // Debugging log
-      return chooseCheckout(body); // Fungsi untuk melakukan request
-    },
+    mutationFn: (body) => chooseCheckout(body),
     onSuccess: (data) => {
       if (data) {
-        console.log("Data on success:", data); // Pastikan data sudah ada sebelum navigasi
         navigate({
           to: "/checkout-biodata",
           state: {
@@ -358,7 +325,7 @@ function ChooseFlight() {
             selectedClass,
             selectedPassengers,
           },
-        }); // Kirim flightList dan data
+        });
       } else {
         console.error("Token or user not found in response");
       }
@@ -377,7 +344,6 @@ function ChooseFlight() {
     }
   }, [flightsData, isSuccess, error]);
 
-
   useEffect(() => {
     const filtered = flightList.departureFlights?.filter((flight) => {
       const formattedDepartureDate = flight.departureDate.substring(0, 10);
@@ -386,14 +352,10 @@ function ChooseFlight() {
     setFilteredFlights(filtered);
   }, [flightList, selectedDay]);
 
-  // if (isLoading) {
-  //   return <p>Loading flights...</p>;
-  // }
-
   const handleSortChange = (criteria) => {
     setSelectedSort(criteria);
 
-    const sorted = [...filteredFlights]; // Salin array sebelum sorting
+    const sorted = [...filteredFlights];
     switch (criteria) {
       case "Harga - Termurah":
         sorted.sort((a, b) => a.price - b.price);
@@ -436,51 +398,21 @@ function ChooseFlight() {
   const onSubmit = async (event, flightId) => {
     event.preventDefault();
 
-    const selectedPassengersJson = JSON.stringify(selectedPassengers);
-
     const body = {
-      passengers: selectedPassengersJson, // Menggunakan selectedPassengers dalam format JSON
+      passengers: JSON.stringify(selectedPassengers),
       userId: 1,
       pp: isReturnEnabled,
       flightIds: JSON.stringify({
-        // Mengonversi flightIds menjadi JSON string
-        departure: flightId, // Menggunakan flightId yang dipilih untuk departure
-
+        departure: flightId,
         return: 0,
-
       }),
     };
 
-    console.log(body);
-    console.log(JSON.parse(body.flightIds)); // Menampilkan flightIds sebagai objek untuk pengecekan
-
-    // Mengirim data ke API
     chooseCheckouts(body);
-
-  };
-
-  const chooseReturn = async (event, flightId) => {
-    event.preventDefault();
-
-    navigate({
-      to: "/choose-return",
-      state: {
-        flightId,
-        selectedDepartureCity,
-        selectedReturnCity,
-        selectedDepartureDate,
-        selectedReturnDate,
-        selectedClass,
-        selectedPassengers,
-        isReturnEnabled,
-        passengersAmount,
-      },
-    });
-
   };
 
 
-  const chooseReturns = async (event, flightId) => {
+  const chooseReturns = (event, flightId) => {
 
     event.preventDefault();
 
@@ -500,9 +432,24 @@ function ChooseFlight() {
     });
   };
 
-  const formatDate = (date) => {
-    return format(new Date(date), "d MMMM yyyy", { locale: id });
-  };
+  if (
+    !selectedDepartureCity ||
+    !selectedReturnCity ||
+    !selectedClass ||
+    !selectedPassengers
+  ) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -684,7 +631,6 @@ function ChooseFlight() {
                         >
                           <strong>IDR {flight.price.toLocaleString()}</strong>
                           <Button
-
                             onClick={(event) => {
                               if (isReturnEnabled) {
                                 chooseReturns(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
@@ -692,7 +638,6 @@ function ChooseFlight() {
                                 onSubmit(event, flight.id); // Panggil onSubmit jika isReturnEnabled false
                               }
                             }}
-
                             variant="primary"
                           >
                             Pilih
@@ -753,7 +698,6 @@ function ChooseFlight() {
                                   fontWeight: "bold",
                                 }}
                               >
-
                                 <li>Jet Air - {flight.class}</li>
 
                                 <li>{flight.airplane.airplaneCode}</li>
