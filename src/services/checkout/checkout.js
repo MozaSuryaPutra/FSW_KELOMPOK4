@@ -35,10 +35,9 @@ export const getCheckoutByID = async (userid, transactionid) => {
     method: "GET",
   });
 
-  console.log("ini reponse : ", response);
+  console.log(response);
   // get data
   const result = await response.json();
-  console.log(result);
 
   return result?.data;
 };

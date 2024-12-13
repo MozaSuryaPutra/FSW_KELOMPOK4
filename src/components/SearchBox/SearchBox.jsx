@@ -11,6 +11,7 @@ import ReturnPopup from "../ReturnPopup/ReturnPopup";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { format, parseISO } from "date-fns";
+import { toast } from "react-toastify";
 import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jika diperlukan
 const SearchBox = () => {
   const [modalShow, setModalShow] = useState(false); // State untuk modal destinasi
@@ -29,6 +30,7 @@ const SearchBox = () => {
     child: 0,
     baby: 0,
   });
+  const [validated, setValidated] = useState(false);
   const [passengersAmount, setPassengersAmount] = useState(0);
   const flightSearch = {
     selectedDepartureCity,
@@ -85,7 +87,31 @@ const SearchBox = () => {
       setPassengersAmount(totalPassengers); // Update state dengan hasil perhitungan
     }
   }, [selectedPassengers]);
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
+    // Validasi input
+    if (
+      !selectedDepartureCity ||
+      !selectedReturnCity ||
+      !selectedDepartureDate ||
+      !selectedClass ||
+      !selectedPassengers ||
+      !passengersAmount
+    ) {
+      toast.warn("Isi Semua Terlebih Dahulu");
+      return;
+    }
+
+    // Validasi jika isReturnEnable true
+    if (isReturnEnabled && !selectedReturnDate) {
+      toast.warn("Isi Semua Terlebih Dahulu");
+      return;
+    }
+
+    toast.success("Berhasil Melakukan Pencarian");
+    navigate({ to: "/choose", state: flightSearch });
+  };
   console.log(passengersAmount);
   return (
     <>
@@ -107,7 +133,10 @@ const SearchBox = () => {
       <div>
         <Row className="justify-content-center">
           <Col md={12} sm={12} xs={12}>
-            <Form className="rounded shadow-lg p-4 bg-white  position-relative">
+            <Form
+              onSubmit={handleSubmit}
+              className="rounded shadow-lg p-4 bg-white  position-relative"
+            >
               <Row className="mb-4">
                 <Col xs={12}>
                   <p style={{ fontSize: 20, fontWeight: "bold" }}>
@@ -143,6 +172,7 @@ const SearchBox = () => {
                       type="text"
                       placeholder="Pilih Kota"
                       readOnly
+                      required
                       value={selectedDepartureCity.name || "Pilih Kota"}
                       className="border-0 border-bottom flex-grow-1 custom-input"
                       style={{
@@ -196,6 +226,7 @@ const SearchBox = () => {
                         fontSize: "2vw",
                         color: "#7126B5" || "#FFFFFF",
                       }}
+                      required
                     />
                   </Form.Group>
                 </Col>
@@ -413,9 +444,10 @@ const SearchBox = () => {
                     style={{ bottom: 0, left: 0, right: 0 }}
                   >
                     <Button
-                      onClick={() =>
-                        navigate({ to: "/choose", state: flightSearch })
-                      }
+                      type="submit"
+                      // onClick={() =>
+                      //   navigate({ to: "/choose", state: flightSearch })
+                      // }
                       className="w-100"
                       style={{
                         backgroundColor: "#7126B5",

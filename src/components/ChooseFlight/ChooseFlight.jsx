@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import {
   Container,
   Row,
@@ -7,8 +8,10 @@ import {
   Accordion,
   Modal,
   ListGroup,
+  Image,
 } from "react-bootstrap";
-import { format } from "date-fns";
+
+import { addDays, format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -251,10 +254,12 @@ function ChooseFlight() {
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
   const [showModal, setShowModal] = useState(false);
+
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
   const [sortedFlights, setSortedFlights] = useState(flightData);
-  const [selectedDay, setSelectedDay] = useState("2023-03-01");
+
   const [flightList, setFlight] = useState([]);
+  const [filteredFlights, setFilteredFlights] = useState([]);
   const location = useLocation();
   const {
     selectedDepartureCity,
@@ -267,6 +272,33 @@ function ChooseFlight() {
     passengersAmount,
     isReturnEnabled,
   } = location.state || {}; // Mendapatkan data dari state
+
+  // Memeriksa apakah ada data yang hilang dan menampilkan pesan jika ada
+  if (
+    !selectedDepartureCity ||
+    !selectedReturnCity ||
+    !selectedDepartureDate ||
+    !selectedClass ||
+    !selectedPassengers ||
+    !passengersAmount ||
+    (isReturnEnabled && !selectedReturnDate)
+  ) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
+
+  console.log("ini selectedDepartureDate: ", selectedDepartureDate);
+  const [selectedDay, setSelectedDay] = useState(selectedDepartureDate);
+
   const dataToSend = {
     selectedDepartureCity,
     selectedReturnCity,
@@ -290,7 +322,7 @@ function ChooseFlight() {
       "flight",
       selectedDepartureCity,
       selectedReturnCity,
-      selectedDepartureDate,
+      selectedDay,
       selectedReturnDate,
       passengersAmount,
       selectedClass,
@@ -299,9 +331,9 @@ function ChooseFlight() {
       getSearchedFlight(
         selectedDepartureCity,
         selectedReturnCity,
-        selectedDepartureDate,
+        selectedDay,
         selectedReturnDate,
-        passengersAmount, // Menggunakan modifiedPassengers yang sudah diproses
+        passengersAmount,
         selectedClass
       ),
     enabled: !!selectedDepartureCity && !!selectedReturnCity, // Pastikan ada parameter yang diperlukan sebelum menjalankan query
@@ -321,7 +353,7 @@ function ChooseFlight() {
             data,
             selectedDepartureCity,
             selectedReturnCity,
-            selectedDepartureDate,
+            selectedDay,
             selectedReturnDate,
             selectedClass,
             selectedPassengers,
@@ -336,9 +368,7 @@ function ChooseFlight() {
       toast.error(err?.message);
     },
   });
-  console.log({ selectedPassengers });
 
-  console.log("isi dari : ", isReturnEnabled);
   useEffect(() => {
     if (isSuccess && flightsData) {
       setFlight(flightsData);
@@ -348,9 +378,60 @@ function ChooseFlight() {
   }, [flightsData, isSuccess, error]);
 
 
-  if (isLoading) {
-    return <p>Loading flights...</p>;
-  }
+  useEffect(() => {
+    const filtered = flightList.departureFlights?.filter((flight) => {
+      const formattedDepartureDate = flight.departureDate.substring(0, 10);
+      return formattedDepartureDate === selectedDay;
+    });
+    setFilteredFlights(filtered);
+  }, [flightList, selectedDay]);
+
+  // if (isLoading) {
+  //   return <p>Loading flights...</p>;
+  // }
+
+  const handleSortChange = (criteria) => {
+    setSelectedSort(criteria);
+
+    const sorted = [...filteredFlights]; // Salin array sebelum sorting
+    switch (criteria) {
+      case "Harga - Termurah":
+        sorted.sort((a, b) => a.price - b.price);
+        break;
+      case "Durasi - Terpendek":
+        sorted.sort((a, b) => {
+          const durationA = new Date(a.arrivalDate) - new Date(a.departureDate);
+          const durationB = new Date(b.arrivalDate) - new Date(b.departureDate);
+          return durationA - durationB;
+        });
+        break;
+      case "Keberangkatan - Paling Awal":
+        sorted.sort(
+          (a, b) => new Date(a.departureDate) - new Date(b.departureDate)
+        );
+        break;
+      case "Keberangkatan - Paling Akhir":
+        sorted.sort(
+          (a, b) => new Date(b.departureDate) - new Date(a.departureDate)
+        );
+        break;
+      case "Kedatangan - Paling Awal":
+        sorted.sort(
+          (a, b) => new Date(a.arrivalDate) - new Date(b.arrivalDate)
+        );
+        break;
+      case "Kedatangan - Paling Akhir":
+        sorted.sort(
+          (a, b) => new Date(b.arrivalDate) - new Date(a.arrivalDate)
+        );
+        break;
+      default:
+        break;
+    }
+
+    setFilteredFlights(sorted);
+    setShowModal(false);
+  };
 
   const onSubmit = async (event, flightId) => {
     event.preventDefault();
@@ -397,99 +478,34 @@ function ChooseFlight() {
     });
 
   };
-  // if (!flightList?.departureFlights?.length) {
-  //   return <p>No flights found.</p>;
-  // }
 
-  //console.log(flightList.departureFlights.map((flight) => flight.id));
-  // Mappingnya gini
-  // Function untuk mengonversi durasi ke menit
-  // const durationToMinutes = (duration) => {
-  //   const [hours, minutes] = duration
-  //     .split(" ")[0]
-  //     .split("jam")
-  //     .map((time) => parseInt(time) || 0);
-  //   return hours * 60 + minutes;
-  // };
+  const chooseReturn = async (event, flightId) => {
+    event.preventDefault();
 
-  // Sorting logic
-  // const handleSortChange = (sortType) => {
-  //   let sortedData = [...flightData];
-  //   switch (sortType) {
-  //     case "Harga - Termurah":
-  //       sortedData.sort((a, b) => a.price - b.price);
-  //       break;
-  //     case "Durasi - Terpendek":
-  //       sortedData.sort(
-  //         (a, b) =>
-  //           durationToMinutes(a.duration) - durationToMinutes(b.duration)
-  //       );
-  //       break;
-  //     case "Keberangkatan - Paling Awal":
-  //       sortedData.sort(
-  //         (a, b) =>
-  //           new Date(`1970/01/01 ${a.departureTime}`) -
-  //           new Date(`1970/01/01 ${b.departureTime}`)
-  //       );
-  //       break;
-  //     case "Keberangkatan - Paling Akhir":
-  //       sortedData.sort(
-  //         (a, b) =>
-  //           new Date(`1970/01/01 ${b.departureTime}`) -
-  //           new Date(`1970/01/01 ${a.departureTime}`)
-  //       );
-  //       break;
-  //     case "Kedatangan - Paling Awal":
-  //       sortedData.sort(
-  //         (a, b) =>
-  //           new Date(`1970/01/01 ${a.arrivalTime}`) -
-  //           new Date(`1970/01/01 ${b.arrivalTime}`)
-  //       );
-  //       break;
-  //     case "Kedatangan - Paling Akhir":
-  //       sortedData.sort(
-  //         (a, b) =>
-  //           new Date(`1970/01/01 ${b.arrivalTime}`) -
-  //           new Date(`1970/01/01 ${a.arrivalTime}`)
-  //       );
-  //       break;
-  //     default:
-  //       break;
-  //   }
-  //   setSortedFlights(sortedData);
-  //   setSelectedSort(sortType);
-  //   setShowModal(false);
-  // };
+    navigate({
+      to: "/choose-return",
+      state: {
+        flightId,
+        selectedDepartureCity,
+        selectedReturnCity,
+        selectedDay,
+        selectedReturnDate,
+        selectedClass,
+        selectedPassengers,
+        isReturnEnabled,
+        passengersAmount,
+      },
+    });
+  };
 
   const formatDate = (date) => {
     return format(new Date(date), "d MMMM yyyy", { locale: id });
   };
 
-  //Filter flights based on the selected date
-  const filteredFlights = sortedFlights.filter(
-    (flight) => flight.date === selectedDay
-  );
-
   return (
     <>
-      <style>{`
-  @media (max-width: 768px) {
-  .custom-col {
-    flex-direction: row !important; /* Menonaktifkan flex-column */
-    justify-content : space-between;
-  }
-}
-   @media (max-width: 990px) {
-  .custom-div {
-    width: 100%;
-    text-align: center;
-  }
-}
-  
-`}</style>
       <Container className="mt-4">
         {/* Header */}
-
         <Row
           style={{ fontSize: 20, fontWeight: "bold" }}
           className="mb-5"
@@ -521,48 +537,27 @@ function ChooseFlight() {
             md={12}
             className="text-center d-flex justify-content-center flex-wrap gap-1"
           >
-            {[
-              { day: "Selasa", date: "2023-03-01" },
-              { day: "Rabu", date: "2023-03-02" },
-              { day: "Kamis", date: "2023-03-03" },
-              { day: "Jumat", date: "2023-03-04" },
-              { day: "Sabtu", date: "2023-03-05" },
-              { day: "Minggu", date: "2023-03-06" },
-              { day: "Senin", date: "2023-03-07" },
-              { day: "Selasa", date: "2023-03-08" },
-            ].map((item, idx, array) => (
-              <div
-                key={idx}
-                className={`d-flex align-items-center ${
-                  idx < array.length - 1 ? "custom-border-end" : ""
-                } px-2`}
-              >
+            {[...Array(8)].map((_, idx) => {
+              const date = addDays(new Date(selectedDepartureDate), idx);
+              const formattedDate = format(date, "yyyy-MM-dd");
+              const dayName = format(date, "EEEE", { locale: id });
+
+              return (
                 <Button
+                  key={idx}
                   variant={
-                    selectedDay === item.date ? "primary" : "outline-secondary"
+                    selectedDay === formattedDate
+                      ? "primary"
+                      : "outline-secondary"
                   }
-                  onClick={() => setSelectedDay(item.date)}
+                  onClick={() => setSelectedDay(formattedDate)}
                   className="text-center"
                 >
-                  <span>{item.day}</span> <br />
-                  <small>{item.date}</small>
+                  <span>{dayName}</span> <br />
+                  <small>{formattedDate}</small>
                 </Button>
-              </div>
-            ))}
-            <style jsx>{`
-              .custom-border-end {
-                position: relative;
-              }
-
-              .custom-border-end::after {
-                content: "";
-                position: absolute;
-                right: 0;
-                top: 15%; /* Offset 15% dari atas */
-                height: 70%; /* Tinggi 70% dari kontainer */
-                border-right: 1px solid #ccc;
-              }
-            `}</style>
+              );
+            })}
           </Col>
         </Row>
 
@@ -587,11 +582,18 @@ function ChooseFlight() {
             </div>
 
             {/* Accordion for Flights */}
-
-            {flightList?.departureFlights?.length > 0 ? (
-              flightList.departureFlights.map((flight, idx) => (
-                <Accordion key={flight.id}>
-                  <Accordion.Item eventKey={idx} className="mb-3">
+            {isLoading ? (
+              <div className="text-center mt-4">
+                <Image src="ilustrasi (1).png"></Image>
+              </div>
+            ) : filteredFlights?.length > 0 ? (
+              filteredFlights.map((flight, idx) => (
+                <Accordion
+                  key={flight.id}
+                  defaultActiveKey="0"
+                  className="mb-3"
+                >
+                  <Accordion.Item eventKey={idx}>
                     <Accordion.Header>
                       <div className="d-flex justify-content-between w-100 flex-wrap">
                         <div className="d-flex align-items-start gap-2">
@@ -722,7 +724,9 @@ function ChooseFlight() {
                         </Col>
                       </Row>
                       <Row>
-                        <p>{formatDate(flight.departureDate)}</p>
+                        <p>
+                          {flight.departureDate.toString().substring(0, 10)}
+                        </p>
                         <p>{flight.departureAirport.name}</p>
                         <hr style={{ width: "50%", margin: "0 auto" }}></hr>
                       </Row>
@@ -748,7 +752,7 @@ function ChooseFlight() {
                                 }}
                               >
 
-                                <li>Jet Air - {flightsData.class}</li>
+                                <li>Jet Air - {flight.class}</li>
 
                                 <li>{flight.airplane.airplaneCode}</li>
                               </ul>
@@ -802,8 +806,8 @@ function ChooseFlight() {
                         </Col>
                       </Row>
                       <Row>
-                        <p>{formatDate(flight.arrivalDate)}</p>
-                        <p>{flight.destinationAirport.id}</p>
+                        <p>{flight.arrivalDate.toString().substring(0, 10)}</p>
+                        {/* <p>{flight.destinationAirport.id}</p> */}
                       </Row>
                     </Accordion.Body>
                   </Accordion.Item>
@@ -811,7 +815,7 @@ function ChooseFlight() {
               ))
             ) : (
               <div className="text-center mt-4">
-                <strong>Data pesawat kosong</strong>
+                <Image src="ilustrasi.png"></Image>
               </div>
             )}
           </Col>
@@ -832,8 +836,8 @@ function ChooseFlight() {
                   label: "Paling Akhir",
                   value: "Keberangkatan - Paling Akhir",
                 },
-                { label: "Paling Awal", value: "Kedatangan - Paling Awal" },
-                { label: "Paling Akhir", value: "Kedatangan - Paling Akhir" },
+                { label: "K. Awal", value: "Kedatangan - Paling Awal" },
+                { label: "K. Akhir", value: "Kedatangan - Paling Akhir" },
               ].map((sortOption, idx) => (
                 <ListGroup.Item
                   key={idx}
@@ -845,7 +849,7 @@ function ChooseFlight() {
                       : "d-flex justify-content-between align-items-center"
                   }
                 >
-                  {sortOption.value} {/* Menampilkan label yang lebih pendek */}
+                  {sortOption.label}
                   {selectedSort === sortOption.value && (
                     <span className="text-success ms-2">✔</span>
                   )}

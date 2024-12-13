@@ -1,0 +1,192 @@
+{
+  "status": 200,
+  "message": "success",
+  "data": {
+    "transaction": {
+      "id": "1",
+      "userId": "1",
+      "ordererId": "1",
+      "departureFlightId": "1",
+      "returnFlightId": "2",
+      "status": "unpaid",
+      "amount": "8170000",
+      "amountAfterTax": "8415100",
+      "expiredPayment": null,
+      "expiredFilling": "2024-11-29T15:50:57.000Z",
+      "createdAt": "2024-11-30T05:03:59.659Z",
+      "updatedAt": null
+    },
+    "flights": {
+      "departure": {
+        "id": "1",
+        "airplaneId": "1",
+        "departureAirportId": "1",
+        "departureTerminalId": "1",
+        "destinationAirportId": "2",
+        "departureDate": "2024-12-01T00:00:00.000Z",
+        "departureTime": "1970-01-01T10:00:00.000Z",
+        "arrivalDate": "2024-12-01T00:00:00.000Z",
+        "arrivalTime": "1970-01-01T14:00:00.000Z",
+        "class": "economy",
+        "price": "2300000",
+        "departureAirport": {
+          "id": "1",
+          "cityId": "1",
+          "name": "Soekarno-Hatta International Airport",
+          "iataCode": "CGK"
+        },
+        "returnFlight": [],
+        "departureTerminal": {
+          "id": "1",
+          "name": "Terminal Hatta A",
+          "airportId": "1"
+        },
+        "airplane": {
+          "id": "1",
+          "airlineId": "1",
+          "airplaneCode": "GA123",
+          "totalSeat": 5,
+          "baggage": 30,
+          "cabinBaggage": 7,
+          "description": "Garuda Airbus A320",
+          "airline": {
+            "id": "1",
+            "name": "Garuda Indonesia",
+            "logo": "garuda-logo.png"
+          },
+          "seat": [
+            {
+              "id": "1",
+              "airplaneId": "1",
+              "code": "1D",
+              "status": "available"
+            },
+            {
+              "id": "2",
+              "airplaneId": "1",
+              "code": "1E",
+              "status": "booked"
+            },
+            {
+              "id": "3",
+              "airplaneId": "1",
+              "code": "1F",
+              "status": "available"
+            },
+            {
+              "id": "4",
+              "airplaneId": "1",
+              "code": "1G",
+              "status": "available"
+            },
+            {
+              "id": "5",
+              "airplaneId": "1",
+              "code": "1H",
+              "status": "available"
+            }
+          ]
+        }
+      },
+      "return": {
+        "id": "2",
+        "airplaneId": "2",
+        "departureAirportId": "1",
+        "departureTerminalId": "1",
+        "destinationAirportId": "4",
+        "departureDate": "2024-12-01T00:00:00.000Z",
+        "departureTime": "1970-01-01T10:00:00.000Z",
+        "arrivalDate": "2024-12-01T00:00:00.000Z",
+        "arrivalTime": "1970-01-01T14:00:00.000Z",
+        "class": "economy",
+        "price": "2000000",
+        "departureAirport": {
+          "id": "1",
+          "cityId": "1",
+          "name": "Soekarno-Hatta International Airport",
+          "iataCode": "CGK"
+        },
+        "returnFlight": [
+          {
+            "id": "1",
+            "userId": "1",
+            "ordererId": "1",
+            "departureFlightId": "1",
+            "returnFlightId": "2",
+            "status": "unpaid",
+            "amount": "8170000",
+            "amountAfterTax": "8415100",
+            "expiredPayment": null,
+            "expiredFilling": "2024-11-29T15:50:57.000Z",
+            "createdAt": "2024-11-30T05:03:59.659Z",
+            "updatedAt": null
+          }
+        ],
+        "departureTerminal": {
+          "id": "1",
+          "name": "Terminal Hatta A",
+          "airportId": "1"
+        },
+        "airplane": {
+          "id": "2",
+          "airlineId": "1",
+          "airplaneCode": "AG234",
+          "totalSeat": 2,
+          "baggage": 30,
+          "cabinBaggage": 7,
+          "description": "Garuda Minibus B210",
+          "airline": {
+            "id": "1",
+            "name": "Garuda Indonesia",
+            "logo": "garuda-logo.png"
+          },
+          "seat": [
+            {
+              "id": "6",
+              "airplaneId": "2",
+              "code": "2A",
+              "status": "available"
+            },
+            {
+              "id": "7",
+              "airplaneId": "2",
+              "code": "2B",
+              "status": "available"
+            }
+          ]
+        }
+      }
+    },
+    "priceDetails": {
+      "passenger": [
+        {
+          "type": "child",
+          "count": 2,
+          "total": 4140000,
+          "flightType": "departure"
+        },
+        {
+          "type": "adult",
+          "count": 1,
+          "total": 2300000,
+          "flightType": "departure"
+        },
+        {
+          "type": "child",
+          "count": 2,
+          "total": 3600000,
+          "flightType": "return"
+        },
+        {
+          "type": "adult",
+          "count": 1,
+          "total": 2000000,
+          "flightType": "return"
+        }
+      ],
+      "tax": 245100,
+      "totalPayBeforeTax": 8170000,
+      "totalPayAfterTax": 8415100
+    }
+  }
+}
