@@ -317,6 +317,7 @@ function ChooseFlight() {
     isLoading,
     error,
   } = useQuery({
+
     queryKey: [
       "flight",
       selectedDepartureCity,
@@ -375,6 +376,7 @@ function ChooseFlight() {
       console.error("Error fetching flight data:", error);
     }
   }, [flightsData, isSuccess, error]);
+
 
   useEffect(() => {
     const filtered = flightList.departureFlights?.filter((flight) => {
@@ -443,7 +445,9 @@ function ChooseFlight() {
       flightIds: JSON.stringify({
         // Mengonversi flightIds menjadi JSON string
         departure: flightId, // Menggunakan flightId yang dipilih untuk departure
+
         return: 0,
+
       }),
     };
 
@@ -452,6 +456,27 @@ function ChooseFlight() {
 
     // Mengirim data ke API
     chooseCheckouts(body);
+
+  };
+
+  const chooseReturn = async (event, flightId) => {
+    event.preventDefault();
+
+    navigate({
+      to: "/choose-return",
+      state: {
+        flightId,
+        selectedDepartureCity,
+        selectedReturnCity,
+        selectedDepartureDate,
+        selectedReturnDate,
+        selectedClass,
+        selectedPassengers,
+        isReturnEnabled,
+        passengersAmount,
+      },
+    });
+
   };
 
   const chooseReturns = async (event, flightId) => {
@@ -657,6 +682,7 @@ function ChooseFlight() {
                         >
                           <strong>IDR {flight.price.toLocaleString()}</strong>
                           <Button
+
                             onClick={(event) => {
                               if (isReturnEnabled) {
                                 chooseReturns(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
@@ -664,6 +690,7 @@ function ChooseFlight() {
                                 onSubmit(event, flight.id); // Panggil onSubmit jika isReturnEnabled false
                               }
                             }}
+
                             variant="primary"
                           >
                             Pilih
@@ -724,7 +751,9 @@ function ChooseFlight() {
                                   fontWeight: "bold",
                                 }}
                               >
+
                                 <li>Jet Air - {flight.class}</li>
+
                                 <li>{flight.airplane.airplaneCode}</li>
                               </ul>
                             </div>
