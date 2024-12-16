@@ -7,6 +7,7 @@ import { Row, Col, Form, Button } from 'react-bootstrap'
 import { createLazyFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
+import { resetPassword } from "../../services/auth/auth";
 
 export const Route = createLazyFileRoute('/auth/forget-pass')({
   component: ResetPassword,
@@ -34,9 +35,7 @@ function ResetPassword() {
   const [isTokenValid, setIsTokenValid] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // const validationUrl = `${import.meta.env.VITE_API_URL}/${token}`;
-
-  // Validate token
+   // Validate token
   useEffect(() => {
     const validateToken = async () => {
       try {

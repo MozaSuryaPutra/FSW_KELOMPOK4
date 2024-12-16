@@ -19,8 +19,7 @@ function OTPInputUI() {
 
   const { token } = useSelector((state) => state.auth);
   const [otp, setOtp] = useState('');
-  const [userId, setUserId] = useState('');
-  const [message, setMessage] = useState('');
+  const { user, email } = useSelector((state) => state.auth);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [counter, setCounter] = useState(60);
@@ -71,36 +70,29 @@ function OTPInputUI() {
   };
 
   const handleOtpVerification = async () => {
-    if (!otp) {
-      alert('OTP is required')
-      return
+    if (!otp || !token) {
+      alert('OTP are required');
+      return;
     }
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/otp/verify`,
-        { otp, token },
-      )
-      alert('OTP verified successfully')
-      navigate('/success')
+      axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/verify-otp`,
+        { otp, token }
+      );
+      alert('OTP verified successfully');
+      navigate('/success');
     } catch (err) {
-      alert(err.response?.data?.message || 'OTP verification failed')
+      console.error(err); // Logging for debugging
+      alert(err?.response?.data?.message || 'OTP verification failed');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
-
-  const handleResendOtp = () => {
-    axios
-      .post(`${import.meta.env.VITE_API_URL}/auth/otp/resend`, { token })
-      .then(() => {
-        alert('OTP resent successfully')
-        setCounter(60)
-      })
-      .catch((err) => {
-        alert(err.response?.data?.message || 'Failed to resend OTP')
-      })
-  }
+  };
+  
+  const handleResendOtp = async () => {
+    verifOTP(email);
+  };
 
   return (
     <div
@@ -119,7 +111,7 @@ function OTPInputUI() {
     </form>
       <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>Masukkan OTP</h1>
       <p style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
-        Ketik 6 digit kode yang dikirimkan ke <b>J*****@gmail.com</b> 
+        Ketik 6 digit kode yang dikirimkan ke {" "} <b>{user?.email}</b>
       </p> 
 
       <div
@@ -145,7 +137,9 @@ function OTPInputUI() {
         ))} */}
         <OtpInput
           value={otp}
-          onChange={handleChange}
+          onChange={(value) => {
+            setOtp(value);
+          }}
           numInputs={6}
           separator={<span> </span>}
           inputStyle={{

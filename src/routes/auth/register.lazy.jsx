@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../../services/auth/auth";
 import { toast } from "react-toastify";
 import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { setUser } from "../../redux/slices/auth";
 import BgTiketkuImage from "/BG-Tiketku.png?url";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+export const Route = createLazyFileRoute("/auth/register")({
+  component: Register,
+});
+
 function Register() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { token } = useSelector((state) => state.auth);
 
   //Register Form Data
   const [name, setName] = useState("");
@@ -23,17 +30,25 @@ function Register() {
     setShowPassword(!showPassword);
   };
 
+  useEffect(() => {
+    // get token from local storage
+    if (token) {
+        navigate({ to: "/" });
+    }
+  }, [token, navigate]);
+
   const { mutate: registerUser } = useMutation({
     mutationFn: (body) => {
       console.log("Register body:", body);
       return register(body); // Ensure register is correctly defined and returns a Promise
     },
-    onSuccess: (data) => {
-      console.log("Success:", data);
-      // Your success logic
+    onSuccess: (result) => {
+      console.log("Register Success:", result);
+      dispatch(setUser(email));
+      navigate({ to: "/auth/otp" });
     },
     onError: (error) => {
-      console.error("Error:", error);
+      console.error("Register Error:", error);
     },
   });
   
@@ -42,7 +57,7 @@ function Register() {
     const body = {
       name,
       email,
-      phoneNumber,
+      numberPhone:phoneNumber,
       password,
     };
     registerUser(body);
@@ -98,7 +113,7 @@ function Register() {
               <Form.Group className="mb-3" controlId="phoneNumber">
                 <Form.Label>Nomor Telepon</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="tel"
                   placeholder="+62"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}

@@ -13,8 +13,6 @@ export const Route = createLazyFileRoute('/auth/forget-pass-req')({
 function ResetRequest() {
   const [email, setEmail] = useState('')
 
-  let url = `${import.meta.env.VITE_API_URL}/` //belum
-
   // Mutation for sending request link through email
   const { mutate: sendRequest, isPending } = useMutation({
     mutationFn: async (email) =>
