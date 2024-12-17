@@ -92,6 +92,18 @@ const FlightDetail = ({ flighter }) => {
           {flightData?.flights?.departure?.id || "Unknown ID"}
         </div>
       </div>
+
+      {/* Tombol "Lanjut Bayar" jika email sudah ada */}
+      {flightData?.orderer?.email && (
+        <div className="text-center pt-3">
+          <button
+            className="btn btn-danger w-100"
+            style={{ fontWeight: "bold" }}
+          >
+            Lanjut Bayar
+          </button>
+        </div>
+      )}
     </div>
   );
 };

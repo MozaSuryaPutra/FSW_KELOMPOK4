@@ -271,26 +271,7 @@ function ReturnFlight() {
     flightId,
   } = location.state || {};
 
-  if (
-    !selectedDepartureCity ||
-    !selectedReturnCity ||
-    !selectedClass ||
-    !selectedPassengers ||
-    !passengersAmount ||
-    (isReturnEnabled && !selectedReturnDate)
-  ) {
-    return (
-      <div className="text-center">
-        <h1>Anda harus memilih terlebih dahulu</h1>
-        <button
-          className="btn btn-primary mt-3"
-          onClick={() => navigate({ to: "/" })}
-        >
-          Kembali ke Beranda
-        </button>
-      </div>
-    );
-  } // Mendapatkan data dari state
+  // Mendapatkan data dari state
   const [selectedDays, setSelectedDay] = useState(selectedReturnDate);
   const dataToSend = {
     selectedDepartureCity,
@@ -338,6 +319,7 @@ function ReturnFlight() {
     onSuccess: (data) => {
       if (data) {
         console.log("Data on success:", data); // Pastikan data sudah ada sebelum navigasi
+        toast.success("Berhasil Membuat Checkout Biodata");
         navigate({
           to: "/checkout-biodata",
           state: {
@@ -456,7 +438,26 @@ function ReturnFlight() {
   const formatDate = (date) => {
     return format(new Date(date), "d MMMM yyyy", { locale: id });
   };
-
+  if (
+    !selectedDepartureCity ||
+    !selectedReturnCity ||
+    !selectedClass ||
+    !selectedPassengers ||
+    !passengersAmount ||
+    (isReturnEnabled && !selectedReturnDate)
+  ) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
   //Filter flights based on the selected date
   // const filteredFlights = sortedFlights.filter(
   //   (flight) => flight.date === selectedDay
@@ -483,7 +484,6 @@ function ReturnFlight() {
 `}</style>
       <Container className="mt-4">
         {/* Header */}
-
         <Row
           style={{ fontSize: 20, fontWeight: "bold" }}
           className="mb-5"
@@ -508,38 +508,40 @@ function ReturnFlight() {
             </Button>
           </Col>
         </Row>
-
         {/* Navigation Dates */}
-        <Row className="mb-4">
-          <Col
-            md={12}
-            className="text-center d-flex justify-content-center flex-wrap gap-1"
-          >
-            {[...Array(8)].map((_, idx) => {
-              const date = addDays(new Date(selectedReturnDate), idx);
-              const formattedDate = format(date, "yyyy-MM-dd");
-              const dayName = format(date, "EEEE", { locale: id });
+        {selectedReturnDate ? (
+          <Row className="mb-4">
+            <Col
+              md={12}
+              className="text-center d-flex justify-content-center flex-wrap gap-1"
+            >
+              {[...Array(8)].map((_, idx) => {
+                const date = addDays(new Date(selectedReturnDate), idx);
+                const formattedDate = format(date, "yyyy-MM-dd");
+                const dayName = format(date, "EEEE", { locale: id });
 
-              return (
-                <Button
-                  key={idx}
-                  variant={
-                    selectedDays === formattedDate
-                      ? "primary"
-                      : "outline-secondary"
-                  }
-                  onClick={() => setSelectedDay(formattedDate)}
-                  className="text-center"
-                >
-                  <span>{dayName}</span> <br />
-                  <small>{formattedDate}</small>
-                </Button>
-              );
-            })}
-          </Col>
-        </Row>
-
-        {/* Main Content */}
+                return (
+                  <Button
+                    key={idx}
+                    variant={
+                      selectedDays === formattedDate
+                        ? "primary"
+                        : "outline-secondary"
+                    }
+                    onClick={() => setSelectedDay(formattedDate)}
+                    className="text-center"
+                  >
+                    <span>{dayName}</span> <br />
+                    <small>{formattedDate}</small>
+                  </Button>
+                );
+              })}
+            </Col>
+          </Row>
+        ) : (
+          <p>Tunggu Sebentar</p> // Menampilkan pesan jika
+        )}
+        ;{/* Main Content */}
         <Row>
           {/* Filter Section */}
           <Col md={3} className="mb-3"></Col>
@@ -560,9 +562,7 @@ function ReturnFlight() {
             </div>
 
             {/* Accordion for Flights */}
-            {error ? (
-              <div className="text-center mt-4">Tunggu Sebentar</div>
-            ) : isLoading ? (
+            {isLoading ? (
               <div className="text-center mt-4">
                 <Image src="ilustrasi (1).png"></Image>
               </div>
@@ -788,7 +788,6 @@ function ReturnFlight() {
             )}
           </Col>
         </Row>
-
         {/* Sort Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
