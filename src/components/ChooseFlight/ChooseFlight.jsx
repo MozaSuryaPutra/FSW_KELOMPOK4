@@ -314,6 +314,9 @@ function ChooseFlight() {
     mutationFn: (body) => chooseCheckout(body),
     onSuccess: (data) => {
       if (data) {
+
+        toast.success("Berhasil Membuat Checkout Biodata");
+
         navigate({
           to: "/checkout-biodata",
           state: {
@@ -451,6 +454,8 @@ function ChooseFlight() {
     );
   }
 
+  console.log(selectedPassengers);
+
   return (
     <>
       <Container className="mt-4">
@@ -479,38 +484,40 @@ function ChooseFlight() {
             </Button>
           </Col>
         </Row>
-
         {/* Navigation Dates */}
-        <Row className="mb-4">
-          <Col
-            md={12}
-            className="text-center d-flex justify-content-center flex-wrap gap-1"
-          >
-            {[...Array(8)].map((_, idx) => {
-              const date = addDays(new Date(selectedDepartureDate), idx);
-              const formattedDate = format(date, "yyyy-MM-dd");
-              const dayName = format(date, "EEEE", { locale: id });
+        {selectedDepartureDate ? (
+          <Row className="mb-4">
+            <Col
+              md={12}
+              className="text-center d-flex justify-content-center flex-wrap gap-1"
+            >
+              {[...Array(8)].map((_, idx) => {
+                const date = addDays(new Date(selectedDepartureDate), idx);
+                const formattedDate = format(date, "yyyy-MM-dd");
+                const dayName = format(date, "EEEE", { locale: id });
 
-              return (
-                <Button
-                  key={idx}
-                  variant={
-                    selectedDay === formattedDate
-                      ? "primary"
-                      : "outline-secondary"
-                  }
-                  onClick={() => setSelectedDay(formattedDate)}
-                  className="text-center"
-                >
-                  <span>{dayName}</span> <br />
-                  <small>{formattedDate}</small>
-                </Button>
-              );
-            })}
-          </Col>
-        </Row>
-
-        {/* Main Content */}
+                return (
+                  <Button
+                    key={idx}
+                    variant={
+                      selectedDay === formattedDate
+                        ? "primary"
+                        : "outline-secondary"
+                    }
+                    onClick={() => setSelectedDay(formattedDate)}
+                    className="text-center"
+                  >
+                    <span>{dayName}</span> <br />
+                    <small>{formattedDate}</small>
+                  </Button>
+                );
+              })}
+            </Col>
+          </Row>
+        ) : (
+          <p>Tunggu Sebentar</p> // Menampilkan pesan jika
+        )}
+        ;{/* Main Content */}
         <Row>
           {/* Filter Section */}
           <Col md={3} className="mb-3"></Col>
@@ -766,7 +773,6 @@ function ChooseFlight() {
             )}
           </Col>
         </Row>
-
         {/* Sort Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>

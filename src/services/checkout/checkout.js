@@ -41,3 +41,26 @@ export const getCheckoutByID = async (userid, transactionid) => {
 
   return result?.data;
 };
+
+export const updateCheckout = async (request) => {
+  // Mengonversi request body menjadi URL-encoded string
+  const urlEncodedData = new URLSearchParams(request).toString();
+  const token = localStorage.getItem("token");
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/api/checkout`, {
+    body: urlEncodedData,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      authorization: `Bearer ${token}`,
+    },
+  });
+  const result = await response.json();
+  console.log("INI url :", urlEncodedData);
+  console.log("INI RESULT :", result); // Debugging log
+  console.log("INI RESPONSE : ", response);
+  if (!response.ok) {
+    throw new Error(result?.message);
+  }
+
+  return result?.data;
+};
