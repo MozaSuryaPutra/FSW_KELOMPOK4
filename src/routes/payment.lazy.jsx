@@ -1,25 +1,30 @@
-import * as React from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import FlightDetail from "../components/payment/flightDetail";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "../components/payment/payment.css";
+import { useLocation } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/payment")({
-  component: RouteComponent,
+  component: Paymentpage,
 });
 
-function RouteComponent() {
+function Paymentpage() {
   const navigate = useNavigate();
-  const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
+  const location = useLocation();
+  const [snapToken, setSnapToken] = useState("");
+  const { token } = useSelector((state) => state.auth);
+
+  const { details, userId, transactionId } = location.state || {};
 
   useEffect(() => {
     if (!token) {
       navigate({ to: "/" });
     }
-  }, [token, navigate]);
+  }, [details, token]);
 
+  console.log(details);
   return (
     <div className="payment-display">
       <div
@@ -135,7 +140,6 @@ function RouteComponent() {
           <div className="btn-bayar container">
             <button
               class="btn text-white fw-medium py-3 fs-5"
-              onClick={() => navigate({ to: "/payment-success" })}
               style={{ backgroundColor: "#7126B5", width: "100%" }}
               type="button"
             >
@@ -146,12 +150,18 @@ function RouteComponent() {
         <div className=" flight-detail-layout w-25">
           <div className="container row">
             <div className="fw-bolder fs-5 pt-1">
-              Booking Code : <span style={{ color: "#7126B5" }}> 987FETGR</span>
+              Booking Code :{" "}
+              <span style={{ color: "#7126B5" }}>
+                {" "}
+                {details.orderer.bookingCode}
+              </span>
             </div>
-            <FlightDetail />
+            <FlightDetail data={details} />
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+export default Paymentpage;

@@ -53,6 +53,8 @@ function Index() {
     selectedPassengers,
   } = location.state || {}; // Menggunakan default object jika state tidak ada
 
+  console.log("ini merupakan luaran data :", data);
+
   const {
     data: details,
     isSuccess,
@@ -65,10 +67,19 @@ function Index() {
     enabled: !!token,
   });
 
+  console.log("ini merupakan isi dari data : ", data);
+
   const { mutate: update, isPending: isUpdateProcessing } = useMutation({
     mutationFn: (request) => updatePassanger(request),
     onSuccess: () => {
-      navigate({ to: `/checkout-success` });
+      navigate({
+        to: "/checkout-success",
+        state: {
+          details: data,
+          userId,
+          transactionId,
+        },
+      });
     },
     onError: (error) => {
       toast.error(error?.message);
@@ -135,6 +146,11 @@ function Index() {
       passengers: JSON.stringify(temp),
       seatIds: JSON.stringify(dataKursi),
     };
+
+    console.log("Navigating to checkout-success with:", {
+      userId,
+      transactionId,
+    });
     update(request);
   };
 
@@ -288,7 +304,7 @@ function Index() {
     );
   };
 
-  console.log("ini luaran details : ", details.priceDetails.passenger);
+  console.log("ini luaran details : ", details.priceDetails.passenger.length);
   // -------------------------------------------------------------------------
   return (
     <div className="row g-3 m-0">
