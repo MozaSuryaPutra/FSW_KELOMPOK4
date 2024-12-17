@@ -25,6 +25,7 @@ export const Route = createLazyFileRoute("/checkout-biodata")({
 function Index() {
   const navigate = useNavigate();
   const location = useLocation();
+
   const queryClient = useQueryClient();
   const token = useSelector((state) => state.auth.token);
   const [outboundSeatIds, setOutboundSeatIds] = useState([]);
@@ -134,6 +135,7 @@ function Index() {
     },
   });
 
+
   // Default hooks harus tetap dipanggil
   const {
     data: details,
@@ -163,6 +165,7 @@ function Index() {
           <h1>Redirecting...</h1>
         </div>
       );
+
     }
 
     if (!routeData || !routeData.transaction) {
@@ -472,11 +475,14 @@ function Index() {
                   <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
                   <FlightDetail flighter={details} />
                 </div>
+
               </div>
             </div>
           </div>
         </div>
+
       </form>
+
     );
   };
 
