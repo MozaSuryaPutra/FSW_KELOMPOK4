@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useMutation } from '@tanstack/react-query'
-import { useSearchParams } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
 import { Row, Col, Form, Button } from 'react-bootstrap'
-import { createLazyFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 import { resetPassword } from "../../services/auth/auth";
@@ -14,53 +13,15 @@ export const Route = createLazyFileRoute('/auth/forget-pass')({
 })
 
 function ResetPassword() {
-  const navigate = useNavigate()
-  const [searchParams] = useSearchParams()
 
-  // Get token from URL
-  const token = searchParams.get('token')
-
-  if (!token) {
-    toast.error('Token is missing. Please try a new request.', {
-      position: 'top-center',
-      autoClose: 5000,
-    })
-    navigate({ to: '/forget-pass-req' })
-    return null
-  }
-
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [isTokenValid, setIsTokenValid] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-   // Validate token
-  useEffect(() => {
-    const validateToken = async () => {
-      try {
-        setIsLoading(true)
-        const response = await axios.get(validationUrl)
-        if (response.status === 200) {
-          setIsTokenValid(true)
-        } else {
-          throw new Error('Token is invalid or expired.')
-        }
-      } catch (error) {
-        setIsTokenValid(false)
-        toast.error(error.message || 'An unexpected error occurred.')
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (token) validateToken()
-  }, [token, validationUrl])
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Toggle password visibility
   const togglePassword = () => {
-    setShowPassword(!showPassword)
-  }
+    setShowPassword(!showPassword);
+  };
 
   // Mutation for password reset
   const { mutate: savePassword, isPending } = useMutation({
@@ -68,38 +29,29 @@ function ResetPassword() {
     onSuccess: () => {
       toast.success('Password reset successful. Redirecting to login page...', {
         autoClose: 4000,
-      })
-      setTimeout(() => navigate({ to: '/login' }), 4000)
+      });
+      setTimeout(() => navigate({ to: '/login' }), 4000);
     },
     onError: (error) => {
       toast.error(
         error.response?.data?.message || 'An unexpected error occurred.',
-      )
+      );
     },
-  })
+  });
 
-  // Handle form submission
   const handleSubmit = (e) => {
-    e.preventDefault()
-
-    if (!isTokenValid) {
-      toast.error('Token is invalid or expired.')
-      return
-    }
-
+    e.preventDefault();
     if (newPassword.length < 8) {
-      toast.warn('Password must be at least 8 characters long.')
-      return
+      toast.warn('Password must be at least 8 characters long.');
+      return;
     }
-
     if (newPassword !== confirmPassword) {
-      toast.warn('Passwords do not match.')
-      return
+      toast.warn('Passwords do not match.');
+      return;
     }
-
-    const data = { token, newPassword }
-    savePassword(data)
-  }
+    const data = { token, newPassword };
+    savePassword(data);
+  };
 
   return (
   <section style={{ height: "100vh", backgroundColor: "white" }}>
@@ -115,17 +67,13 @@ function ResetPassword() {
           alt="Logo"
           style={{ height: "100vh", width: "100%", objectFit: "cover" }}
         />
-      </Col>        <Col
+      </Col>
+      <Col
           lg={6}
           md={12}
           className="d-flex flex-column align-items-center justify-content-center"
         >
-          {isLoading ? (
-            <p className="p-3 bg-light bg-opacity-75 border-2 shadow-sm rounded">
-              Validating token, please wait...
-            </p>
-          ) : (
-            <Form
+          <Form
               style={{
                 width: '100%',
                 maxWidth: '452px',
@@ -197,7 +145,7 @@ function ResetPassword() {
                 disabled={isPending}
                 style={{ borderRadius: '16px' }}
               >
-                {isPending ? 'Saving...' : 'Save'}
+                {isPending ? 'Resetting...' : 'Reset Password'}
               </Button>
 
               <div className="text-center mt-3">
@@ -214,21 +162,11 @@ function ResetPassword() {
                   </Link>
                 </span>
               </div>
-
-              {!isTokenValid && (
-                <div className="text-center text-danger mt-5">
-                  <span>
-                    Token has expired or is invalid.{' '}
-                    <Link to={`/forget-pass-req`} style={{ color: '#7126B5' }}>
-                      Try again
-                    </Link>
-                  </span>
-                </div>
-              )}
             </Form>
-          )}
         </Col>
       </Row>
     </section>
-  )
+  );
 }
+
+export default ResetPassword;

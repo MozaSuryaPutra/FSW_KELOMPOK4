@@ -29,7 +29,7 @@ function OTPInputUI() {
         setIsLoading(true);
         const toastId = toast.loading("Sending OTP...",{position:"bottom-center", className:""});
         axios
-            .post(`${import.meta.env.VITE_API_URL}/auth/otp/verify`, data)
+            .post(`${import.meta.env.VITE_API_URL}/api/auth/otp/verify`, data)
             .then((res) => {
                 console.log(res);
                 toast.update(toastId, {
@@ -53,6 +53,13 @@ function OTPInputUI() {
     },
   });
 
+  useEffect(() => {
+    if (counter > 0) {
+      const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
+      return () => clearInterval(timer); // Bersihkan timer saat unmount
+    }
+  }, [counter]);
+
   const handleChange = (e) => {
     setOtp(e.target.value);
     setError('');
@@ -60,39 +67,50 @@ function OTPInputUI() {
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    
+    if (!otp ) {
+      alert('OTP diperlukan');
+      return;
+    }
+  
+    setIsLoading(true);
+  
     const body = {
       email: user?.email,
       otp,
     };
-    console.log(body);
-    // hit the login API with the data
-    verifOTP(body);
-  };
-
-  const handleOtpVerification = async () => {
-    if (!otp || !token) {
-      alert('OTP are required');
-      return;
-    }
-    setIsLoading(true);
+  
     try {
-      axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/verify-otp`,
-        { otp, token }
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/otp/verify-otp`,
+        body
       );
-      alert('OTP verified successfully');
+      alert('OTP berhasil diverifikasi');
       navigate('/success');
     } catch (err) {
-      console.error(err); // Logging for debugging
-      alert(err?.response?.data?.message || 'OTP verification failed');
+      console.error(err);
+      alert(err?.response?.data?.message || 'Verifikasi OTP gagal');
     } finally {
       setIsLoading(false);
     }
   };
   
-  const handleResendOtp = async () => {
-    verifOTP(email);
-  };
+  const handleResendOtp = () => {
+    axios
+      .post(`${import.meta.env.VITE_API_URL}/api/auth/otp`, {
+        email: user?.email,
+      })
+      .then((res) => {
+        console.log("OTP sent:", res);
+        alert("OTP telah dikirim ulang ke email Anda.");
+      })
+      .catch((err) => {
+        console.error("Error resending OTP:", err);
+        alert("Gagal mengirim ulang OTP. Silakan coba lagi.");
+      });
+  
+    setCounter(60); // Reset countdown
+  };  
 
   return (
     <div
@@ -117,24 +135,6 @@ function OTPInputUI() {
       <div
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
       >
-        {/* {[...Array(6)].map((_, index) => (
-          <input
-            key={index}
-            type="number"
-            max={9}
-            min={0}
-            maxLength="1"
-            style={{
-              width: "40px",
-              height: "40px",
-              margin: "0 5px",
-              fontSize: "20px",
-              textAlign: "center",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-            }}
-          />
-        ))} */}
         <OtpInput
           value={otp}
           onChange={(value) => {
@@ -156,17 +156,24 @@ function OTPInputUI() {
 
       <p
         style={{
-          fontSize: "14px",
-          color: "#666",
+    fontSize: "14px",
+    color: "#666",
         }}
       >
-        Kirim Ulang OTP dalam {counter} detik
+      Kirim Ulang OTP dalam {counter} detik
       </p>
-      <div style={{ marginTop: "20px", color: "red", cursor: "pointer" }} onClick={handleResendOtp}>
+      {counter === 0 && (
+      <div
+        style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
+        onClick={handleResendOtp}
+      >
         Kirim ulang OTP
       </div>
+      )}
+
       <button
-        onClick={handleOtpVerification}
+        type="submit"
+        onClick={onSubmit}
         style={{
           backgroundColor: "#6C63FF",
           color: "white",

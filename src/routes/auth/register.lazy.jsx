@@ -156,7 +156,7 @@ function Register() {
             </Form>
             <p className="text-center mt-4">
               Sudah punya akun?{" "}
-              <a href="/login" style={{ color: "#6C63FF", fontWeight: "500" }}>
+              <a href="/auth/login" style={{ color: "#6C63FF", fontWeight: "500" }}>
                 Masuk di sini
               </a>
             </p>
