@@ -314,7 +314,9 @@ function ChooseFlight() {
     mutationFn: (body) => chooseCheckout(body),
     onSuccess: (data) => {
       if (data) {
+
         toast.success("Berhasil Membuat Checkout Biodata");
+
         navigate({
           to: "/checkout-biodata",
           state: {
@@ -451,7 +453,9 @@ function ChooseFlight() {
       </div>
     );
   }
+
   console.log(selectedPassengers);
+
   return (
     <>
       <Container className="mt-4">
