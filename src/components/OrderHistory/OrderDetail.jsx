@@ -1,11 +1,46 @@
 import PropTypes from "prop-types";
 import { Card, Row, Col, Button } from "react-bootstrap";
-//import logoIcon from "../../assets/info-icon.png";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+import { useState, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 const OrderDetail = ({ data }) => {
+  const navigate = useNavigate();
+  const [orders, setOrders] = useState(data); // Menyimpan data dalam state
+
+  useEffect(() => {
+    setOrders(data); // Mengupdate state ketika props data berubah
+  }, [data]);
+
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
+  };
+
+  const formatTime = (dateString) => {
+    return format(new Date(dateString), "HH:mm");
+  };
+
+  // Fungsi untuk memperbarui status pesanan
+  const updateOrderStatus = (orderId, status) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.id === orderId
+          ? {
+              ...order,
+              departureFlight: {
+                ...order.departureFlight,
+                status: status, // Mengubah status pesanan
+              },
+            }
+          : order
+      )
+    );
+  };
+  console.log(orders);
   return (
     <div>
-      {data.map((order) => (
+      {orders.map((order) => (
         <Card key={order.id} style={{ marginLeft: "10px" }}>
           <Card.Body>
             <Row className="mb-2">
@@ -16,19 +51,19 @@ const OrderDetail = ({ data }) => {
                 <span
                   style={{
                     backgroundColor:
-                      order.status === "Issued"
+                      order.departureFlight.status === "Issued"
                         ? "#73CA5C"
-                        : order.status === "Unpaid"
+                        : order.departureFlight.status === "Unpaid"
                           ? "#FF0000"
-                          : "#8A8A8As",
+                          : "#8A8A8A",
                     color: "white",
                     padding: "4px 12px",
                     fontSize: "14px",
                     borderRadius: "16px",
-                    display: "inline-block", // Jika perlu
+                    display: "inline-block",
                   }}
                 >
-                  {order.status}
+                  {order.departureFlight.status}
                 </span>
               </Col>
             </Row>
@@ -36,44 +71,112 @@ const OrderDetail = ({ data }) => {
               <Col>
                 <p>
                   Booking Code:{" "}
-                  <span className="text-primary">{order.bookingCode}</span>
+                  <span className="text-primary">
+                    {order.departureFlight.bookingCode}
+                  </span>
                 </p>
               </Col>
             </Row>
             <Row className="mb-2">
               <Col>
                 <div className="mb-0 d-flex justify-content-between">
-                  <strong className="mb-0">{order.departure.time}</strong>
+                  <strong className="mb-0">
+                    {formatTime(order.departureFlight.departure.time)}
+                  </strong>
                   <p className="mb-0" style={{ color: "#A06ECE" }}>
                     Keberangkatan
                   </p>
                 </div>
-                <p className="mb-0">{order.departure.date}</p>
-                <p>{order.departureAirport}</p>
+                <p className="mb-0">
+                  {formatDate(order.departureFlight.departure.date)}
+                </p>
+                <p>
+                  {order.departureFlight.departure.airport}
+                  {order.departureFlight.departure.terminalName && (
+                    <> - {order.departureFlight.departure.terminalName}</>
+                  )}{" "}
+                </p>
+                {order.returnFlight && (
+                  <>
+                    <div className="mb-0 d-flex justify-content-between">
+                      <strong className="mb-0">
+                        {formatTime(order.returnFlight.departure.time)}
+                      </strong>
+                      <p className="mb-0" style={{ color: "#A06ECE" }}>
+                        Keberangkatan
+                      </p>
+                    </div>
+                    <p className="mb-0">
+                      {formatDate(order.returnFlight.departure.date)}
+                    </p>
+                    <p>
+                      {order.returnFlight.departure.airport}
+                      {order.returnFlight.departure.terminalName && (
+                        <> - {order.returnFlight.departure.terminalName}</>
+                      )}{" "}
+                    </p>
+                  </>
+                )}
               </Col>
             </Row>
             <hr />
             <Row className="mb-2">
               <Col xs={1} md={1} className="p-0 align-content-center">
                 <img
-                  src="Info-icon.png"
+                  src={order.departureFlight.logo}
                   alt="logo Info"
                   className=" img-fluid w-100 align-content-center"
                 />
+                {order.returnFlight && (
+                  <img
+                    src={order.returnFlight.logo}
+                    alt="logo Info"
+                    className=" img-fluid w-100 align-content-center"
+                  />
+                )}
               </Col>
               <Col>
-                <p>
-                  <strong>{order.airline}</strong> <br />
-                  <strong>{order.flightCode}</strong>
-                </p>
+                {order.returnFlight ? (
+                  <Row>
+                    <Col className="p-0">
+                      <p>
+                        <strong>
+                          {order.departureFlight.airlineName} -{" "}
+                          {order.departureFlight.seatClass}
+                        </strong>{" "}
+                        <br />
+                        <strong>{order.departureFlight.airplaneCode}</strong>
+                      </p>
+                    </Col>
+                    <Col>
+                      <strong>
+                        {order.returnFlight.airlineName} -{" "}
+                        {order.returnFlight.seatClass}
+                      </strong>{" "}
+                      <br />
+                      <strong>{order.returnFlight.airplaneCode}</strong>
+                    </Col>
+                  </Row>
+                ) : (
+                  <Row>
+                    <p>
+                      <strong>
+                        {order.departureFlight.airlineName} -{" "}
+                        {order.departureFlight.seatClass}
+                      </strong>{" "}
+                      <br />
+                      <strong>{order.departureFlight.airplaneCode}</strong>
+                    </p>
+                  </Row>
+                )}
 
                 <p className="m-0">
                   <strong>Informasi:</strong>
                 </p>
-                {order.passengers.map((passenger, index) => (
+                {order.ordererNames.map((passenger, index) => (
                   <p key={index} className="m-0">
                     Penumpang {index + 1}:{" "}
-                    <span className="text-primary">{passenger.name}</span>
+                    <span className="text-primary">{passenger.fullname}</span>
                     <br />
                     ID: {passenger.id}
                   </p>
@@ -84,13 +187,43 @@ const OrderDetail = ({ data }) => {
             <Row className="mb-2">
               <Col>
                 <div className="mb-0 d-flex justify-content-between">
-                  <strong className="mb-0">{order.arrival.time}</strong>
+                  <strong className="mb-0">
+                    {formatTime(order.departureFlight.arrival.time)}
+                  </strong>
                   <p className="mb-0" style={{ color: "#A06ECE" }}>
                     Kedatangan
                   </p>
                 </div>
-                <p className="mb-0">{order.arrival.date}</p>
-                <p>{order.arrivalAirport}</p>
+                <p className="mb-0">
+                  {formatDate(order.departureFlight.arrival.date)}
+                </p>
+                <p>
+                  {order.departureFlight.arrival.airport}{" "}
+                  {order.departureFlight.arrival.terminalName && (
+                    <> - {order.departureFlight.arrival.terminalName}</>
+                  )}{" "}
+                </p>
+                {order.returnFlight && (
+                  <>
+                    <div className="mb-0 d-flex justify-content-between">
+                      <strong className="mb-0">
+                        {formatTime(order.returnFlight.arrival.time)}
+                      </strong>
+                      <p className="mb-0" style={{ color: "#A06ECE" }}>
+                        Kedatangan
+                      </p>
+                    </div>
+                    <p className="mb-0">
+                      {formatDate(order.returnFlight.arrival.date)}
+                    </p>
+                    <p>
+                      {order.returnFlight.arrival.airport}
+                      {order.returnFlight.arrival.terminalName && (
+                        <> - {order.returnFlight.arrival.terminalName}</>
+                      )}{" "}
+                    </p>
+                  </>
+                )}
               </Col>
             </Row>
             <hr />
@@ -99,51 +232,244 @@ const OrderDetail = ({ data }) => {
                 <p>
                   <strong>Rincian Harga</strong>
                 </p>
-                <div className="d-flex justify-content-between mb-0">
-                  <p>2 Adults </p>
-                  <p>{order.pricing.adults}</p>
+                <div>
+                  {/* Bagian Departure Flight */}
+                  <h6>Departure Flight</h6>
+                  <div className="d-flex justify-content-between">
+                    <p className="m-0">
+                      {order.priceDetails.passenger
+                        .filter(
+                          (passenger) =>
+                            (passenger.type === "adult" &&
+                              passenger.flightType === "departure") ||
+                            null
+                        )
+                        .reduce(
+                          (total, passenger) => total + passenger.count,
+                          0
+                        )}{" "}
+                      Adults
+                    </p>
+                    <p className="m-0">
+                      Rp{" "}
+                      {order.priceDetails.passenger
+                        .filter(
+                          (passenger) =>
+                            passenger.type === "adult" &&
+                            passenger.flightType === "departure"
+                        )
+                        .reduce(
+                          (total, passenger) => total + passenger.total,
+                          0
+                        )
+                        .toLocaleString()}
+                    </p>
+                  </div>
+
+                  {order.priceDetails.passenger
+                    .filter(
+                      (passenger) =>
+                        passenger.type === "child" &&
+                        passenger.flightType === "departure"
+                    )
+                    .reduce((total, passenger) => total + passenger.count, 0) >
+                    0 && (
+                    <div className="d-flex justify-content-between">
+                      <p className="m-0">
+                        {order.priceDetails.passenger
+                          .filter(
+                            (passenger) =>
+                              passenger.type === "child" &&
+                              passenger.flightType === "departure"
+                          )
+                          .reduce(
+                            (total, passenger) => total + passenger.count,
+                            0
+                          )}{" "}
+                        Children
+                      </p>
+                      <p className="m-0">
+                        Rp{" "}
+                        {order.priceDetails.passenger
+                          .filter(
+                            (passenger) =>
+                              passenger.type === "child" &&
+                              passenger.flightType === "departure"
+                          )
+                          .reduce(
+                            (total, passenger) => total + passenger.total,
+                            0
+                          )
+                          .toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+
+                  {order.priceDetails.passenger
+                    .filter(
+                      (passenger) =>
+                        passenger.type === "baby" &&
+                        passenger.flightType === "departure"
+                    )
+                    .reduce((total, passenger) => total + passenger.count, 0) >
+                    0 && (
+                    <div className="d-flex justify-content-between">
+                      <p className="m-0">
+                        {order.priceDetails.passenger
+                          .filter(
+                            (passenger) =>
+                              passenger.type === "baby" &&
+                              passenger.flightType === "departure"
+                          )
+                          .reduce(
+                            (total, passenger) => total + passenger.count,
+                            0
+                          )}{" "}
+                        Babies
+                      </p>
+                      <p className="m-0">
+                        Rp{" "}
+                        {order.priceDetails.passenger
+                          .filter(
+                            (passenger) =>
+                              passenger.type === "baby" &&
+                              passenger.flightType === "departure"
+                          )
+                          .reduce(
+                            (total, passenger) => total + passenger.total,
+                            0
+                          )
+                          .toLocaleString()}
+                      </p>
+                    </div>
+                  )}
+                  <hr />
+
+                  {/* Bagian Return Flight */}
+                  {order.returnFlight && (
+                    <>
+                      <h6>Return Flight</h6>
+                      <div className="d-flex justify-content-between">
+                        <p className="m-0">
+                          {order.priceDetails.passenger
+                            .filter(
+                              (passenger) =>
+                                passenger.type === "adult" &&
+                                passenger.flightType === "return"
+                            )
+                            .reduce(
+                              (total, passenger) => total + passenger.count,
+                              0
+                            )}{" "}
+                          Adults
+                        </p>
+                        <p className="m-0">
+                          Rp{" "}
+                          {order.priceDetails.passenger
+                            .filter(
+                              (passenger) =>
+                                passenger.type === "adult" &&
+                                passenger.flightType === "return"
+                            )
+                            .reduce(
+                              (total, passenger) => total + passenger.total,
+                              0
+                            )
+                            .toLocaleString()}
+                        </p>
+                      </div>
+
+                      {order.priceDetails.passenger
+                        .filter(
+                          (passenger) =>
+                            passenger.type === "baby" &&
+                            passenger.flightType === "return"
+                        )
+                        .reduce(
+                          (total, passenger) => total + passenger.count,
+                          0
+                        ) > 0 && (
+                        <div className="d-flex justify-content-between">
+                          <p className="m-0">
+                            {order.priceDetails.passenger
+                              .filter(
+                                (passenger) =>
+                                  passenger.type === "baby" &&
+                                  passenger.flightType === "return"
+                              )
+                              .reduce(
+                                (total, passenger) => total + passenger.count,
+                                0
+                              )}{" "}
+                            Babies
+                          </p>
+                          <p className="m-0">
+                            Rp{" "}
+                            {order.priceDetails.passenger
+                              .filter(
+                                (passenger) =>
+                                  passenger.type === "baby" &&
+                                  passenger.flightType === "return"
+                              )
+                              .reduce(
+                                (total, passenger) => total + passenger.total,
+                                0
+                              )
+                              .toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Bagian Pajak dan Total */}
+                  <div className="d-flex justify-content-between">
+                    <p className="m-0">Tax</p>
+                    <p className="m-0">
+                      Rp {order.priceDetails.tax.toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <strong>Total</strong>
+                    <strong style={{ color: "#9b59b6", fontSize: "20px" }}>
+                      Rp {order.priceDetails.totalPayAfterTax.toLocaleString()}
+                    </strong>
+                  </div>
                 </div>
-                <div className="d-flex justify-content-between mb-0">
-                  <p>1 baby </p>
-                  <p>{order.pricing.baby}</p>
-                </div>
-                <div className="d-flex justify-content-between mb-0">
-                  <p>Tax </p>
-                  <p>{order.pricing.tax}</p>
-                </div>
-                <hr />
-                <div className="d-flex justify-content-between mb-0">
-                  <strong>Total</strong>
-                  <strong style={{ color: "#9b59b6", fontSize: "20px" }}>
-                    {order.pricing.total}
-                  </strong>
-                </div>
-                <p></p>
               </Col>
             </Row>
             <Button
               style={{
                 padding: "16px 12px",
                 backgroundColor:
-                  order.status === "Issued"
+                  order.departureFlight.status === "Issued"
                     ? "#7126B5"
-                    : order.status === "Unpaid"
+                    : order.departureFlight.status === "Unpaid"
                       ? "#FF0000"
                       : "#95a5a6",
                 borderColor:
-                  order.status === "Issued"
+                  order.departureFlight.status === "Issued"
                     ? "#9b59b6"
-                    : order.status === "Unpaid"
+                    : order.departureFlight.status === "Unpaid"
                       ? "#e74c3c"
                       : "#95a5a6",
                 color: "white",
               }}
               className="w-100"
-              disabled={order.status === "Canceled"}
+              disabled={order.departureFlight.status === "Canceled"}
+              onClick={() =>
+                navigate({
+                  to: "/checkout-success",
+                  replace: false, // Set to true if you want to replace the current entry in history
+                  state: {
+                    transactionId: order.transactionId, // Kirim transactionId sebagai state
+                  },
+                })
+              } // Memperbarui status saat tombol ditekan
             >
-              {order.status === "Issued"
+              {order.departureFlight.status === "Issued"
                 ? "Cetak Tiket"
-                : order.status === "Unpaid"
+                : order.departureFlight.status === "Unpaid"
                   ? "Lanjut Bayar"
                   : "Canceled"}
             </Button>
@@ -157,33 +483,42 @@ const OrderDetail = ({ data }) => {
 OrderDetail.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      status: PropTypes.string.isRequired,
-      bookingCode: PropTypes.string.isRequired,
-      departure: PropTypes.shape({
-        time: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
+      departureFlight: PropTypes.shape({
+        status: PropTypes.string.isRequired,
+        bookingCode: PropTypes.string,
+        airlineName: PropTypes.string.isRequired,
+        airplaneCode: PropTypes.string.isRequired,
+        seatClass: PropTypes.string.isRequired,
+        departure: PropTypes.shape({
+          date: PropTypes.string.isRequired,
+          time: PropTypes.string.isRequired,
+          airport: PropTypes.string.isRequired,
+          terminalName: PropTypes.string.isRequired,
+        }).isRequired,
+        arrival: PropTypes.shape({
+          date: PropTypes.string.isRequired,
+          time: PropTypes.string.isRequired,
+          airport: PropTypes.string.isRequired,
+        }).isRequired,
       }).isRequired,
-      departureAirport: PropTypes.string.isRequired,
-      airline: PropTypes.string.isRequired,
-      flightCode: PropTypes.string.isRequired,
-      passengers: PropTypes.arrayOf(
+      priceDetails: PropTypes.shape({
+        passenger: PropTypes.arrayOf(
+          PropTypes.shape({
+            type: PropTypes.string.isRequired,
+            count: PropTypes.number.isRequired,
+            total: PropTypes.number.isRequired,
+            flightType: PropTypes.string.isRequired,
+          })
+        ).isRequired,
+        tax: PropTypes.number.isRequired,
+        totalPayAfterTax: PropTypes.number.isRequired,
+      }).isRequired,
+      ordererNames: PropTypes.arrayOf(
         PropTypes.shape({
-          name: PropTypes.string.isRequired,
-          id: PropTypes.string.isRequired,
+          id: PropTypes.number.isRequired,
+          fullname: PropTypes.string.isRequired,
         })
       ).isRequired,
-      arrival: PropTypes.shape({
-        time: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-      }).isRequired,
-      arrivalAirport: PropTypes.string.isRequired,
-      pricing: PropTypes.shape({
-        adults: PropTypes.string.isRequired,
-        baby: PropTypes.string.isRequired,
-        tax: PropTypes.string.isRequired,
-        total: PropTypes.string.isRequired,
-      }).isRequired,
     })
   ).isRequired,
 };

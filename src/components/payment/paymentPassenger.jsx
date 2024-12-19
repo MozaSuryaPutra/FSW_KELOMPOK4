@@ -19,7 +19,11 @@ const BookingFormPassenger = ({
   }, [ordererData?.passengers]);
 
   const passengersToDisplay = ordererData?.orderer?.familyName
-    ? ordererData.passengers // Gunakan passengers dari ordererData jika familyName ada
+
+    ? ordererData.passengers?.filter(
+        (passenger) => passenger.flightType === "departure"
+      ) // Filter hanya passenger dengan flightType "departure"
+
     : formData?.passengers; // Jika tidak, gunakan passengers dari formData
 
   return (

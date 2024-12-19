@@ -30,12 +30,17 @@ function Index() {
   const token = useSelector((state) => state.auth.token);
   const [outboundSeatIds, setOutboundSeatIds] = useState([]);
   const [returnSeatIds, setReturnSeatIds] = useState([]);
-
+  const userIds = useSelector((state) => {
+    const userString = state.auth.user; // Ambil string JSON dari state
+    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
+    return user?.id; // Kembalikan id jika user ada
+  });
   const { data: routeData, selectedClass } = location.state || {};
-
+  const [userId, setUserId] = useState(0);
+  const [transactionId, setTransactionId] = useState(0);
   //Ini Untuk Form isi
   const [formData, setFormData] = useState({
-    userId: 1,
+    userId: userIds,
     transactionId: routeData?.transaction?.id,
     orderer: {
       fullname: "",
@@ -93,6 +98,7 @@ function Index() {
     }));
   };
 
+
   const handleOrdererChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -108,6 +114,7 @@ function Index() {
       return { ...prev, passengers: updatedPassengers };
     });
   };
+
 
   const handleSeatSelection = (selectedSeats) => {
     setOutboundSeatIds(selectedSeats); // Untuk seat pergi
@@ -156,6 +163,15 @@ function Index() {
     enabled: !!token && !!routeData?.transaction, // Query hanya berjalan jika data lengkap
   });
 
+  useEffect(() => {
+    if (isSuccess) {
+      setUserId(details?.transaction.userId);
+      setTransactionId(details?.transaction.id);
+    } else if (error) {
+      console.error("Error fetching flight data:", error);
+    }
+  }, [details, isSuccess, navigate]);
+
   // Handling state
   const renderContent = () => {
     if (!token) {
@@ -181,6 +197,7 @@ function Index() {
         </div>
       );
     }
+
 
     if (isLoading) {
       return (
@@ -230,7 +247,9 @@ function Index() {
 
       const data = {
         ...formData,
-        userId: parseInt(formData?.userId, 10),
+
+        userId: parseInt(userIds, 10),
+
         transactionId: parseInt(formData?.transactionId, 10),
         orderer: JSON.stringify(formData?.orderer),
         passengers: JSON.stringify(formData?.passengers),
@@ -263,8 +282,10 @@ function Index() {
         ); // Menit
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000); // Detik
 
+
         return { hours, minutes, seconds };
       };
+
 
       // 2. Menyimpan waktu dalam state
       const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
@@ -448,6 +469,7 @@ function Index() {
                   )}
                 </div>
 
+
                 <div className="container pt-3">
                   <button
                     type="submit"
@@ -470,10 +492,29 @@ function Index() {
                 </div>
               </div>
 
+
               <div className="flight-detail-layout w-25">
                 <div className="container row">
                   <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
                   <FlightDetail flighter={details} />
+
+                  <div className="text-center pt-3">
+                    <button
+                      className="btn btn-danger w-100"
+                      onClick={() =>
+                        navigate({
+                          to: "/checkout-success",
+                          state: {
+                            // userId,
+                            transactionId,
+                          },
+                        })
+                      }
+                      style={{ fontWeight: "bold" }}
+                    >
+                      Lanjut Bayar
+                    </button>
+                  </div>
                 </div>
 
               </div>
