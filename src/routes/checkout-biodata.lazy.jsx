@@ -31,7 +31,8 @@ function Index() {
   const [returnSeatIds, setReturnSeatIds] = useState([]);
 
   const { data: routeData, selectedClass } = location.state || {};
-
+  const [userId, setUserId] = useState(0);
+  const [transactionId, setTransactionId] = useState(0);
   //Ini Untuk Form isi
   const [formData, setFormData] = useState({
     userId: 1,
@@ -138,6 +139,7 @@ function Index() {
   const {
     data: details,
     isLoading,
+    isSuccess,
     isError,
     error,
   } = useQuery({
@@ -153,7 +155,14 @@ function Index() {
       ),
     enabled: !!token && !!routeData?.transaction, // Query hanya berjalan jika data lengkap
   });
-
+  useEffect(() => {
+    if (isSuccess) {
+      setUserId(details?.transaction.userId);
+      setTransactionId(details?.transaction.id);
+    } else if (error) {
+      console.error("Error fetching flight data:", error);
+    }
+  }, [details, isSuccess, navigate]);
   // Handling state
   const renderContent = () => {
     if (!token) {
@@ -471,6 +480,23 @@ function Index() {
                 <div className="container row">
                   <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
                   <FlightDetail flighter={details} />
+                  <div className="text-center pt-3">
+                    <button
+                      className="btn btn-danger w-100"
+                      onClick={() =>
+                        navigate({
+                          to: "/checkout-success",
+                          state: {
+                            userId,
+                            transactionId,
+                          },
+                        })
+                      }
+                      style={{ fontWeight: "bold" }}
+                    >
+                      Lanjut Bayar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
