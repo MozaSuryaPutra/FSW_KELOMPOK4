@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
+import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "bootstrap/dist/css/bootstrap.min.css"; // To apply the bootstrap styling
 import "react-datepicker/dist/react-datepicker.css";

@@ -35,8 +35,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 // Default (initial) state
 const initialState = {
-  user: JSON.parse(localStorage.getItem("user")) || null, // Ambil user dari localStorage (jika ada)
-  token: localStorage.getItem("token") || null, // Ambil token dari localStorage (jika ada)
+
+  user: localStorage.getItem("user") || null,
+  token: localStorage.getItem("token") || null,
+
 };
 
 // Slice action and reducer
@@ -45,6 +47,11 @@ export const authSlice = createSlice({
   name: "auth",
   reducers: {
     setUser: (state, action) => {
+      if (action.payload) {
+        localStorage.setItem("user", action.payload);
+      } else {
+        localStorage.removeItem("user");
+      }
       state.user = action.payload;
       // Simpan user ke localStorage
       if (action.payload) {

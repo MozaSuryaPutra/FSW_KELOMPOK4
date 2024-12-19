@@ -1,5 +1,5 @@
 import React from "react";
-import { createRootRoute, Outlet, useLocation } from "@tanstack/react-router";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import Container from "react-bootstrap/Container";
 import { ToastContainer } from "react-toastify";
@@ -10,7 +10,6 @@ import NavBar from "../components/Navbar/NavBar";
 
 export const Route = createRootRoute({
   component: () => {
-    const location = useLocation(); // Ambil lokasi saat ini
 
     // Cek apakah path dimulai dengan '/auth' untuk menentukan apakah NavBar ditampilkan
     const isAuthRoute = location.pathname.startsWith("/auth");

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Row, Col, Form, Button } from "react-bootstrap";
@@ -39,8 +39,9 @@ function Login() {
       if (data?.token) {
         console.log("Data on success:", data?.token); // Debugging log
         console.log("Data on success:", data?.user); // Debugging log
+
         dispatch(setToken(data?.token));
-        dispatch(setUser(data?.user));
+        dispatch(setUser(JSON.stringify(data?.user)));
         navigate({ to: "/" });
       } else {
         console.error("Token or user not found in response");
@@ -123,8 +124,8 @@ function Login() {
             <Form.Group controlId="password" className="mb-3">
               <div className="d-flex justify-content-between align-items-center">
                 <Form.Label>Password</Form.Label>
-                <a
-                  href={`/forget-pass-req`}
+                <Link
+                  href={`/auth/forget-pass-req`}
                   style={{
                     fontSize: "0.875rem",
                     fontWeight: "light",
@@ -133,7 +134,7 @@ function Login() {
                   }}
                 >
                   Forget password
-                </a>
+                </Link>
               </div>
               <div style={{ position: "relative" }}>
                 <Form.Control
@@ -172,7 +173,7 @@ function Login() {
             <div className="text-center mt-3">
               <span>
                 Don't have an account?{" "}
-                <Link to="/register" style={{ color: "#7126B5" }}>
+                <Link to="/auth/register" style={{ color: "#7126B5" }}>
                   Register here
                 </Link>
               </span>

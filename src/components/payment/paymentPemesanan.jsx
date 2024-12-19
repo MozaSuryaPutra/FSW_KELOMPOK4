@@ -1,10 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Form, Row, Col } from "react-bootstrap";
 import "./paymentPemesanan.css";
 
-const BookingForm = () => {
+const BookingForm = ({ ordererData, handleOrdererChange }) => {
   const [hasLastName, setHasLastName] = useState(true);
+  const [DataOrderer, setDataOrderer] = useState({ ...ordererData });
 
+  useEffect(() => {
+    // Periksa apakah ordererData memiliki lastName
+    if (ordererData?.orderer?.familyName) {
+      setHasLastName(true);
+    } else {
+      setHasLastName(false);
+    }
+
+    // Sinkronkan perubahan ordererData ke DataOrderer
+    setDataOrderer({ ...ordererData });
+  }, [ordererData]);
+  console.log("Data orderer : ", DataOrderer);
   return (
     <Card
       className=""
@@ -26,22 +39,40 @@ const BookingForm = () => {
           padding: "10px 15px",
           fontSize: "1rem",
           fontWeight: "500",
+          position: "relative", // This makes the parent container for positioning the icon
         }}
       >
         Data Diri Pemesan
+        {DataOrderer?.orderer?.fullname && (
+          <img
+            src="Vector (3).png"
+            alt="Icon"
+            style={{
+              position: "absolute",
+              right: "10px", // Adjust the position to your liking
+              top: "50%", // Vertically center the icon
+              transform: "translateY(-50%)", // Perfectly center the icon vertically
+              width: "20px", // Adjust icon size as needed
+            }}
+          />
+        )}
       </Card.Subtitle>
+
       <Card.Body>
         <Form style={{ marginTop: "-15px" }}>
           <Form.Group className="mb-3" controlId="fullName">
             <Form.Label className="custom-label">Nama Lengkap</Form.Label>
             <Form.Control
+              name="fullname"
               type="text"
               placeholder="Nama Lengkap"
+              defaultValue={DataOrderer?.orderer?.fullname || ""}
               style={{
                 borderRadius: "8px",
                 padding: "10px",
                 border: "1px black solid",
               }}
+              onChange={handleOrdererChange}
             />
           </Form.Group>
 
@@ -64,13 +95,16 @@ const BookingForm = () => {
             <Form.Group className="mb-3" controlId="lastName">
               <Form.Label className="custom-label">Nama Keluarga</Form.Label>
               <Form.Control
+                name="familyName"
                 type="text"
                 placeholder="Nama Keluarga"
+                defaultValue={DataOrderer?.orderer?.familyName || ""}
                 style={{
                   borderRadius: "8px",
                   padding: "10px",
                   border: "1px black solid",
                 }}
+                onChange={handleOrdererChange}
               />
             </Form.Group>
           )}
@@ -79,13 +113,16 @@ const BookingForm = () => {
           <Form.Group className="mb-3" controlId="phoneNumber">
             <Form.Label className="custom-label">Nomor Telepon</Form.Label>
             <Form.Control
+              name="numberPhone"
               type="text"
               placeholder="Nomor Telepon"
+              defaultValue={DataOrderer?.orderer?.numberPhone || ""}
               style={{
                 borderRadius: "8px",
                 padding: "10px",
                 border: "1px black solid",
               }}
+              onChange={handleOrdererChange}
             />
           </Form.Group>
 
@@ -93,20 +130,21 @@ const BookingForm = () => {
           <Form.Group className="mb-3" controlId="email">
             <Form.Label className="custom-label">Email</Form.Label>
             <Form.Control
+              name="email"
               type="email"
               placeholder="Contoh: johndoe@gmail.com"
+              defaultValue={DataOrderer?.orderer?.email || ""}
               style={{
                 borderRadius: "8px",
                 padding: "10px",
                 border: "1px black solid",
               }}
+              onChange={handleOrdererChange}
             />
           </Form.Group>
         </Form>
       </Card.Body>
     </Card>
-
-    // --------------------------------------------------------------------
   );
 };
 
