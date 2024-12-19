@@ -1,15 +1,14 @@
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
-import Container from "react-bootstrap/Container";
-
-import { useSelector } from "react-redux";
-
-import BgTiketkuImage from "../../../public/BG-Tiketku.png";
+import React, { useState, useEffect } from "react";
+import { createLazyFileRoute } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { useDispatch, useSelector } from "react-redux";
+import { register } from "../../services/auth/auth";
+import { toast } from "react-toastify";
+import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
+import { setUser } from "../../redux/slices/auth";
+import BgTiketkuImage from "/BG-Tiketku.png?url";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export const Route = createLazyFileRoute("/auth/register")({
   component: Register,
@@ -17,28 +16,52 @@ export const Route = createLazyFileRoute("/auth/register")({
 
 function Register() {
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
+
+  //Register Form Data
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const onSubmit = (event) => {
-    event.preventDefault();
-
-    const isSuccess = true;
-
-    if (isSuccess) {
-      navigate({ to: "/" });
-    }
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
   };
 
   useEffect(() => {
+    // get token from local storage
     if (token) {
-      navigate({ to: "/" });
+        navigate({ to: "/" });
     }
   }, [token, navigate]);
+
+  const { mutate: registerUser } = useMutation({
+    mutationFn: (body) => {
+      console.log("Register body:", body);
+      return register(body); // Ensure register is correctly defined and returns a Promise
+    },
+    onSuccess: (result) => {
+      console.log("Register Success:", result?.user);
+      dispatch(setUser(result?.user));
+      navigate({ to: "/auth/otp" });
+    },
+    onError: (error) => {
+      toast.error("Register Error:", error.message);
+    },
+  });
+  
+  const onSubmit = (event) => {
+    event.preventDefault();
+    const body = {
+      name,
+      email,
+      numberPhone:phoneNumber,
+      password,
+    };
+    registerUser(body);
+  };
 
   return (
     <Container fluid className="h-100" style={{ backgroundColor: "#F8F8F8" }}>
@@ -65,8 +88,8 @@ function Register() {
               Daftar
             </h3>
             <Form onSubmit={onSubmit}>
-              <Form.Group className="mb-3" controlId="formName">
-                <Form.Label style={{ fontWeight: "500" }}>Nama</Form.Label>
+              <Form.Group className="mb-3" controlId="name">
+                <Form.Label>Nama</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Nama Lengkap"
@@ -76,8 +99,8 @@ function Register() {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formEmail">
-                <Form.Label style={{ fontWeight: "500" }}>Email</Form.Label>
+              <Form.Group className="mb-3" controlId="email">
+                <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
                   placeholder="Contoh: johndoe@gmail.com"
@@ -87,12 +110,10 @@ function Register() {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formPhoneNumber">
-                <Form.Label style={{ fontWeight: "500" }}>
-                  Nomor Telepon
-                </Form.Label>
+              <Form.Group className="mb-3" controlId="phoneNumber">
+                <Form.Label>Nomor Telepon</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="tel"
                   placeholder="+62"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
@@ -100,17 +121,24 @@ function Register() {
                 />
               </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formPassword">
-                <Form.Label style={{ fontWeight: "500" }}>
-                  Buat Password
-                </Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Buat Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{ borderRadius: "12px" }}
-                />
+              <Form.Group className="mb-3" controlId="password">
+                <Form.Label>Buat Password</Form.Label>
+                <div className="d-flex align-items-center">
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Buat Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ borderRadius: "12px" }}
+                  />
+                  <Button
+                    variant="link"
+                    onClick={togglePassword}
+                    style={{ textDecoration: "none" }}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </Button>
+                </div>
               </Form.Group>
 
               <Button
@@ -128,7 +156,7 @@ function Register() {
             </Form>
             <p className="text-center mt-4">
               Sudah punya akun?{" "}
-              <a href="/login" style={{ color: "#6C63FF", fontWeight: "500" }}>
+              <a href="/auth/login" style={{ color: "#6C63FF", fontWeight: "500" }}>
                 Masuk di sini
               </a>
             </p>
@@ -138,5 +166,3 @@ function Register() {
     </Container>
   );
 }
-
-export default Register;

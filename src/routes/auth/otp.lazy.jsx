@@ -1,30 +1,84 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 import { OtpInput } from "reactjs-otp-input";
 import { useNavigate } from "@tanstack/react-router";
+import { verifOTP,resendOTP } from "../../services/auth/auth";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+
 export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
 });
 
 function OTPInputUI() {
   const navigate = useNavigate();
-
-  const { token } = useSelector((state) => state.auth);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [counter, setCounter] = useState(60);
+  const userId = useSelector((state) => state.auth.user?.id);
+  const userEmail = useSelector((state) => state.auth.user?.email);
+
+
+  const { mutate: VerifikasiOTP } = useMutation({
+    mutationFn: (otp) => verifOTP(otp),
+    onSuccess: () => {
+      toast.success('OTP berhasil diverifikasi!');
+      navigate({to:'/auth/login'}); // Redirect after success
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Verifikasi OTP gagal');
+    },
+  });
+
+  const { mutate: ResendOtp, isPending: isResending } = useMutation({
+    mutationFn: (userId) => resendOTP(userId), // Pastikan userId diteruskan
+    onSuccess: () => {
+      setCounter(60); // Reset countdown ketika OTP dikirim ulang
+      toast.success('OTP baru telah dikirim!');
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Gagal mengirim OTP');
+    },
+  });
+  
 
   useEffect(() => {
-    if (token) {
-      navigate({ to: "/" });
+    if (counter > 0) {
+      const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
+      return () => clearInterval(timer); // Cleanup timer when component unmounts
     }
-    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
-  }, [counter, token, navigate]);
+  }, [counter]);
 
-  const handleChange = (otp) => setOtp(otp);
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    
+    if (!otp) {
+      toast.error('OTP diperlukan');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const body = {
+      userId,
+      otp,
+    };
+
+    console.log(body);
+    // Call mutation to verify OTP
+    VerifikasiOTP(body);
+    setIsLoading(false);
+  };
+
+  const handleResendOtp = () => {
+    // Trigger resend OTP mutation
+    const request={
+      userId:userId,
+    }
+    ResendOtp(request);
+  };
+
   return (
     <div
       style={{
@@ -35,48 +89,17 @@ function OTPInputUI() {
         padding: "20px",
       }}
     >
-      <header
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      >
-        <div style={{ textAlign: "left" }}>
-          <img src={BgTiketkuImage} alt="Tiketku" style={{ height: "120x" }} />
-        </div>
-      </header>
-
       <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>Masukkan OTP</h1>
       <p style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
-        Ketik 6 digit kode yang dikirimkan ke <b>J*****@gmail.com</b>
+        Ketik 6 digit kode yang dikirimkan ke <b>{userEmail}</b>
       </p>
 
       <div
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
       >
-        {/* {[...Array(6)].map((_, index) => (
-          <input
-            key={index}
-            type="number"
-            max={9}
-            min={0}
-            maxLength="1"
-            style={{
-              width: "40px",
-              height: "40px",
-              margin: "0 5px",
-              fontSize: "20px",
-              textAlign: "center",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-            }}
-          />
-        ))} */}
         <OtpInput
           value={otp}
-          onChange={handleChange}
+          onChange={(value) => setOtp(value)}
           numInputs={6}
           separator={<span> </span>}
           inputStyle={{
@@ -99,8 +122,19 @@ function OTPInputUI() {
       >
         Kirim Ulang OTP dalam {counter} detik
       </p>
+      
+      {counter === 0 && (
+        <div
+          style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
+          onClick={handleResendOtp}
+        >
+          Kirim ulang OTP
+        </div>
+      )}
 
       <button
+        type="submit"
+        onClick={onSubmit}
         style={{
           backgroundColor: "#6C63FF",
           color: "white",
@@ -112,11 +146,10 @@ function OTPInputUI() {
           cursor: "pointer",
           marginTop: "20px",
         }}
+        disabled={isLoading || isResending}
       >
-        Simpan
+        {isLoading || isResending ? 'Memproses...' : 'Verifikasi OTP'}
       </button>
     </div>
   );
 }
-
-export default OTPInputUI;

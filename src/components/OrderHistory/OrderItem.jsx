@@ -1,28 +1,37 @@
 import { useState, useEffect, memo } from "react";
 import PropTypes from "prop-types";
 import { Card, Badge, Row, Col } from "react-bootstrap";
-//import Arrow from "../../assets/Arrow.png";
-//import LocationMark from "../../assets/location-icon.png";
+import Arrow from "../../../public/Arrow.png";
+import LocationMark from "../../../public/location-icon.png";
 import { useMediaQuery } from "react-responsive";
+import { format, parse } from "date-fns";
+import { id } from "date-fns/locale";
 
 const OrderItem = ({ data, onSelectOrder }) => {
   const [displayedData, setDisplayedData] = useState(data);
-  const isMiniMobile = useMediaQuery({ query: "(max-width: 484px)" }); // Deteksi tablet
+  const isMiniMobile = useMediaQuery({ query: "(max-width: 508px)" }); // Deteksi tablet
 
-  // Grup data berdasarkan bulan dan tahun
   const groupByMonthYear = (bookings) => {
     return bookings.reduce((acc, booking) => {
-      const departureDate = booking.departure?.date;
+      const departureDate = booking.departureFlight.departure?.date;
       if (!departureDate) return acc;
 
-      const [day, month, year] = departureDate.split(" ");
-      const groupKey = `${month} ${year}`;
+      // Format bulan dan tahun dengan date-fns
+      const groupKey = format(new Date(departureDate), "MMMM yyyy", { locale: id }); // Contoh hasil: "Desember 2024"
 
       if (!acc[groupKey]) acc[groupKey] = [];
       acc[groupKey].push(booking);
 
       return acc;
     }, {});
+  };
+
+  const formatDate = (dateString) => {
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
+  };
+
+  const formatTime = (dateString) => {
+    return format(new Date(dateString), "HH:mm"); // Contoh hasil: "06:00"
   };
 
   const getBadgeClass = (status) => {
@@ -38,13 +47,30 @@ const OrderItem = ({ data, onSelectOrder }) => {
 
   const groupedBookings = groupByMonthYear(displayedData);
 
+  // Menyortir berdasarkan urutan bulan dan tahun
+  const sortedGroupedBookings = Object.entries(groupedBookings)
+    .sort((a, b) => {
+      const dateA = parse(a[0], "MMMM yyyy", new Date(), { locale: id });
+      const dateB = parse(b[0], "MMMM yyyy", new Date(), { locale: id });
+      return dateA - dateB;
+    });
+
   useEffect(() => {
-    setDisplayedData(data);
+    // Ubah status untuk setiap booking menjadi kapitalisasi pada huruf pertama
+    const updatedData = data.map((booking) => ({
+      ...booking,
+      departureFlight: {
+        ...booking.departureFlight,
+        status: booking.departureFlight.status.charAt(0).toUpperCase() + booking.departureFlight.status.slice(1).toLowerCase(),
+      },
+    }));
+    
+    setDisplayedData(updatedData);
   }, [data]);
 
   return (
     <div style={{ margin: "0 auto", maxWidth: "100%" }}>
-      {Object.entries(groupedBookings).map(([monthYear, bookings], index) => (
+      {sortedGroupedBookings.map(([monthYear, bookings], index) => (
         <div key={index} style={{ marginBottom: "20px" }}>
           <h5 className="text-primary fw-bold mt-3 fs-5">{monthYear}</h5>
 
@@ -72,19 +98,25 @@ const OrderItem = ({ data, onSelectOrder }) => {
               <Card.Body>
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <Badge
-                    className={`${getBadgeClass(booking.status)} fs-6 px-3 py-2 rounded-pill`}
+                    className={`${getBadgeClass(booking.departureFlight.status)} fs-6 px-3 py-2 rounded-pill`}
                   >
-                    {booking.status}
+                    {booking.departureFlight.status}
                   </Badge>
+
+                  {booking.returnFlight && (
+                      <Badge className="bg-warning fs-6 px-3 py-2 rounded-pill">
+                        PP
+                      </Badge>
+                    )}
                 </div>
 
                 <Row className="align-items-center">
                   <Col xs={1} className="text-center p-1 mb-4">
                     <img
-                      src="location-icon.png"
+                      src={LocationMark}
                       alt="Location-icons"
                       className="img-fluid w-75"
-                    />{" "}
+                    />
                   </Col>
                   <Col xs={isMiniMobile ? 4 : 3}>
                     <div>
@@ -92,25 +124,22 @@ const OrderItem = ({ data, onSelectOrder }) => {
                         className="fw-bold mb-1"
                         style={{ fontSize: isMiniMobile ? "11px" : "15px" }}
                       >
-                        {booking.departure?.city}
+                        {booking.departureFlight.departure?.city}
                       </p>
-                      <p className="mb-1">{booking.departure?.date}</p>
-                      <p className="mb-0 ">{booking.departure?.time}</p>
+                      <p className="mb-1">{formatDate(booking.departureFlight.departure?.date)}</p>
+                      <p className="mb-0 ">{formatTime(booking.departureFlight.departure?.time)}</p>
                     </div>
                   </Col>
-                  <Col
-                    xs={isMiniMobile ? 2 : 4}
-                    className={isMiniMobile ? "text-center p-0" : "text-center"}
-                  >
+                  <Col xs={isMiniMobile ? 2 : 4} className={isMiniMobile ? "text-center p-0" : "text-center"}>
                     <div>{booking.duration}</div>
-                    <img src="Arrow.png" alt="Arrow" className="img-fluid" />
+                    <img src={Arrow} alt="Arrow" className="img-fluid"/>
                   </Col>
                   <Col xs={1} className="text-center p-1 mb-4">
                     <img
-                      src="location-icon.png"
+                      src={LocationMark}
                       alt="Location-icons"
                       className="img-fluid w-75"
-                    />{" "}
+                    />
                   </Col>
                   <Col xs={isMiniMobile ? 4 : 3}>
                     <div>
@@ -118,28 +147,64 @@ const OrderItem = ({ data, onSelectOrder }) => {
                         className="fw-bold mb-1"
                         style={{ fontSize: isMiniMobile ? "11px" : "15px" }}
                       >
-                        {booking.arrival?.city}
+                        {booking.departureFlight.arrival?.city}
                       </p>
-                      <p className="mb-1">{booking.arrival?.date}</p>
-                      <p className="mb-0">{booking.arrival?.time}</p>
+                      <p className="mb-1">{formatDate(booking.departureFlight.arrival?.date)}</p>
+                      <p className="mb-0">{formatTime(booking.departureFlight.arrival?.time)}</p>
                     </div>
                   </Col>
                 </Row>
+
+                {booking.returnFlight && (
+                    <>
+                      {/* Return Flight (Duplicate Row for Return) */}
+                      <Row className="align-items-center mt-3">
+                        <Col xs={1} className="text-center p-1 mb-4">
+                          <img src={LocationMark} alt="Location-icons" className="img-fluid w-75" />
+                        </Col>
+                        <Col xs={isMiniMobile ? 4 : 3}>
+                          <div>
+                            <p className="fw-bold mb-1" style={{ fontSize: isMiniMobile ? "11px" : "15px" }}>
+                              {booking.returnFlight.departure?.city}
+                            </p>
+                            <p className="mb-1">{formatDate(booking.returnFlight.departure?.date)}</p>
+                            <p className="mb-0">{formatTime(booking.returnFlight.departure?.time)}</p>
+                          </div>
+                        </Col>
+                        <Col xs={isMiniMobile ? 2 : 4} className={isMiniMobile ? "text-center p-0" : "text-center"}>
+                          <div>{booking.duration}</div>
+                          <img src={Arrow} alt="Arrow" className="img-fluid"  style={{ transform: "rotate(180deg)" }}/>
+                        </Col>
+                        <Col xs={1} className="text-center p-1 mb-4">
+                          <img src={LocationMark} alt="Location-icons" className="img-fluid w-75" />
+                        </Col>
+                        <Col xs={isMiniMobile ? 4 : 3}>
+                          <div>
+                            <p className="fw-bold mb-1" style={{ fontSize: isMiniMobile ? "11px" : "15px" }}>
+                              {booking.returnFlight.arrival?.city}
+                            </p>
+                            <p className="mb-1">{formatDate(booking.returnFlight.arrival?.date)}</p>
+                            <p className="mb-0">{formatTime(booking.returnFlight.arrival?.time)}</p>
+                          </div>
+                        </Col>
+                      </Row>
+                    </>
+                  )}
 
                 <hr className="my-4" />
 
                 <Row>
                   <Col>
                     <p className="fw-bold mb-1">Booking Code:</p>
-                    <p>{booking.bookingCode}</p>
+                    <p>{booking.departureFlight.bookingCode}</p>
                   </Col>
                   <Col>
                     <p className="fw-bold mb-1 ">Class:</p>
-                    <p>{booking.class}</p>
+                    <p>{booking.departureFlight.seatClass}</p>
                   </Col>
                   <Col className="text-end">
-                    <h6 className="text-primary fw-bold">
-                      {booking.pricing.total}
+                    <h6 className="fw-bold" style={{ color:"#4B1979" }}>
+                      IDR {booking.priceDetails.totalPayAfterTax.toLocaleString()}
                     </h6>
                   </Col>
                 </Row>
@@ -155,23 +220,43 @@ const OrderItem = ({ data, onSelectOrder }) => {
 OrderItem.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      status: PropTypes.string.isRequired,
-      departure: PropTypes.shape({
-        city: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        time: PropTypes.string.isRequired,
+      departureFlight: PropTypes.shape({
+        status: PropTypes.string.isRequired,
+        bookingCode: PropTypes.string, // Bisa null, jadi tidak pakai isRequired
+        airlineName: PropTypes.string.isRequired,
+        airplaneCode: PropTypes.string.isRequired,
+        seatClass: PropTypes.string.isRequired,
+        departure: PropTypes.shape({
+          date: PropTypes.string.isRequired,
+          time: PropTypes.string.isRequired,
+          airport: PropTypes.string.isRequired,
+          terminalName: PropTypes.string.isRequired,
+        }).isRequired,
+        arrival: PropTypes.shape({
+          date: PropTypes.string.isRequired,
+          time: PropTypes.string.isRequired,
+          airport: PropTypes.string.isRequired,
+        }).isRequired,
       }).isRequired,
-      arrival: PropTypes.shape({
-        city: PropTypes.string.isRequired,
-        date: PropTypes.string.isRequired,
-        time: PropTypes.string.isRequired,
+      priceDetails: PropTypes.shape({
+        passenger: PropTypes.arrayOf(
+          PropTypes.shape({
+            type: PropTypes.string.isRequired,
+            count: PropTypes.number.isRequired,
+            total: PropTypes.number.isRequired,
+            flightType: PropTypes.string.isRequired,
+          })
+        ).isRequired,
+        tax: PropTypes.number.isRequired,
+        totalPayAfterTax: PropTypes.number.isRequired,
       }).isRequired,
-      duration: PropTypes.string.isRequired,
-      bookingCode: PropTypes.string.isRequired,
-      class: PropTypes.string.isRequired,
-      pricing: PropTypes.shape({
-        total: PropTypes.string.isRequired,
-      }).isRequired,
+
+      ordererNames: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.number.isRequired,
+          fullname: PropTypes.string.isRequired,
+        })
+      ).isRequired,
     })
   ).isRequired,
   onSelectOrder: PropTypes.func.isRequired,
