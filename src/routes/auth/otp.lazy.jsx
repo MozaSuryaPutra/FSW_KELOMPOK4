@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { OtpInput } from "reactjs-otp-input";
 import { useNavigate } from "@tanstack/react-router";
+
 import { verifOTP, resendOTP } from "../../services/auth/auth";
+
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -13,7 +15,9 @@ export const Route = createLazyFileRoute("/auth/otp")({
 
 function OTPInputUI() {
   const navigate = useNavigate();
+
   const [otp, setOtp] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [counter, setCounter] = useState(60);
   const userId = useSelector((state) => state.auth.user?.id);
@@ -27,6 +31,7 @@ function OTPInputUI() {
     },
     onError: (error) => {
       toast.error(error?.message || "Verifikasi OTP gagal");
+
     },
   });
 
@@ -34,6 +39,7 @@ function OTPInputUI() {
     mutationFn: (userId) => resendOTP(userId), // Pastikan userId diteruskan
     onSuccess: () => {
       setCounter(60); // Reset countdown ketika OTP dikirim ulang
+
       toast.success("OTP baru telah dikirim!");
     },
     onError: (error) => {
@@ -41,10 +47,12 @@ function OTPInputUI() {
     },
   });
 
+
   useEffect(() => {
     if (counter > 0) {
       const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
       return () => clearInterval(timer); // Cleanup timer when component unmounts
+
     }
   }, [counter]);
 
@@ -76,6 +84,7 @@ function OTPInputUI() {
     };
     ResendOtp(request);
   };
+
 
   return (
     <div
@@ -120,6 +129,15 @@ function OTPInputUI() {
       >
         Kirim Ulang OTP dalam {counter} detik
       </p>
+      
+      {counter === 0 && (
+        <div
+          style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
+          onClick={handleResendOtp}
+        >
+          Kirim ulang OTP
+        </div>
+      )}
 
       {counter === 0 && (
         <div
@@ -146,7 +164,9 @@ function OTPInputUI() {
         }}
         disabled={isLoading || isResending}
       >
+
         {isLoading || isResending ? "Memproses..." : "Verifikasi OTP"}
+
       </button>
     </div>
   );
