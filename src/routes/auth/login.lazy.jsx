@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { Row, Col, Form, Button } from "react-bootstrap";
@@ -123,8 +123,8 @@ function Login() {
             <Form.Group controlId="password" className="mb-3">
               <div className="d-flex justify-content-between align-items-center">
                 <Form.Label>Password</Form.Label>
-                <a
-                  href={`/forget-pass-req`}
+                <Link
+                  href={`/auth/forget-pass-req`}
                   style={{
                     fontSize: "0.875rem",
                     fontWeight: "light",
@@ -133,7 +133,7 @@ function Login() {
                   }}
                 >
                   Forget password
-                </a>
+                </Link>
               </div>
               <div style={{ position: "relative" }}>
                 <Form.Control

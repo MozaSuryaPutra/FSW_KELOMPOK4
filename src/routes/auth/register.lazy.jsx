@@ -43,12 +43,12 @@ function Register() {
       return register(body); // Ensure register is correctly defined and returns a Promise
     },
     onSuccess: (result) => {
-      console.log("Register Success:", result);
-      dispatch(setUser(email));
+      console.log("Register Success:", result?.user);
+      dispatch(setUser(result?.user));
       navigate({ to: "/auth/otp" });
     },
     onError: (error) => {
-      console.error("Register Error:", error);
+      toast.error("Register Error:", error.message);
     },
   });
   

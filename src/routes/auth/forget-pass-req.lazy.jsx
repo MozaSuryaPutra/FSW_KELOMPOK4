@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import { useState } from 'react'
+import { forgotPassword } from '../../services/auth/auth'
 import { useMutation } from '@tanstack/react-query'
 import { ToastContainer, toast } from 'react-toastify'
 import { Row, Col, Form, Button } from 'react-bootstrap'
@@ -15,13 +15,7 @@ function ResetRequest() {
 
   // Mutation for sending request link through email
   const { mutate: sendRequest, isPending } = useMutation({
-    mutationFn: async (email) =>
-      await axios.post(
-        url,
-        { email },
-        { headers: { 'Content-Type': 'application/json' } },
-      ),
-
+    mutationFn: (request) => forgotPassword(request),
     onSuccess: () => {
       toast.success('Reset link was sent! Check your email', {
         autoClose: 4000,
@@ -43,8 +37,10 @@ function ResetRequest() {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    const request={email}
+
     // Call mutation
-    sendRequest(email)
+    sendRequest(request)
   }
 
   return (
@@ -116,7 +112,7 @@ function ResetRequest() {
                 <div className="d-grid">
                   <Button
                     as={Link}
-                    href={`/login`}
+                    href={`/auth/login`}
                     style={{
                       backgroundColor: 'white',
                       borderColor: '#7126B5',

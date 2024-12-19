@@ -1,14 +1,11 @@
-import React from "react";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import BgTiketkuImage from "../../../public/BG-Tiketku.png";
 import { OtpInput } from "reactjs-otp-input";
 import { useNavigate } from "@tanstack/react-router";
-import { useSelector } from "react-redux";
-import axios from 'axios'
-import Countdown from 'react-countdown'
+import { verifOTP,resendOTP } from "../../services/auth/auth";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
@@ -16,101 +13,71 @@ export const Route = createLazyFileRoute("/auth/otp")({
 
 function OTPInputUI() {
   const navigate = useNavigate();
-
-  const { token } = useSelector((state) => state.auth);
   const [otp, setOtp] = useState('');
-  const { user, email } = useSelector((state) => state.auth);
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [counter, setCounter] = useState(60);
+  const userId = useSelector((state) => state.auth.user?.id);
+  const userEmail = useSelector((state) => state.auth.user?.email);
 
-  const { mutate: verifOTP } = useMutation({
-    mutationFn: (data) => {
-        setIsLoading(true);
-        const toastId = toast.loading("Sending OTP...",{position:"bottom-center", className:""});
-        axios
-            .post(`${import.meta.env.VITE_API_URL}/api/auth/otp/verify`, data)
-            .then((res) => {
-                console.log(res);
-                toast.update(toastId, {
-                    render: "Verification Success",
-                    type: "success",
-                    autoClose: 3000,
-                    isLoading:false,
-                });
-                navigate({ to: "/login" });
-            })
-            .catch((err) => {
-                console.log(err);
-                toast.update(toastId, {
-                    render: (<span className="text-red-500 font-bold">OTP invalid</span>),
-                    type: "error",
-                    autoClose: 3000,
-                    isLoading:false,
-                });
-            })
-            .finally(() => setIsLoading(false));
+
+  const { mutate: VerifikasiOTP } = useMutation({
+    mutationFn: (otp) => verifOTP(otp),
+    onSuccess: () => {
+      toast.success('OTP berhasil diverifikasi!');
+      navigate({to:'/auth/login'}); // Redirect after success
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Verifikasi OTP gagal');
     },
   });
+
+  const { mutate: ResendOtp, isPending: isResending } = useMutation({
+    mutationFn: (userId) => resendOTP(userId), // Pastikan userId diteruskan
+    onSuccess: () => {
+      setCounter(60); // Reset countdown ketika OTP dikirim ulang
+      toast.success('OTP baru telah dikirim!');
+    },
+    onError: (error) => {
+      toast.error(error?.message || 'Gagal mengirim OTP');
+    },
+  });
+  
 
   useEffect(() => {
     if (counter > 0) {
       const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
-      return () => clearInterval(timer); // Bersihkan timer saat unmount
+      return () => clearInterval(timer); // Cleanup timer when component unmounts
     }
   }, [counter]);
-
-  const handleChange = (e) => {
-    setOtp(e.target.value);
-    setError('');
-  };
 
   const onSubmit = async (event) => {
     event.preventDefault();
     
-    if (!otp ) {
-      alert('OTP diperlukan');
+    if (!otp) {
+      toast.error('OTP diperlukan');
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     const body = {
-      email: user?.email,
+      userId,
       otp,
     };
-  
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/otp/verify-otp`,
-        body
-      );
-      alert('OTP berhasil diverifikasi');
-      navigate('/success');
-    } catch (err) {
-      console.error(err);
-      alert(err?.response?.data?.message || 'Verifikasi OTP gagal');
-    } finally {
-      setIsLoading(false);
-    }
+
+    console.log(body);
+    // Call mutation to verify OTP
+    VerifikasiOTP(body);
+    setIsLoading(false);
   };
-  
+
   const handleResendOtp = () => {
-    axios
-      .post(`${import.meta.env.VITE_API_URL}/api/auth/otp`, {
-        email: user?.email,
-      })
-      .then((res) => {
-        console.log("OTP sent:", res);
-        alert("OTP telah dikirim ulang ke email Anda.");
-      })
-      .catch((err) => {
-        console.error("Error resending OTP:", err);
-        alert("Gagal mengirim ulang OTP. Silakan coba lagi.");
-      });
-  
-    setCounter(60); // Reset countdown
-  };  
+    // Trigger resend OTP mutation
+    const request={
+      userId:userId,
+    }
+    ResendOtp(request);
+  };
 
   return (
     <div
@@ -122,24 +89,17 @@ function OTPInputUI() {
         padding: "20px",
       }}
     >
-    <form
-      onSubmit={onSubmit}
-      className="flex w-1/2 flex-col gap-12 items-center text-center"
-    >
-    </form>
       <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>Masukkan OTP</h1>
       <p style={{ marginTop: "10px", fontSize: "14px", color: "#666" }}>
-        Ketik 6 digit kode yang dikirimkan ke {" "} <b>{user?.email}</b>
-      </p> 
+        Ketik 6 digit kode yang dikirimkan ke <b>{userEmail}</b>
+      </p>
 
       <div
         style={{ display: "flex", justifyContent: "center", margin: "20px 0" }}
       >
         <OtpInput
           value={otp}
-          onChange={(value) => {
-            setOtp(value);
-          }}
+          onChange={(value) => setOtp(value)}
           numInputs={6}
           separator={<span> </span>}
           inputStyle={{
@@ -156,19 +116,20 @@ function OTPInputUI() {
 
       <p
         style={{
-    fontSize: "14px",
-    color: "#666",
+          fontSize: "14px",
+          color: "#666",
         }}
       >
-      Kirim Ulang OTP dalam {counter} detik
+        Kirim Ulang OTP dalam {counter} detik
       </p>
+      
       {counter === 0 && (
-      <div
-        style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
-        onClick={handleResendOtp}
-      >
-        Kirim ulang OTP
-      </div>
+        <div
+          style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
+          onClick={handleResendOtp}
+        >
+          Kirim ulang OTP
+        </div>
       )}
 
       <button
@@ -185,11 +146,10 @@ function OTPInputUI() {
           cursor: "pointer",
           marginTop: "20px",
         }}
-        disabled={isLoading}
+        disabled={isLoading || isResending}
       >
-        Simpan
+        {isLoading || isResending ? 'Memproses...' : 'Verifikasi OTP'}
       </button>
     </div>
   );
 }
-
