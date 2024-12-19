@@ -94,6 +94,8 @@ const FlightDetail = ({ flighter }) => {
       </div>
 
       {/* Tombol "Lanjut Bayar" jika email sudah ada */}
+
+
     </div>
   );
 };
