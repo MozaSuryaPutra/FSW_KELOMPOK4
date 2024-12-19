@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { OtpInput } from "reactjs-otp-input";
 import { useNavigate } from "@tanstack/react-router";
-import { verifOTP,resendOTP } from "../../services/auth/auth";
+
+import { verifOTP, resendOTP } from "../../services/auth/auth";
+
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -13,21 +15,23 @@ export const Route = createLazyFileRoute("/auth/otp")({
 
 function OTPInputUI() {
   const navigate = useNavigate();
-  const [otp, setOtp] = useState('');
+
+  const [otp, setOtp] = useState("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [counter, setCounter] = useState(60);
   const userId = useSelector((state) => state.auth.user?.id);
   const userEmail = useSelector((state) => state.auth.user?.email);
 
-
   const { mutate: VerifikasiOTP } = useMutation({
     mutationFn: (otp) => verifOTP(otp),
     onSuccess: () => {
-      toast.success('OTP berhasil diverifikasi!');
-      navigate({to:'/auth/login'}); // Redirect after success
+      toast.success("OTP berhasil diverifikasi!");
+      navigate({ to: "/auth/login" }); // Redirect after success
     },
     onError: (error) => {
-      toast.error(error?.message || 'Verifikasi OTP gagal');
+      toast.error(error?.message || "Verifikasi OTP gagal");
+
     },
   });
 
@@ -35,26 +39,28 @@ function OTPInputUI() {
     mutationFn: (userId) => resendOTP(userId), // Pastikan userId diteruskan
     onSuccess: () => {
       setCounter(60); // Reset countdown ketika OTP dikirim ulang
-      toast.success('OTP baru telah dikirim!');
+
+      toast.success("OTP baru telah dikirim!");
     },
     onError: (error) => {
-      toast.error(error?.message || 'Gagal mengirim OTP');
+      toast.error(error?.message || "Gagal mengirim OTP");
     },
   });
-  
+
 
   useEffect(() => {
     if (counter > 0) {
       const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
       return () => clearInterval(timer); // Cleanup timer when component unmounts
+
     }
   }, [counter]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    
+
     if (!otp) {
-      toast.error('OTP diperlukan');
+      toast.error("OTP diperlukan");
       return;
     }
 
@@ -73,11 +79,12 @@ function OTPInputUI() {
 
   const handleResendOtp = () => {
     // Trigger resend OTP mutation
-    const request={
-      userId:userId,
-    }
+    const request = {
+      userId: userId,
+    };
     ResendOtp(request);
   };
+
 
   return (
     <div
@@ -132,6 +139,15 @@ function OTPInputUI() {
         </div>
       )}
 
+      {counter === 0 && (
+        <div
+          style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
+          onClick={handleResendOtp}
+        >
+          Kirim ulang OTP
+        </div>
+      )}
+
       <button
         type="submit"
         onClick={onSubmit}
@@ -148,7 +164,9 @@ function OTPInputUI() {
         }}
         disabled={isLoading || isResending}
       >
-        {isLoading || isResending ? 'Memproses...' : 'Verifikasi OTP'}
+
+        {isLoading || isResending ? "Memproses..." : "Verifikasi OTP"}
+
       </button>
     </div>
   );

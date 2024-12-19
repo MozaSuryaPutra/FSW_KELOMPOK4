@@ -254,7 +254,11 @@ function ReturnFlight() {
   const [showModal, setShowModal] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
   const [sortedFlights, setSortedFlights] = useState(flightData);
-
+  const userIds = useSelector((state) => {
+    const userString = state.auth.user; // Ambil string JSON dari state
+    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
+    return user?.id; // Kembalikan id jika user ada
+  });
   const [flightList, setFlight] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
   const location = useLocation();
@@ -408,7 +412,7 @@ function ReturnFlight() {
 
     const body = {
       passengers: selectedPassengersJson, // Menggunakan selectedPassengers dalam format JSON
-      userId: 1,
+      userId: userIds,
       pp: isReturnEnabled,
       flightIds: JSON.stringify({
         // Mengonversi flightIds menjadi JSON string
