@@ -254,6 +254,11 @@ function ChooseFlight() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
+  const userIds = useSelector((state) => {
+    const userString = state.auth.user; // Ambil string JSON dari state
+    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
+    return user?.id; // Kembalikan id jika user ada
+  });
   const [flightList, setFlight] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
   const location = useLocation();
@@ -401,7 +406,7 @@ function ChooseFlight() {
 
     const body = {
       passengers: JSON.stringify(selectedPassengers),
-      userId: 1,
+      userId: userIds,
       pp: isReturnEnabled,
       flightIds: JSON.stringify({
         departure: flightId,
@@ -412,9 +417,7 @@ function ChooseFlight() {
     chooseCheckouts(body);
   };
 
-
   const chooseReturns = (event, flightId) => {
-
     event.preventDefault();
 
     navigate({
