@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 import {
   Container,
   Row,
@@ -10,7 +9,6 @@ import {
   ListGroup,
   Image,
 } from "react-bootstrap";
-
 import { addDays, format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useNavigate, useLocation } from "@tanstack/react-router";
@@ -250,31 +248,35 @@ const flightData = [
   },
 ];
 
-function ChooseFlight() {
+function ReturnFlight() {
   const navigate = useNavigate();
+  const { user, token } = useSelector((state) => state.auth);
   const [showModal, setShowModal] = useState(false);
   const [selectedSort, setSelectedSort] = useState("Harga - Termurah");
+  const [sortedFlights, setSortedFlights] = useState(flightData);
+
   const [flightList, setFlight] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
   const location = useLocation();
   const {
     selectedDepartureCity,
     selectedReturnCity,
-    selectedDepartureDate,
+    selectedDay,
     selectedReturnDate,
     selectedClass,
     selectedPassengers,
     customFunction,
     passengersAmount,
     isReturnEnabled,
+    flightId,
   } = location.state || {};
 
-  const [selectedDay, setSelectedDay] = useState(selectedDepartureDate || "");
-
+  // Mendapatkan data dari state
+  const [selectedDays, setSelectedDay] = useState(selectedReturnDate);
   const dataToSend = {
     selectedDepartureCity,
     selectedReturnCity,
-    selectedDepartureDate,
+    selectedDay,
     selectedReturnDate,
     selectedClass,
     selectedPassengers,
@@ -282,7 +284,6 @@ function ChooseFlight() {
     passengersAmount,
     isReturnEnabled,
   };
-
   const {
     data: flightsData,
     isSuccess,
@@ -294,7 +295,7 @@ function ChooseFlight() {
       selectedDepartureCity,
       selectedReturnCity,
       selectedDay,
-      selectedReturnDate,
+      selectedDays,
       passengersAmount,
       selectedClass,
     ],
@@ -303,17 +304,21 @@ function ChooseFlight() {
         selectedDepartureCity,
         selectedReturnCity,
         selectedDay,
-        selectedReturnDate,
-        passengersAmount,
+        selectedDays,
+        passengersAmount, // Menggunakan modifiedPassengers yang sudah diproses
         selectedClass
       ),
-    enabled: !!selectedDepartureCity && !!selectedReturnCity,
+    enabled: !!selectedDepartureCity && !!selectedReturnCity, // Pastikan ada parameter yang diperlukan sebelum menjalankan query
   });
-
+  console.log(selectedDay);
   const { mutate: chooseCheckouts } = useMutation({
-    mutationFn: (body) => chooseCheckout(body),
+    mutationFn: (body) => {
+      console.log("Login mutation called with body:", body); // Debugging log
+      return chooseCheckout(body); // Fungsi untuk melakukan request
+    },
     onSuccess: (data) => {
       if (data) {
+        console.log("Data on success:", data); // Pastikan data sudah ada sebelum navigasi
         toast.success("Berhasil Membuat Checkout Biodata");
         navigate({
           to: "/checkout-biodata",
@@ -322,11 +327,11 @@ function ChooseFlight() {
             selectedDepartureCity,
             selectedReturnCity,
             selectedDay,
-            selectedReturnDate,
+            selectedDays,
             selectedClass,
             selectedPassengers,
           },
-        });
+        }); // Kirim flightList dan data
       } else {
         console.error("Token or user not found in response");
       }
@@ -336,7 +341,8 @@ function ChooseFlight() {
       toast.error(err?.message);
     },
   });
-
+  console.log({ selectedPassengers });
+  console.log("isi dari : ", isReturnEnabled);
   useEffect(() => {
     if (isSuccess && flightsData) {
       setFlight(flightsData);
@@ -346,17 +352,17 @@ function ChooseFlight() {
   }, [flightsData, isSuccess, error]);
 
   useEffect(() => {
-    const filtered = flightList.departureFlights?.filter((flight) => {
+    const filtered = flightList.returnFlights?.filter((flight) => {
       const formattedDepartureDate = flight.departureDate.substring(0, 10);
-      return formattedDepartureDate === selectedDay;
+      return formattedDepartureDate === selectedDays;
     });
     setFilteredFlights(filtered);
-  }, [flightList, selectedDay]);
+  }, [flightList, selectedDays]);
 
   const handleSortChange = (criteria) => {
     setSelectedSort(criteria);
 
-    const sorted = [...filteredFlights];
+    const sorted = [...filteredFlights]; // Salin array sebelum sorting
     switch (criteria) {
       case "Harga - Termurah":
         sorted.sort((a, b) => a.price - b.price);
@@ -395,49 +401,50 @@ function ChooseFlight() {
     setFilteredFlights(sorted);
     setShowModal(false);
   };
-
-  const onSubmit = async (event, flightId) => {
+  const onSubmit = async (event, flightIds) => {
     event.preventDefault();
 
+    const selectedPassengersJson = JSON.stringify(selectedPassengers);
+
     const body = {
-      passengers: JSON.stringify(selectedPassengers),
+      passengers: selectedPassengersJson, // Menggunakan selectedPassengers dalam format JSON
       userId: 1,
       pp: isReturnEnabled,
       flightIds: JSON.stringify({
-        departure: flightId,
-        return: 0,
+        // Mengonversi flightIds menjadi JSON string
+        departure: flightId, // Menggunakan flightId yang dipilih untuk departure
+        return: flightIds,
       }),
     };
 
+    console.log(body);
+    console.log(JSON.parse(body.flightIds)); // Menampilkan flightIds sebagai objek untuk pengecekan
+
+    // Mengirim data ke API
     chooseCheckouts(body);
   };
 
+  //   const chooseReturn = async (event, flightId) => {
+  //     event.preventDefault();
 
-  const chooseReturns = (event, flightId) => {
+  //     navigate({
+  //       to: "/checkout-biodata",
+  //       state: {
+  //         flightId,
+  //       },
+  //     });
+  //   };
 
-    event.preventDefault();
-
-    navigate({
-      to: "/choose-return",
-      state: {
-        flightId,
-        selectedDepartureCity,
-        selectedReturnCity,
-        selectedDay,
-        selectedReturnDate,
-        selectedClass,
-        selectedPassengers,
-        isReturnEnabled,
-        passengersAmount,
-      },
-    });
+  const formatDate = (date) => {
+    return format(new Date(date), "d MMMM yyyy", { locale: id });
   };
-
   if (
     !selectedDepartureCity ||
     !selectedReturnCity ||
     !selectedClass ||
-    !selectedPassengers
+    !selectedPassengers ||
+    !passengersAmount ||
+    (isReturnEnabled && !selectedReturnDate)
   ) {
     return (
       <div className="text-center">
@@ -451,9 +458,30 @@ function ChooseFlight() {
       </div>
     );
   }
-  console.log(selectedPassengers);
+  //Filter flights based on the selected date
+  // const filteredFlights = sortedFlights.filter(
+  //   (flight) => flight.date === selectedDay
+  // );
+  console.log("fd : ", flightsData);
+  console.log("selectedfiltered : ", filteredFlights);
+  console.log("selectedday : ", selectedDay);
   return (
     <>
+      <style>{`
+  @media (max-width: 768px) {
+  .custom-col {
+    flex-direction: row !important; /* Menonaktifkan flex-column */
+    justify-content : space-between;
+  }
+}
+   @media (max-width: 990px) {
+  .custom-div {
+    width: 100%;
+    text-align: center;
+  }
+}
+  
+`}</style>
       <Container className="mt-4">
         {/* Header */}
         <Row
@@ -481,14 +509,14 @@ function ChooseFlight() {
           </Col>
         </Row>
         {/* Navigation Dates */}
-        {selectedDepartureDate ? (
+        {selectedReturnDate ? (
           <Row className="mb-4">
             <Col
               md={12}
               className="text-center d-flex justify-content-center flex-wrap gap-1"
             >
               {[...Array(8)].map((_, idx) => {
-                const date = addDays(new Date(selectedDepartureDate), idx);
+                const date = addDays(new Date(selectedReturnDate), idx);
                 const formattedDate = format(date, "yyyy-MM-dd");
                 const dayName = format(date, "EEEE", { locale: id });
 
@@ -496,7 +524,7 @@ function ChooseFlight() {
                   <Button
                     key={idx}
                     variant={
-                      selectedDay === formattedDate
+                      selectedDays === formattedDate
                         ? "primary"
                         : "outline-secondary"
                     }
@@ -634,13 +662,7 @@ function ChooseFlight() {
                         >
                           <strong>IDR {flight.price.toLocaleString()}</strong>
                           <Button
-                            onClick={(event) => {
-                              if (isReturnEnabled) {
-                                chooseReturns(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
-                              } else {
-                                onSubmit(event, flight.id); // Panggil onSubmit jika isReturnEnabled false
-                              }
-                            }}
+                            onClick={(event) => onSubmit(event, flight.id)}
                             variant="primary"
                           >
                             Pilih
@@ -674,9 +696,7 @@ function ChooseFlight() {
                         </Col>
                       </Row>
                       <Row>
-                        <p>
-                          {flight.departureDate.toString().substring(0, 10)}
-                        </p>
+                        <p>{formatDate(flight.departureDate)}</p>
                         <p>{flight.departureAirport.name}</p>
                         <hr style={{ width: "50%", margin: "0 auto" }}></hr>
                       </Row>
@@ -702,7 +722,6 @@ function ChooseFlight() {
                                 }}
                               >
                                 <li>Jet Air - {flight.class}</li>
-
                                 <li>{flight.airplane.airplaneCode}</li>
                               </ul>
                             </div>
@@ -755,8 +774,8 @@ function ChooseFlight() {
                         </Col>
                       </Row>
                       <Row>
-                        <p>{flight.arrivalDate.toString().substring(0, 10)}</p>
-                        {/* <p>{flight.destinationAirport.id}</p> */}
+                        <p>{formatDate(flight.arrivalDate)}</p>
+                        <p>{flight.destinationAirport.id}</p>
                       </Row>
                     </Accordion.Body>
                   </Accordion.Item>
@@ -764,7 +783,7 @@ function ChooseFlight() {
               ))
             ) : (
               <div className="text-center mt-4">
-                <Image src="ilustrasi.png"></Image>
+                <strong>Data pesawat kosong</strong>
               </div>
             )}
           </Col>
@@ -816,4 +835,4 @@ function ChooseFlight() {
   );
 }
 
-export default ChooseFlight;
+export default ReturnFlight;

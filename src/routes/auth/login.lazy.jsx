@@ -39,8 +39,9 @@ function Login() {
       if (data?.token) {
         console.log("Data on success:", data?.token); // Debugging log
         console.log("Data on success:", data?.user); // Debugging log
+
         dispatch(setToken(data?.token));
-        dispatch(setUser(data?.user));
+        dispatch(setUser(JSON.stringify(data?.user)));
         navigate({ to: "/" });
       } else {
         console.error("Token or user not found in response");

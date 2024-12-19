@@ -1,0 +1,115 @@
+/* SeatSelector.css */
+.seat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 100%; /* Ensure it takes up 100% of the available width */
+  width: 90%; /* Adjust width for responsiveness */
+  margin: 20px auto;
+}
+
+.seat-header h3 {
+  margin: 10px 0;
+  color: #4caf50;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    7,
+    1fr
+  ); /* Always 7 columns, each takes equal space */
+  gap: 10px;
+  justify-items: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.seat {
+  width: 100%; /* Make seat width take up the full available space within the grid cell */
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.seat.available {
+  background-color: #4caf50;
+  color: white;
+}
+
+.seat.booked {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}
+
+.seat.selected {
+  background-color: #8c18a7;
+  color: white;
+}
+
+.seat:hover:not(.booked) {
+  background-color: #45a049;
+}
+
+.separator {
+  width: 20px;
+  height: 40px;
+  background-color: rgba(242, 242, 242, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 6px;
+  pointer-events: none; /* Separator tidak bisa diklik */
+  margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .seat-grid {
+    grid-template-columns: repeat(
+      7,
+      1fr
+    ); /* Still 7 columns, but the size of each column adjusts */
+  }
+
+  .separator {
+    font-size: 12px; /* Adjust separator font size */
+  }
+}
+
+@media (max-width: 480px) {
+  .seat-grid {
+    grid-template-columns: repeat(
+      7,
+      1fr
+    ); /* Still 7 columns on small screens */
+  }
+
+  .separator {
+    width: 16px; /* Smaller width for separator */
+    height: 32px; /* Smaller height for separator */
+    font-size: 10px; /* Adjust font size for mobile */
+  }
+
+  .seat {
+    height: 30px; /* Smaller seat height for mobile */
+    font-size: 12px; /* Smaller font size for mobile */
+  }
+}
