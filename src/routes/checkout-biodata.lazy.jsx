@@ -29,13 +29,17 @@ function Index() {
   const token = useSelector((state) => state.auth.token);
   const [outboundSeatIds, setOutboundSeatIds] = useState([]);
   const [returnSeatIds, setReturnSeatIds] = useState([]);
-
+  const userIds = useSelector((state) => {
+    const userString = state.auth.user; // Ambil string JSON dari state
+    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
+    return user?.id; // Kembalikan id jika user ada
+  });
   const { data: routeData, selectedClass } = location.state || {};
   const [userId, setUserId] = useState(0);
   const [transactionId, setTransactionId] = useState(0);
   //Ini Untuk Form isi
   const [formData, setFormData] = useState({
-    userId: 1,
+    userId: userIds,
     transactionId: routeData?.transaction?.id,
     orderer: {
       fullname: "",
@@ -236,7 +240,7 @@ function Index() {
 
       const data = {
         ...formData,
-        userId: parseInt(formData?.userId, 10),
+        userId: parseInt(userIds, 10),
         transactionId: parseInt(formData?.transactionId, 10),
         orderer: JSON.stringify(formData?.orderer),
         passengers: JSON.stringify(formData?.passengers),
@@ -487,7 +491,7 @@ function Index() {
                         navigate({
                           to: "/checkout-success",
                           state: {
-                            userId,
+                            // userId,
                             transactionId,
                           },
                         })

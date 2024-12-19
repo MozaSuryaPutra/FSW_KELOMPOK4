@@ -20,7 +20,9 @@ export const Route = createLazyFileRoute("/orderHistory")({
 
 function OrderHistory() {
   const userId = useSelector((state) => {
-    return state.auth.user.id;
+    const userString = state.auth.user; // Ambil string JSON dari state
+    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
+    return user?.id; // Kembalikan id jika user ada
   });
   const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
   const isTablet = useMediaQuery({ query: "(max-width: 992px)" });
@@ -116,15 +118,14 @@ function OrderHistory() {
       const itemDate = new Date(item.departureFlight.departure.date);
       const startDate = new Date(selectedDates[0]); // Tanggal awal
       const endDate = new Date(selectedDates[1]); // Tanggal akhir
-  
+
       // Periksa apakah itemDate berada dalam rentang tanggal yang dipilih
       return itemDate >= startDate && itemDate <= endDate;
     });
-  
+
     setFilteredData(filtered);
     setShowModal(false);
   };
-  
 
   function calculateDuration(departureTime, arrivalTime) {
     const minutes = differenceInMinutes(
@@ -277,7 +278,9 @@ function OrderHistory() {
                 {selectedOrder ? (
                   <OrderDetail data={[selectedOrder]} />
                 ) : (
-                  <p className="text-center">Klik pesanan untuk melihat detail.</p>
+                  <p className="text-center">
+                    Klik pesanan untuk melihat detail.
+                  </p>
                 )}
               </Col>
             </>

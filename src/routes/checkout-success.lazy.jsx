@@ -21,7 +21,12 @@ function RouteComponent() {
   const [snapVisible, setSnapVisible] = useState(false);
   const { snapEmbed } = useSnap();
   // The state object contains userId and transactionId
-  const { userId, transactionId } = location.state || {};
+  const userId = useSelector((state) => {
+    const userString = state.auth.user; // Ambil string JSON dari state
+    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
+    return user?.id; // Kembalikan id jika user ada
+  });
+  const { transactionId } = location.state || {};
 
   const {
     data: details,

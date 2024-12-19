@@ -3,8 +3,10 @@ import { Card, Row, Col, Button } from "react-bootstrap";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 const OrderDetail = ({ data }) => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState(data); // Menyimpan data dalam state
 
   useEffect(() => {
@@ -35,7 +37,7 @@ const OrderDetail = ({ data }) => {
       )
     );
   };
-
+  console.log(orders);
   return (
     <div>
       {orders.map((order) => (
@@ -238,8 +240,9 @@ const OrderDetail = ({ data }) => {
                       {order.priceDetails.passenger
                         .filter(
                           (passenger) =>
-                            passenger.type === "adult" &&
-                            passenger.flightType === "departure" || null
+                            (passenger.type === "adult" &&
+                              passenger.flightType === "departure") ||
+                            null
                         )
                         .reduce(
                           (total, passenger) => total + passenger.count,
@@ -454,7 +457,15 @@ const OrderDetail = ({ data }) => {
               }}
               className="w-100"
               disabled={order.departureFlight.status === "Canceled"}
-              onClick={() => updateOrderStatus(order.id, "Issued")} // Memperbarui status saat tombol ditekan
+              onClick={() =>
+                navigate({
+                  to: "/checkout-success",
+                  replace: false, // Set to true if you want to replace the current entry in history
+                  state: {
+                    transactionId: order.transactionId, // Kirim transactionId sebagai state
+                  },
+                })
+              } // Memperbarui status saat tombol ditekan
             >
               {order.departureFlight.status === "Issued"
                 ? "Cetak Tiket"

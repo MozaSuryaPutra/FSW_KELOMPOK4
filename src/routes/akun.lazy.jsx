@@ -25,7 +25,11 @@ function AccountSettings() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const userId = useSelector((state) => state.auth.user.id);
+  const userId = useSelector((state) => {
+    const userString = state.auth.user; // Ambil string JSON dari state
+    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
+    return user?.id; // Kembalikan id jika user ada
+  });
   const { token } = useSelector((state) => state.auth); // Ambil token dari Redux
 
   const [name, setName] = useState("");
@@ -66,7 +70,7 @@ function AccountSettings() {
     useMutation({
       mutationFn: (request) => updateProfile(userId, request),
       onSuccess: (result) => {
-        toast.success(result.message||"Update Berhasil")
+        toast.success(result.message || "Update Berhasil");
       },
       onError: (error) => {
         console.error(error.message);
