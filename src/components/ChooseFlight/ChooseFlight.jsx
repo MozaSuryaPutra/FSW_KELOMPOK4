@@ -276,19 +276,6 @@ function ChooseFlight() {
 
   const [selectedDay, setSelectedDay] = useState(selectedDepartureDate || "");
 
-  
-  const dataToSend = {
-    departureCity:selectedDepartureCity,
-    returnCity:selectedReturnCity,
-    departureDate:selectedDepartureDate,
-    returnDate:selectedReturnDate,
-    class:selectedClass,
-    passengers:selectedPassengers,
-    customFunction,
-    passengersAmount,
-    return:isReturnEnabled,
-  };
-
   const {
     data: flightsData,
     isSuccess,
@@ -322,7 +309,7 @@ function ChooseFlight() {
       if (data) {
 
         toast.success("Berhasil Membuat Checkout Biodata");
-
+        localStorage.removeItem("flightSearch"); // Menghapus item
         navigate({
           to: "/checkout-biodata",
           state: {
