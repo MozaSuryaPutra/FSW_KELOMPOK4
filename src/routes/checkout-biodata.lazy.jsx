@@ -52,9 +52,6 @@ function Index() {
     seatIds: [],
   });
   const { selectedPassengers: passengers } = location.state || {};
-  console.log("ini : ", passengers);
-  console.log("routeData : ", routeData);
-  console.log("selected class : ", selectedClass);
   useEffect(() => {
     const generatePassengers = () => {
       const newPassengers = [];
@@ -144,6 +141,7 @@ function Index() {
   const {
     data: details,
     isLoading,
+    isSuccess,
     isError,
     error,
   } = useQuery({

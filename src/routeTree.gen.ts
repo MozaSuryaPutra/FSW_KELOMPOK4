@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as PaymentSuccessImport } from './routes/payment-success'
+import { Route as PaymentFinishImport } from './routes/payment/finish'
 
 // Create Virtual Routes
 
@@ -139,6 +140,12 @@ const AuthForgetPassLazyRoute = AuthForgetPassLazyImport.update({
   import('./routes/auth/forget-pass.lazy').then((d) => d.Route),
 )
 
+const PaymentFinishRoute = PaymentFinishImport.update({
+  id: '/finish',
+  path: '/finish',
+  getParentRoute: () => PaymentLazyRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -220,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TestajaLazyImport
       parentRoute: typeof rootRoute
     }
+    '/payment/finish': {
+      id: '/payment/finish'
+      path: '/finish'
+      fullPath: '/payment/finish'
+      preLoaderRoute: typeof PaymentFinishImport
+      parentRoute: typeof PaymentLazyImport
+    }
     '/auth/forget-pass': {
       id: '/auth/forget-pass'
       path: '/auth/forget-pass'
@@ -260,6 +274,18 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
+interface PaymentLazyRouteChildren {
+  PaymentFinishRoute: typeof PaymentFinishRoute
+}
+
+const PaymentLazyRouteChildren: PaymentLazyRouteChildren = {
+  PaymentFinishRoute: PaymentFinishRoute,
+}
+
+const PaymentLazyRouteWithChildren = PaymentLazyRoute._addFileChildren(
+  PaymentLazyRouteChildren,
+)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/payment-success': typeof PaymentSuccessRoute
@@ -270,8 +296,9 @@ export interface FileRoutesByFullPath {
   '/choose-return': typeof ChooseReturnLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
-  '/payment': typeof PaymentLazyRoute
+  '/payment': typeof PaymentLazyRouteWithChildren
   '/testaja': typeof TestajaLazyRoute
+  '/payment/finish': typeof PaymentFinishRoute
   '/auth/forget-pass': typeof AuthForgetPassLazyRoute
   '/auth/forget-pass-req': typeof AuthForgetPassReqLazyRoute
   '/auth/login': typeof AuthLoginLazyRoute
@@ -289,8 +316,9 @@ export interface FileRoutesByTo {
   '/choose-return': typeof ChooseReturnLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
-  '/payment': typeof PaymentLazyRoute
+  '/payment': typeof PaymentLazyRouteWithChildren
   '/testaja': typeof TestajaLazyRoute
+  '/payment/finish': typeof PaymentFinishRoute
   '/auth/forget-pass': typeof AuthForgetPassLazyRoute
   '/auth/forget-pass-req': typeof AuthForgetPassReqLazyRoute
   '/auth/login': typeof AuthLoginLazyRoute
@@ -309,8 +337,9 @@ export interface FileRoutesById {
   '/choose-return': typeof ChooseReturnLazyRoute
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
-  '/payment': typeof PaymentLazyRoute
+  '/payment': typeof PaymentLazyRouteWithChildren
   '/testaja': typeof TestajaLazyRoute
+  '/payment/finish': typeof PaymentFinishRoute
   '/auth/forget-pass': typeof AuthForgetPassLazyRoute
   '/auth/forget-pass-req': typeof AuthForgetPassReqLazyRoute
   '/auth/login': typeof AuthLoginLazyRoute
@@ -332,6 +361,7 @@ export interface FileRouteTypes {
     | '/orderHistory'
     | '/payment'
     | '/testaja'
+    | '/payment/finish'
     | '/auth/forget-pass'
     | '/auth/forget-pass-req'
     | '/auth/login'
@@ -350,6 +380,7 @@ export interface FileRouteTypes {
     | '/orderHistory'
     | '/payment'
     | '/testaja'
+    | '/payment/finish'
     | '/auth/forget-pass'
     | '/auth/forget-pass-req'
     | '/auth/login'
@@ -368,6 +399,7 @@ export interface FileRouteTypes {
     | '/orderHistory'
     | '/payment'
     | '/testaja'
+    | '/payment/finish'
     | '/auth/forget-pass'
     | '/auth/forget-pass-req'
     | '/auth/login'
@@ -386,7 +418,7 @@ export interface RootRouteChildren {
   ChooseReturnLazyRoute: typeof ChooseReturnLazyRoute
   NotificationsLazyRoute: typeof NotificationsLazyRoute
   OrderHistoryLazyRoute: typeof OrderHistoryLazyRoute
-  PaymentLazyRoute: typeof PaymentLazyRoute
+  PaymentLazyRoute: typeof PaymentLazyRouteWithChildren
   TestajaLazyRoute: typeof TestajaLazyRoute
   AuthForgetPassLazyRoute: typeof AuthForgetPassLazyRoute
   AuthForgetPassReqLazyRoute: typeof AuthForgetPassReqLazyRoute
@@ -405,7 +437,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChooseReturnLazyRoute: ChooseReturnLazyRoute,
   NotificationsLazyRoute: NotificationsLazyRoute,
   OrderHistoryLazyRoute: OrderHistoryLazyRoute,
-  PaymentLazyRoute: PaymentLazyRoute,
+  PaymentLazyRoute: PaymentLazyRouteWithChildren,
   TestajaLazyRoute: TestajaLazyRoute,
   AuthForgetPassLazyRoute: AuthForgetPassLazyRoute,
   AuthForgetPassReqLazyRoute: AuthForgetPassReqLazyRoute,
@@ -470,10 +502,17 @@ export const routeTree = rootRoute
       "filePath": "orderHistory.lazy.jsx"
     },
     "/payment": {
-      "filePath": "payment.lazy.jsx"
+      "filePath": "payment.lazy.jsx",
+      "children": [
+        "/payment/finish"
+      ]
     },
     "/testaja": {
       "filePath": "testaja.lazy.jsx"
+    },
+    "/payment/finish": {
+      "filePath": "payment/finish.jsx",
+      "parent": "/payment"
     },
     "/auth/forget-pass": {
       "filePath": "auth/forget-pass.lazy.jsx"
