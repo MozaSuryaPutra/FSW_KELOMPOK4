@@ -486,25 +486,26 @@ function Index() {
               <div className="flight-detail-layout w-25">
                 <div className="container row">
                   <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
-                  <FlightDetailPayment data={details} />
-
-                  <div className="text-center pt-3">
-                    <button
-                      className="btn btn-danger w-100"
-                      onClick={() =>
-                        navigate({
-                          to: "/checkout-success",
-                          state: {
-                            // userId,
-                            transactionId,
-                          },
-                        })
-                      }
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Lanjut Bayar
-                    </button>
-                  </div>
+                  <FlightDetail flighter={details} />
+                  {details?.orderer?.email && (
+                    <div className="text-center pt-3">
+                      <button
+                        className="btn btn-danger w-100"
+                        onClick={() =>
+                          navigate({
+                            to: "/checkout-success",
+                            state: {
+                              // userId,
+                              transactionId,
+                            },
+                          })
+                        }
+                        style={{ fontWeight: "bold" }}
+                      >
+                        Lanjut Bayar
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
