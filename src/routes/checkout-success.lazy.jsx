@@ -53,11 +53,7 @@ function RouteComponent() {
             }
           },
           onPending: (result) => {
-            if (result.transaction_status == "settlement") {
-              navigate({
-                to: "/payment-finish",
-              });
-            }
+            console.log("Snap Closed", result);
           },
           onClose: () => {
             console.log("Snap Closed");
