@@ -49,7 +49,7 @@ function RouteComponent() {
             console.log("Payment Success:", result);
             if (result.transaction_status == "settlement") {
               navigate({
-                to: "/payment/finish",
+                to: "/payment-finish",
               });
             }
           },
