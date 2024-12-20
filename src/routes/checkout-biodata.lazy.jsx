@@ -98,7 +98,6 @@ function Index() {
     }));
   };
 
-
   const handleOrdererChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -114,7 +113,6 @@ function Index() {
       return { ...prev, passengers: updatedPassengers };
     });
   };
-
 
   const handleSeatSelection = (selectedSeats) => {
     setOutboundSeatIds(selectedSeats); // Untuk seat pergi
@@ -142,11 +140,11 @@ function Index() {
     },
   });
 
-
   // Default hooks harus tetap dipanggil
   const {
     data: details,
     isLoading,
+    isSuccess,
     isError,
     error,
   } = useQuery({
@@ -181,7 +179,6 @@ function Index() {
           <h1>Redirecting...</h1>
         </div>
       );
-
     }
 
     if (!routeData || !routeData.transaction) {
@@ -197,7 +194,6 @@ function Index() {
         </div>
       );
     }
-
 
     if (isLoading) {
       return (
@@ -282,10 +278,8 @@ function Index() {
         ); // Menit
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000); // Detik
 
-
         return { hours, minutes, seconds };
       };
-
 
       // 2. Menyimpan waktu dalam state
       const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
@@ -469,7 +463,6 @@ function Index() {
                   )}
                 </div>
 
-
                 <div className="container pt-3">
                   <button
                     type="submit"
@@ -491,7 +484,6 @@ function Index() {
                   </button>
                 </div>
               </div>
-
 
               <div className="flight-detail-layout w-25">
                 <div className="container row">
@@ -516,14 +508,11 @@ function Index() {
                     </button>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
         </div>
-
       </form>
-
     );
   };
 

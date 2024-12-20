@@ -1,42 +1,44 @@
-import * as React from "react";
-import { createLazyFileRoute } from "@tanstack/react-router";
-import { useLocation } from "react-router-dom";
-import PaymentSuccess from "../../components/payment/paymentsuccess";
-import PaymentPending from "../../components/payment/paymentpanding";
-import PaymentFailed from "../../components/payment/paymentfailed";
+import React, { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+// import PaymentSuccess from "../../components/payment/paymentsuccess";
+// import PaymentPending from "../../components/payment/paymentpanding";
+// import PaymentFailed from "../../components/payment/paymentfailed";
 
-export const Route = createLazyFileRoute("/payment/success")({
-  component: SuccessPage,
-});
-
-function SuccessPage() {
+function PaymentSuccess() {
   const location = useLocation();
-  const [transactionStatus, setTransactionStatus] = React.useState(null);
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
-    // Mengambil parameter query dari URL
-    const params = new URLSearchParams(location.search);
-    const status = params.get("transaction_status"); // Mendapatkan nilai transaction_status
-    setTransactionStatus(status); // Menyimpan nilai status ke dalam state
-  }, [location]);
+  // Mendapatkan query parameters dari URL
+  const params = new URLSearchParams(location.search);
+  const orderId = params.get("order_id");
+  const statusCode = params.get("status_code");
+  const transactionStatus = params.get("transaction_status");
 
-  // Menentukan tampilan berdasarkan status transaksi
-  const renderContent = () => {
+  // Menangani status transaksi
+  useEffect(() => {
     if (transactionStatus === "settlement") {
-      return <PaymentSuccess />; // Menampilkan komponen sukses
+      // Jika transaksi berhasil, arahkan ke halaman sukses
+      navigate("/payment/finish");
     } else if (transactionStatus === "pending") {
-      return <PaymentPending />; // Menampilkan komponen pending
+      // Jika transaksi pending, arahkan ke halaman pending
+      navigate("/payment/pending");
     } else if (transactionStatus === "failed") {
-      return <PaymentFailed />; // Menampilkan komponen gagal
+      // Jika transaksi gagal, arahkan ke halaman gagal
+      navigate("/payment/failed");
     } else {
-      return (
-        <div>
-          <h2>Transaksi Tidak Dikenali</h2>
-          <p>Status transaksi tidak ditemukan.</p>
-        </div>
-      );
+      // Handle status lainnya jika diperlukan
+      console.log("Unhandled transaction status:", transactionStatus);
     }
-  };
+  }, [transactionStatus, navigate]);
 
-  return <div className="finish-page">{renderContent()}</div>;
+  return (
+    <div>
+      <h1>Status Pembayaran</h1>
+      <p>Order ID: {orderId}</p>
+      <p>Status Code: {statusCode}</p>
+      <p>Transaction Status: {transactionStatus}</p>
+    </div>
+  );
 }
+
+export default PaymentSuccess;
