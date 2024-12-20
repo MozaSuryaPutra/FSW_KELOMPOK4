@@ -147,6 +147,7 @@ function Index() {
   const {
     data: details,
     isLoading,
+    isSuccess,
     isError,
     error,
   } = useQuery({

@@ -42,8 +42,25 @@ const SearchBox = () => {
     passengersAmount,
     isReturnEnabled,
   };
+
   // State untuk jumlah penumpang
   const navigate = useNavigate();
+
+   // Ambil data dari localStorage saat pertama kali komponen dimuat
+   useEffect(() => {
+    const savedData = localStorage.getItem("flightSearch");
+    if (savedData) {
+      const parsedData = JSON.parse(savedData);
+      setSelectedDepartureCity(parsedData.selectedDepartureCity);
+      setSelectedReturnCity(parsedData.selectedReturnCity);
+      setSelectedDepartureDate(parsedData.selectedDepartureDate);
+      setSelectedReturnDate(parsedData.selectedReturnDate);
+      setSelectedClass(parsedData.selectedClass);
+      setSelectedPassengers(parsedData.selectedPassengers);
+      setIsReturnEnabled(parsedData.isReturnEnabled);
+    }
+  }, []);
+
 
   const handleSelectCounts = (counts) => {
     setSelectedPassengers(counts); // Update state dengan jumlah penumpang yang dipilih
@@ -89,6 +106,8 @@ const SearchBox = () => {
   }, [selectedPassengers]);
   const handleSubmit = (event) => {
     event.preventDefault();
+    localStorage.setItem("flightSearch", JSON.stringify(flightSearch));
+
 
     // Validasi input
     if (

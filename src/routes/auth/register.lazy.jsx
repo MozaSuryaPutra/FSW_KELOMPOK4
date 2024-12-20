@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
@@ -48,7 +48,10 @@ function Register() {
       navigate({ to: "/auth/otp" });
     },
     onError: (error) => {
-      toast.error("Register Error:", error.message);
+      console.log(error);
+      // Pastikan error.message ada, atau tampilkan error default
+      const errorMessage = error?.message || 'An unexpected error occurred.';
+      toast.error(`Register Error: ${errorMessage}`); // Menampilkan pesan error menggunakan toast
     },
   });
   

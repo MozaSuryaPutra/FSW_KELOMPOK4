@@ -39,8 +39,6 @@ export const register = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
   if (!response.ok) {
     throw new Error(result?.message);
   }

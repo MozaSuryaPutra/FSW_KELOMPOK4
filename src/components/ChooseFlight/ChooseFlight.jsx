@@ -276,16 +276,17 @@ function ChooseFlight() {
 
   const [selectedDay, setSelectedDay] = useState(selectedDepartureDate || "");
 
+  
   const dataToSend = {
-    selectedDepartureCity,
-    selectedReturnCity,
-    selectedDepartureDate,
-    selectedReturnDate,
-    selectedClass,
-    selectedPassengers,
+    departureCity:selectedDepartureCity,
+    returnCity:selectedReturnCity,
+    departureDate:selectedDepartureDate,
+    returnDate:selectedReturnDate,
+    class:selectedClass,
+    passengers:selectedPassengers,
     customFunction,
     passengersAmount,
-    isReturnEnabled,
+    return:isReturnEnabled,
   };
 
   const {
