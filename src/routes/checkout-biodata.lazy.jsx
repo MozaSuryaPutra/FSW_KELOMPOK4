@@ -2,6 +2,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import PemesananItem from "../components/payment/paymentPemesanan";
 import BookingFormPassanger from "../components/payment/paymentPassenger";
 import FlightDetail from "../components/payment/flightDetail";
+import FlightDetailPayment from "../components/payment/flightDetailPayment";
 import DataPassangers from "../data/data.json";
 import AlertDanger from "../components/payment/alertDanger";
 import BreadCrumb from "../components/payment/breadCrumbs";
@@ -485,7 +486,7 @@ function Index() {
               <div className="flight-detail-layout w-25">
                 <div className="container row">
                   <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
-                  <FlightDetail flighter={details} />
+                  <FlightDetailPayment data={details} />
 
                   <div className="text-center pt-3">
                     <button
