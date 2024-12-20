@@ -98,7 +98,6 @@ function Index() {
     }));
   };
 
-
   const handleOrdererChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -114,7 +113,6 @@ function Index() {
       return { ...prev, passengers: updatedPassengers };
     });
   };
-
 
   const handleSeatSelection = (selectedSeats) => {
     setOutboundSeatIds(selectedSeats); // Untuk seat pergi
@@ -141,7 +139,6 @@ function Index() {
       toast.error(err?.message);
     },
   });
-
 
   // Default hooks harus tetap dipanggil
   const {
@@ -181,7 +178,6 @@ function Index() {
           <h1>Redirecting...</h1>
         </div>
       );
-
     }
 
     if (!routeData || !routeData.transaction) {
@@ -197,7 +193,6 @@ function Index() {
         </div>
       );
     }
-
 
     if (isLoading) {
       return (
@@ -282,10 +277,8 @@ function Index() {
         ); // Menit
         const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000); // Detik
 
-
         return { hours, minutes, seconds };
       };
-
 
       // 2. Menyimpan waktu dalam state
       const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
@@ -469,7 +462,6 @@ function Index() {
                   )}
                 </div>
 
-
                 <div className="container pt-3">
                   <button
                     type="submit"
@@ -492,38 +484,35 @@ function Index() {
                 </div>
               </div>
 
-
               <div className="flight-detail-layout w-25">
                 <div className="container row">
                   <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
                   <FlightDetail flighter={details} />
-
-                  <div className="text-center pt-3">
-                    <button
-                      className="btn btn-danger w-100"
-                      onClick={() =>
-                        navigate({
-                          to: "/checkout-success",
-                          state: {
-                            // userId,
-                            transactionId,
-                          },
-                        })
-                      }
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Lanjut Bayar
-                    </button>
-                  </div>
+                  {details?.orderer?.email && (
+                    <div className="text-center pt-3">
+                      <button
+                        className="btn btn-danger w-100"
+                        onClick={() =>
+                          navigate({
+                            to: "/checkout-success",
+                            state: {
+                              // userId,
+                              transactionId,
+                            },
+                          })
+                        }
+                        style={{ fontWeight: "bold" }}
+                      >
+                        Lanjut Bayar
+                      </button>
+                    </div>
+                  )}
                 </div>
-
               </div>
             </div>
           </div>
         </div>
-
       </form>
-
     );
   };
 
