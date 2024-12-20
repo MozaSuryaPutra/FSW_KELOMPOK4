@@ -48,9 +48,7 @@ function RouteComponent() {
           onSuccess: (result) => {
             console.log("Payment Success:", result);
             if (result.transaction_status == "settlement") {
-              navigate({
-                to: "/payment-finish",
-              });
+              navigate("/payment-finish");
             }
           },
           onPending: (result) => {
