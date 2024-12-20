@@ -47,6 +47,11 @@ function RouteComponent() {
         snapEmbed(data.snapToken, "snap-container", {
           onSuccess: (result) => {
             console.log("Payment Success:", result);
+            if (result.transaction_status == "settlement") {
+              navigate({
+                to: "/payment/finish",
+              });
+            }
           },
           onPending: (result) => {
             console.log("Payment Pending:", result);
