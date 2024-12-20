@@ -7,7 +7,9 @@ const paymentSuccess = () => {
   const navigate = useNavigate();
 
   const handleSearchOtherFlights = () => {
-    navigate("/");
+    navigate({
+      to: "/",
+    });
   };
 
   return (
@@ -22,10 +24,10 @@ const paymentSuccess = () => {
               <li className="breadcrumb-item mt-4">
                 <a>Home</a>
               </li>
-              <li className="breadcrumb-item active" aria-current="page">
-                Bayar
-              </li>
               <li className="breadcrumb-item mt-4">
+                <a>Bayar</a>
+              </li>
+              <li className="breadcrumb-item active">
                 <a href="#">Selesai</a>
               </li>
             </ol>
@@ -60,14 +62,16 @@ const paymentSuccess = () => {
             Terbitkan Tiket
           </div>
         </div>
-        <div className="btn-search-ticket w-25 mx-auto">
-          <button
-            className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-2"
-            style={{ backgroundColor: "#D0B7E6" }}
-            onClick={handleSearchOtherFlights}
-          >
-            Cari Penerbangan Lain
-          </button>
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div className="btn-search-ticket w-25">
+            <button
+              className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-2"
+              style={{ backgroundColor: "#D0B7E6" }}
+              onClick={handleSearchOtherFlights}
+            >
+              Cari Penerbangan Lain
+            </button>
+          </div>
         </div>
       </div>
     </div>
