@@ -66,7 +66,7 @@ const paymentSuccess = () => {
         <div className="btn-search-ticket w-25">
           <button
             className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-2"
-            style={{ backgroundColor: "#D0B7E6", marginLeft: "30px" }}
+            style={{ backgroundColor: "#D0B7E6", marginLeft: "0px auto" }}
             onClick={handleSearchOtherFlights}
           >
             Cari Penerbangan Lain
