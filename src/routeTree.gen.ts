@@ -27,7 +27,6 @@ const CheckoutSuccessLazyImport = createFileRoute('/checkout-success')()
 const CheckoutBiodataLazyImport = createFileRoute('/checkout-biodata')()
 const AkunLazyImport = createFileRoute('/akun')()
 const IndexLazyImport = createFileRoute('/')()
-const PaymentSuccessLazyImport = createFileRoute('/payment/success')()
 const PaymentFinishLazyImport = createFileRoute('/payment/finish')()
 const AuthRegisterLazyImport = createFileRoute('/auth/register')()
 const AuthOtpLazyImport = createFileRoute('/auth/otp')()
@@ -106,14 +105,6 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
-
-const PaymentSuccessLazyRoute = PaymentSuccessLazyImport.update({
-  id: '/success',
-  path: '/success',
-  getParentRoute: () => PaymentLazyRoute,
-} as any).lazy(() =>
-  import('./routes/payment/success.lazy').then((d) => d.Route),
-)
 
 const PaymentFinishLazyRoute = PaymentFinishLazyImport.update({
   id: '/finish',
@@ -280,13 +271,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentFinishLazyImport
       parentRoute: typeof PaymentLazyImport
     }
-    '/payment/success': {
-      id: '/payment/success'
-      path: '/success'
-      fullPath: '/payment/success'
-      preLoaderRoute: typeof PaymentSuccessLazyImport
-      parentRoute: typeof PaymentLazyImport
-    }
   }
 }
 
@@ -294,12 +278,10 @@ declare module '@tanstack/react-router' {
 
 interface PaymentLazyRouteChildren {
   PaymentFinishLazyRoute: typeof PaymentFinishLazyRoute
-  PaymentSuccessLazyRoute: typeof PaymentSuccessLazyRoute
 }
 
 const PaymentLazyRouteChildren: PaymentLazyRouteChildren = {
   PaymentFinishLazyRoute: PaymentFinishLazyRoute,
-  PaymentSuccessLazyRoute: PaymentSuccessLazyRoute,
 }
 
 const PaymentLazyRouteWithChildren = PaymentLazyRoute._addFileChildren(
@@ -324,7 +306,6 @@ export interface FileRoutesByFullPath {
   '/auth/otp': typeof AuthOtpLazyRoute
   '/auth/register': typeof AuthRegisterLazyRoute
   '/payment/finish': typeof PaymentFinishLazyRoute
-  '/payment/success': typeof PaymentSuccessLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -345,7 +326,6 @@ export interface FileRoutesByTo {
   '/auth/otp': typeof AuthOtpLazyRoute
   '/auth/register': typeof AuthRegisterLazyRoute
   '/payment/finish': typeof PaymentFinishLazyRoute
-  '/payment/success': typeof PaymentSuccessLazyRoute
 }
 
 export interface FileRoutesById {
@@ -367,7 +347,6 @@ export interface FileRoutesById {
   '/auth/otp': typeof AuthOtpLazyRoute
   '/auth/register': typeof AuthRegisterLazyRoute
   '/payment/finish': typeof PaymentFinishLazyRoute
-  '/payment/success': typeof PaymentSuccessLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -390,7 +369,6 @@ export interface FileRouteTypes {
     | '/auth/otp'
     | '/auth/register'
     | '/payment/finish'
-    | '/payment/success'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -410,7 +388,6 @@ export interface FileRouteTypes {
     | '/auth/otp'
     | '/auth/register'
     | '/payment/finish'
-    | '/payment/success'
   id:
     | '__root__'
     | '/'
@@ -430,7 +407,6 @@ export interface FileRouteTypes {
     | '/auth/otp'
     | '/auth/register'
     | '/payment/finish'
-    | '/payment/success'
   fileRoutesById: FileRoutesById
 }
 
@@ -530,8 +506,7 @@ export const routeTree = rootRoute
     "/payment": {
       "filePath": "payment.lazy.jsx",
       "children": [
-        "/payment/finish",
-        "/payment/success"
+        "/payment/finish"
       ]
     },
     "/testaja": {
@@ -554,10 +529,6 @@ export const routeTree = rootRoute
     },
     "/payment/finish": {
       "filePath": "payment/finish.lazy.jsx",
-      "parent": "/payment"
-    },
-    "/payment/success": {
-      "filePath": "payment/success.lazy.jsx",
       "parent": "/payment"
     }
   }
