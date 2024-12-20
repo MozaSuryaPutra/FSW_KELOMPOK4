@@ -1,8 +1,15 @@
 import React from "react";
 import Successimage from "../../../public/🦆 illustration _Cart shopping list_.png";
 import "../payment/payment.css";
+import { useNavigate } from "@tanstack/react-router";
 
 const paymentSuccess = () => {
+  const navigate = useNavigate();
+
+  const handleSearchOtherFlights = () => {
+    navigate("/");
+  };
+
   return (
     <div>
       <div>
@@ -12,11 +19,14 @@ const paymentSuccess = () => {
             aria-label="breadcrumb"
           >
             <ol className="breadcrumb">
-              <li className="breadcrumb-item">
-                <a href="#">Home</a>
+              <li className="breadcrumb-item mt-4">
+                <a>Home</a>
               </li>
               <li className="breadcrumb-item active" aria-current="page">
-                Library
+                Bayar
+              </li>
+              <li className="breadcrumb-item mt-4">
+                <a href="#">Selesai</a>
               </li>
             </ol>
           </nav>
@@ -51,12 +61,13 @@ const paymentSuccess = () => {
           </div>
         </div>
         <div className="btn-search-ticket w-25 mx-auto">
-          <div
+          <button
             className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-2"
             style={{ backgroundColor: "#D0B7E6" }}
+            onClick={handleSearchOtherFlights}
           >
             Cari Penerbangan Lain
-          </div>
+          </button>
         </div>
       </div>
     </div>
