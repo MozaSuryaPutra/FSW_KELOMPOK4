@@ -2,6 +2,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import PemesananItem from "../components/payment/paymentPemesanan";
 import BookingFormPassanger from "../components/payment/paymentPassenger";
 import FlightDetail from "../components/payment/flightDetail";
+import FlightDetailPayment from "../components/payment/flightDetailPayment";
 import DataPassangers from "../data/data.json";
 import AlertDanger from "../components/payment/alertDanger";
 import BreadCrumb from "../components/payment/breadCrumbs";
@@ -52,9 +53,6 @@ function Index() {
     seatIds: [],
   });
   const { selectedPassengers: passengers } = location.state || {};
-  console.log("ini : ", passengers);
-  console.log("routeData : ", routeData);
-  console.log("selected class : ", selectedClass);
   useEffect(() => {
     const generatePassengers = () => {
       const newPassengers = [];
@@ -145,6 +143,7 @@ function Index() {
     data: details,
     isSuccess,
     isLoading,
+    isSuccess,
     isError,
     error,
   } = useQuery({
@@ -489,24 +488,25 @@ function Index() {
                 <div className="container row">
                   <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
                   <FlightDetail flighter={details} />
-
-                  <div className="text-center pt-3">
-                    <button
-                      className="btn btn-danger w-100"
-                      onClick={() =>
-                        navigate({
-                          to: "/checkout-success",
-                          state: {
-                            // userId,
-                            transactionId,
-                          },
-                        })
-                      }
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Lanjut Bayar
-                    </button>
-                  </div>
+                  {details?.orderer?.email && (
+                    <div className="text-center pt-3">
+                      <button
+                        className="btn btn-danger w-100"
+                        onClick={() =>
+                          navigate({
+                            to: "/checkout-success",
+                            state: {
+                              // userId,
+                              transactionId,
+                            },
+                          })
+                        }
+                        style={{ fontWeight: "bold" }}
+                      >
+                        Lanjut Bayar
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

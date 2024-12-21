@@ -18,6 +18,7 @@ import { Route as PaymentSuccessImport } from './routes/payment-success'
 // Create Virtual Routes
 
 const TestajaLazyImport = createFileRoute('/testaja')()
+const PaymentFinishLazyImport = createFileRoute('/payment-finish')()
 const PaymentLazyImport = createFileRoute('/payment')()
 const OrderHistoryLazyImport = createFileRoute('/orderHistory')()
 const NotificationsLazyImport = createFileRoute('/notifications')()
@@ -40,6 +41,14 @@ const TestajaLazyRoute = TestajaLazyImport.update({
   path: '/testaja',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/testaja.lazy').then((d) => d.Route))
+
+const PaymentFinishLazyRoute = PaymentFinishLazyImport.update({
+  id: '/payment-finish',
+  path: '/payment-finish',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/payment-finish.lazy').then((d) => d.Route),
+)
 
 const PaymentLazyRoute = PaymentLazyImport.update({
   id: '/payment',
@@ -213,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentLazyImport
       parentRoute: typeof rootRoute
     }
+    '/payment-finish': {
+      id: '/payment-finish'
+      path: '/payment-finish'
+      fullPath: '/payment-finish'
+      preLoaderRoute: typeof PaymentFinishLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/testaja': {
       id: '/testaja'
       path: '/testaja'
@@ -271,6 +287,7 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
   '/payment': typeof PaymentLazyRoute
+  '/payment-finish': typeof PaymentFinishLazyRoute
   '/testaja': typeof TestajaLazyRoute
   '/auth/forget-pass': typeof AuthForgetPassLazyRoute
   '/auth/forget-pass-req': typeof AuthForgetPassReqLazyRoute
@@ -290,6 +307,7 @@ export interface FileRoutesByTo {
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
   '/payment': typeof PaymentLazyRoute
+  '/payment-finish': typeof PaymentFinishLazyRoute
   '/testaja': typeof TestajaLazyRoute
   '/auth/forget-pass': typeof AuthForgetPassLazyRoute
   '/auth/forget-pass-req': typeof AuthForgetPassReqLazyRoute
@@ -310,6 +328,7 @@ export interface FileRoutesById {
   '/notifications': typeof NotificationsLazyRoute
   '/orderHistory': typeof OrderHistoryLazyRoute
   '/payment': typeof PaymentLazyRoute
+  '/payment-finish': typeof PaymentFinishLazyRoute
   '/testaja': typeof TestajaLazyRoute
   '/auth/forget-pass': typeof AuthForgetPassLazyRoute
   '/auth/forget-pass-req': typeof AuthForgetPassReqLazyRoute
@@ -331,6 +350,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/orderHistory'
     | '/payment'
+    | '/payment-finish'
     | '/testaja'
     | '/auth/forget-pass'
     | '/auth/forget-pass-req'
@@ -349,6 +369,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/orderHistory'
     | '/payment'
+    | '/payment-finish'
     | '/testaja'
     | '/auth/forget-pass'
     | '/auth/forget-pass-req'
@@ -367,6 +388,7 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/orderHistory'
     | '/payment'
+    | '/payment-finish'
     | '/testaja'
     | '/auth/forget-pass'
     | '/auth/forget-pass-req'
@@ -387,6 +409,7 @@ export interface RootRouteChildren {
   NotificationsLazyRoute: typeof NotificationsLazyRoute
   OrderHistoryLazyRoute: typeof OrderHistoryLazyRoute
   PaymentLazyRoute: typeof PaymentLazyRoute
+  PaymentFinishLazyRoute: typeof PaymentFinishLazyRoute
   TestajaLazyRoute: typeof TestajaLazyRoute
   AuthForgetPassLazyRoute: typeof AuthForgetPassLazyRoute
   AuthForgetPassReqLazyRoute: typeof AuthForgetPassReqLazyRoute
@@ -406,6 +429,7 @@ const rootRouteChildren: RootRouteChildren = {
   NotificationsLazyRoute: NotificationsLazyRoute,
   OrderHistoryLazyRoute: OrderHistoryLazyRoute,
   PaymentLazyRoute: PaymentLazyRoute,
+  PaymentFinishLazyRoute: PaymentFinishLazyRoute,
   TestajaLazyRoute: TestajaLazyRoute,
   AuthForgetPassLazyRoute: AuthForgetPassLazyRoute,
   AuthForgetPassReqLazyRoute: AuthForgetPassReqLazyRoute,
@@ -434,6 +458,7 @@ export const routeTree = rootRoute
         "/notifications",
         "/orderHistory",
         "/payment",
+        "/payment-finish",
         "/testaja",
         "/auth/forget-pass",
         "/auth/forget-pass-req",
@@ -471,6 +496,9 @@ export const routeTree = rootRoute
     },
     "/payment": {
       "filePath": "payment.lazy.jsx"
+    },
+    "/payment-finish": {
+      "filePath": "payment-finish.lazy.jsx"
     },
     "/testaja": {
       "filePath": "testaja.lazy.jsx"
