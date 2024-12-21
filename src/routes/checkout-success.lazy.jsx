@@ -38,7 +38,7 @@ function RouteComponent() {
     queryFn: () => getCheckoutByID(userId, transactionId),
     enabled: !!token,
   });
-  console.log("ini adalah details", details, userId, transactionId);
+
   const { mutate: create, isPending } = useMutation({
     mutationFn: (request) => createPayment(request),
     onSuccess: (data) => {
@@ -46,10 +46,14 @@ function RouteComponent() {
         setSnapVisible(true); // Ubah tampilan snap
         snapEmbed(data.snapToken, "snap-container", {
           onSuccess: (result) => {
-            console.log("Payment Success:", result);
+            if (result.transaction_status == "settlement") {
+              navigate({
+                to: "/payment-finish",
+              });
+            }
           },
           onPending: (result) => {
-            console.log("Payment Pending:", result);
+            console.log("Snap Closed", result);
           },
           onClose: () => {
             console.log("Snap Closed");
@@ -104,7 +108,6 @@ function RouteComponent() {
       </div>
     );
   }
-  console.log("Ini adalah", details);
 
   return (
     <div>

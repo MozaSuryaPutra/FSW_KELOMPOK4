@@ -19,11 +19,9 @@ const BookingFormPassenger = ({
   }, [ordererData?.passengers]);
 
   const passengersToDisplay = ordererData?.orderer?.familyName
-
     ? ordererData.passengers?.filter(
         (passenger) => passenger.flightType === "departure"
       ) // Filter hanya passenger dengan flightType "departure"
-
     : formData?.passengers; // Jika tidak, gunakan passengers dari formData
 
   return (
@@ -228,7 +226,7 @@ const BookingFormPassenger = ({
 
                   <Form.Group className="mb-3" controlId={`expiredAt-${index}`}>
                     <Form.Label className="custom-label">
-                      Tanggal Lahir
+                      Berlaku Sampai
                     </Form.Label>
                     <Form.Control
                       type="date"
