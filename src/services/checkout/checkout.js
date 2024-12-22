@@ -38,7 +38,7 @@ export const getCheckoutByID = async (userid, transactionid) => {
   console.log(response);
   // get data
   const result = await response.json();
-
+  console.log(result?.data?.orderer?.bookingCode);
   return result?.data;
 };
 

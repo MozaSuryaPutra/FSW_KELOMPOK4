@@ -117,16 +117,88 @@ function NotificationsList() {
   };
 
   if (notificationsLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div
+          style={{
+            width: "50px",
+            height: "50px",
+            border: "6px solid #f3f3f3",
+            borderTop: "6px solid #3498db",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+          }}
+        ></div>
+        <p style={{ marginTop: "16px", fontSize: "18px", color: "#555" }}>
+          Memuat notifikasi, harap tunggu...
+        </p>
+        <style>
+          {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+        </style>
+      </div>
+    );
   }
 
   if (isError) {
     return (
-      <div className="text-center mt-5">
-        <h5 style={{ color: "#FF5722", fontWeight: "bold" }}>
-          {error.message}
-        </h5>
-        <p>Silakan cek kembali nanti.</p>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          fontFamily: "'Comic Sans MS', cursive, sans-serif",
+          color: "#4b6584",
+          textAlign: "center",
+          padding: "20px",
+        }}
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2921/2921825.png"
+          alt="Empty"
+          style={{
+            width: "150px",
+            marginBottom: "20px",
+          }}
+        />
+        <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
+          Ups! Riwayat kosong nih! 😅
+        </h3>
+        <p style={{ fontSize: "16px", margin: "10px 0" }}>
+          Sepertinya kamu belum pernah melakukan pemesanan. 🛫️
+        </p>
+        <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+          Ayo, buat perjalanan pertama kamu! 🌟
+        </p>
+        <button
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#4b6584",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            fontSize: "14px",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+          }}
+          onClick={() => navigate({ to: "/" })}
+        >
+          Cari Penerbangan! ✈️
+        </button>
       </div>
     );
   }

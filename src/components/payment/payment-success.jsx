@@ -21,15 +21,9 @@ const paymentSuccess = () => {
             aria-label="breadcrumb"
           >
             <ol className="breadcrumb">
-              <li className="breadcrumb-item mt-4">
-                <a>Home</a>
-              </li>
-              <li className="breadcrumb-item mt-4">
-                <a>Bayar</a>
-              </li>
-              <li className="breadcrumb-item mt-4 active">
-                <a href="#">Selesai</a>
-              </li>
+              <li className="breadcrumb-item ">Isi Data Diri</li>
+              <li className="breadcrumb-item ">Bayar Selesai</li>
+              <li className="breadcrumb-item">Bayar</li>
             </ol>
           </nav>
         </div>

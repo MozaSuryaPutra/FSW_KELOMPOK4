@@ -233,8 +233,42 @@ function Index() {
 
     if (isLoading) {
       return (
-        <div className="text-center">
-          <p>Loading...</p>
+        <div
+          className="text-center"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+            fontFamily: "'Comic Sans MS', cursive, sans-serif",
+            color: "#2f3640",
+          }}
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/201/201623.png" // Ikon tiket pesawat
+            alt="Loading"
+            style={{
+              width: "120px",
+              animation: "fly 2s infinite ease-in-out",
+              marginBottom: "20px",
+            }}
+          />
+          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+            Sedang memproses checkout pesawatmu... 🛫
+          </p>
+          <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+            Tiketmu hampir siap untuk lepas landas! Tunggu sebentar ya... ✈️
+          </p>
+          <style>
+            {`
+          @keyframes fly {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+          }
+        `}
+          </style>
         </div>
       );
     }
@@ -462,7 +496,28 @@ function Index() {
           style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
         >
           <div className="fs-5 text-dark">
-            <BreadCrumb />
+            <div className="container fw-bolder ">
+              <nav
+                style={{ "--bs-breadcrumb-divider": "'>'" }}
+                aria-label="breadcrumb"
+              >
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item active">Isi Data Diri</li>
+                  <li
+                    className="breadcrumb-item"
+                    style={{ color: "#6c757d", opacity: 0.6 }}
+                  >
+                    Bayar Selesai
+                  </li>
+                  <li
+                    className="breadcrumb-item"
+                    style={{ color: "#6c757d", opacity: 0.6 }}
+                  >
+                    Bayar
+                  </li>
+                </ol>
+              </nav>
+            </div>
           </div>
           <div className="text-center">
             <div className="container">
@@ -582,17 +637,18 @@ function Index() {
               <div className="container row">
                 <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
                 <FlightDetail flighter={details} />
-                {details?.orderer?.email && (
-                  <div className="text-center pt-3">
-                    <button
-                      className="btn btn-danger w-100"
-                      onClick={inSubmit}
-                      style={{ fontWeight: "bold" }}
-                    >
-                      Lanjut Bayar
-                    </button>
-                  </div>
-                )}
+                {details?.orderer?.email &&
+                  details?.transaction?.status !== "issued" && (
+                    <div className="text-center pt-3">
+                      <button
+                        className="btn btn-danger w-100"
+                        onClick={inSubmit}
+                        style={{ fontWeight: "bold" }}
+                      >
+                        Lanjut Bayar
+                      </button>
+                    </div>
+                  )}
               </div>
             </div>
           </div>

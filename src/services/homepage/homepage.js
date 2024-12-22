@@ -1,7 +1,7 @@
 export const getCities = async () => {
   const token = localStorage.getItem("token");
 
-  let url = `${import.meta.env.VITE_API_URL}/api/homepage/cities`;
+  let url = `${import.meta.env.VITE_API_URL}/api/cities`;
 
   const response = await fetch(url, {
     headers: {
@@ -44,7 +44,7 @@ export const getSearchedFlight = async (
   }
 
   let url =
-    `${import.meta.env.VITE_API_URL}/api/homepage/search?` +
+    `${import.meta.env.VITE_API_URL}/api/flights/search?` +
     new URLSearchParams(params);
   console.log(url);
   const response = await fetch(url, {

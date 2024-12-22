@@ -7,7 +7,7 @@ import useSnap from "../hooks/useSnap";
 import FlightDetailPayment from "../components/payment/flightDetailPayment.jsx";
 import { getCheckoutByID } from "../services/checkout/checkout";
 import { toast } from "react-toastify";
-
+import { createNotification } from "../services/notifications/index.js";
 export const Route = createLazyFileRoute("/checkout-success")({
   component: RouteComponent,
 });
@@ -59,28 +59,43 @@ function RouteComponent() {
   }, [details, snapVisible]);
 
   useEffect(() => {
-    if (snapVisible) {
-      // Hapus kontainer snap yang ada sebelumnya jika ada
+    if (snapVisible && details?.transaction?.snapToken) {
+      // Hapus kontainer snap yang ada sebelumnya jika ada, hanya dilakukan ketika snapVisible pertama kali true
       const snapContainer = document.getElementById("snap-container");
-      if (snapContainer) {
-        snapContainer.innerHTML = ""; // Hapus konten lama
+      if (snapContainer && !snapContainer.hasChildNodes()) {
+        snapContainer.innerHTML = ""; // Hapus konten lama hanya jika tidak ada konten sebelumnya
       }
 
       // Menunggu beberapa saat untuk memastikan kontainer bersih sebelum embedding
       setTimeout(() => {
         // Sekarang coba untuk embed Snap
-        snapEmbed(details?.transaction?.snapToken, "snap-container", {
-          onSuccess: (result) => {
-            console.log("Payment Success", result);
-            if (result.transaction_status === "settlement") {
-              navigate({ to: "/payment-finish" });
+        snapEmbed(details.transaction.snapToken, "snap-container", {
+          onSuccess: async (result) => {
+            toast.success("Pembayaran Berhasil Dilakukan");
+            const notificationRequest = {
+              userId: userId, // Misalnya userId dari hasil update
+              notifType: "Pembayaran",
+              title: "Pembayaran Berhasil",
+              message: `Pembayaran Berhasil ${details?.orderer?.bookingCode} Dilakukan`,
+            };
+
+            try {
+              // Tunggu hingga notifikasi berhasil terkirim
+              const notificationResult =
+                await createNotification(notificationRequest);
+              toast.success(
+                notificationResult.message || "Notifikasi berhasil dikirim"
+              );
+            } catch (notificationError) {
+              toast.error("Gagal mengirim notifikasi");
+              console.error("Notification Error:", notificationError);
             }
           },
           onPending: (result) => {
-            console.log("Payment pending", result);
+            navigate({ to: "/orderHistory" });
           },
           onClose: () => {
-            console.log("Snap closed");
+            navigate({ to: "/orderHistory" });
           },
         });
       }, 300);
@@ -100,11 +115,58 @@ function RouteComponent() {
     };
     return new Intl.DateTimeFormat("id-ID", options).format(date);
   }
-
-  if (isLoading) {
+  if (!transactionId) {
     return (
       <div className="text-center">
-        <p>Loading...</p>
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
+  }
+  if (isLoading) {
+    return (
+      <div
+        className="text-center"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          fontFamily: "'Comic Sans MS', cursive, sans-serif",
+          color: "#4b6584",
+        }}
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/1995/1995584.png" // Gambar pesawat
+          alt="Loading"
+          style={{
+            width: "120px",
+            animation: "fly 3s infinite",
+            marginBottom: "20px",
+          }}
+        />
+        <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+          Sedang memproses penerbanganmu... ✈️
+        </p>
+        <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+          Pesawat kami sedang lepas landas menuju pembayaran! Tunggu sebentar
+          ya... 🚀
+        </p>
+        <style>
+          {`
+          @keyframes fly {
+            0% { transform: translateX(-50px) translateY(0); }
+            50% { transform: translateX(50px) translateY(-20px); }
+            100% { transform: translateX(-50px) translateY(0); }
+          }
+        `}
+        </style>
       </div>
     );
   }
@@ -116,20 +178,19 @@ function RouteComponent() {
           className="border-bottom border-dark p-2 mb-2 border-opacity-10"
           style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
         >
-          <div className="container fw-bolder fs-5 text-dark">
+          <div className="container fw-bolder ">
             <nav
               style={{ "--bs-breadcrumb-divider": "'>'" }}
               aria-label="breadcrumb"
             >
               <ol className="breadcrumb">
-                <li className="breadcrumb-item">
-                  <a>Isi Data Diri</a>
-                </li>
-                <li className="breadcrumb-item active" aria-current="page">
-                  <a href="#">Bayar</a>
-                </li>
-                <li className="breadcrumb-item">
-                  <a>Selesai</a>
+                <li className="breadcrumb-item ">Isi Data Diri</li>
+                <li className="breadcrumb-item ">Bayar Selesai</li>
+                <li
+                  className="breadcrumb-item"
+                  style={{ color: "#6c757d", opacity: 0.6 }}
+                >
+                  Bayar
                 </li>
               </ol>
             </nav>

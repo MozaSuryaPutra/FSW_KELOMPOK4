@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { updateProfile, getUserById } from "../services/user";
 import { toast } from "react-toastify";
-
+import { createNotification } from "../services/notifications";
 export const Route = createLazyFileRoute("/akun")({
   component: AccountSettings,
 });
@@ -68,12 +68,38 @@ function AccountSettings() {
   // Handle Update Profil
   const { mutate: updateProfileData, isPending: isUpdateProcessing } =
     useMutation({
-      mutationFn: (request) => updateProfile(userId, request),
-      onSuccess: (result) => {
+      mutationFn: async (request) => {
+        // Panggil fungsi updateProfile (misalnya) untuk update profil pengguna
+        const result = await updateProfile(userId, request);
+        return result;
+      },
+      onSuccess: async (result) => {
+        // Jika update berhasil, tampilkan toast success
         toast.success(result.message || "Update Berhasil");
+
+        // Kirim notifikasi setelah berhasil update profil
+        const notificationRequest = {
+          userId: userId, // Misalnya userId dari hasil update
+          notifType: "INFO",
+          title: "Profile Updated",
+          message: "Profil kamu berhasil diperbarui!",
+        };
+
+        try {
+          // Tunggu hingga notifikasi berhasil terkirim
+          const notificationResult =
+            await createNotification(notificationRequest);
+          toast.success(
+            notificationResult.message || "Notifikasi berhasil dikirim"
+          );
+        } catch (notificationError) {
+          toast.error("Gagal mengirim notifikasi");
+          console.error("Notification Error:", notificationError);
+        }
       },
       onError: (error) => {
-        console.error(error.message);
+        console.error("Update Error:", error.message);
+        toast.error("Terjadi kesalahan saat memperbarui profil");
       },
     });
 
@@ -98,7 +124,44 @@ function AccountSettings() {
   return (
     <Container className="mt-4">
       {/* Loading State */}
-      {isLoading && <div>Loading...</div>}
+      {isLoading && (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+            textAlign: "center",
+            color: "#555",
+          }}
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/4697/4697990.png"
+            alt="Loading"
+            style={{
+              width: "100px",
+              marginBottom: "15px",
+              animation: "spin 2s linear infinite",
+            }}
+          />
+          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+            Sebentar ya, Tunggu Sebentar
+          </p>
+          <p style={{ fontSize: "14px", color: "#888" }}>
+            Pastikan Kamu Menjalani Hari Dengan Semangat
+          </p>
+          <style>
+            {`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}
+          </style>
+        </div>
+      )}
+
       {isError && (
         <div style={{ color: "red" }}>
           Error: {error.message || "Gagal memuat data"}
