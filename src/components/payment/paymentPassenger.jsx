@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Form, Row, Col } from "react-bootstrap";
+import { Card, Form, Row, Col, Modal } from "react-bootstrap";
 import "react-datepicker/dist/react-datepicker.css";
 import "./paymentPassenger.css";
 
@@ -8,22 +8,29 @@ const BookingFormPassenger = ({
   formData,
   handlePassengerChange,
 }) => {
-  const [hasLastName, setHasLastName] = useState(true);
+  const [hasLastName, setHasLastName] = useState(false);
 
   useEffect(() => {
     // Set hasLastName sesuai dengan apakah familyName ada di ordererData.passengers
     if (ordererData?.passengers?.length > 0) {
       const firstPassenger = ordererData.passengers[0];
-      setHasLastName(!!firstPassenger.familyName);
+      setHasLastName(!!firstPassenger.fullname);
     }
   }, [ordererData?.passengers]);
 
-  const passengersToDisplay = ordererData?.orderer?.familyName
+  const passengersToDisplay = ordererData?.orderer?.fullname
     ? ordererData.passengers?.filter(
         (passenger) => passenger.flightType === "departure"
       ) // Filter hanya passenger dengan flightType "departure"
     : formData?.passengers; // Jika tidak, gunakan passengers dari formData
-
+  const formatDate = (isoString) => {
+    if (!isoString) return "";
+    const date = new Date(isoString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // bulan harus 2 digit
+    const day = String(date.getDate()).padStart(2, "0"); // tanggal harus 2 digit
+    return `${year}-${month}-${day}`; // Mengubah format ke yyyy-MM-dd
+  };
   return (
     <>
       {passengersToDisplay?.length > 0 ? (
@@ -117,7 +124,19 @@ const BookingFormPassenger = ({
                         type="switch"
                         id={`hasLastName-${index}`}
                         checked={hasLastName}
-                        onChange={(e) => setHasLastName(e.target.checked)}
+                        onChange={(e) => {
+                          setHasLastName(e.target.checked);
+                          // Jika hasLastName berubah menjadi false, kosongkan familyName
+                          if (!e.target.checked) {
+                            handlePassengerChange(index, {
+                              target: { name: "familyName", value: undefined },
+                            });
+                          } else {
+                            handlePassengerChange(index, {
+                              target: { name: "familyName", value: "" },
+                            });
+                          }
+                        }}
                         className="custom-switch"
                       />
                     </Col>
@@ -141,7 +160,8 @@ const BookingFormPassenger = ({
                           border: "1px black solid",
                         }}
                         onChange={(e) => handlePassengerChange(index, e)}
-                        value={passenger.familyName || ""}
+                        value={passenger.familyName || " " || "Kosong"}
+                        required={hasLastName} // Set as required if hasLastName is true
                       />
                     </Form.Group>
                   )}
@@ -172,10 +192,8 @@ const BookingFormPassenger = ({
                     <Form.Label className="custom-label">
                       Kewarganegaraan
                     </Form.Label>
-                    <Form.Control
+                    <Form.Select
                       name="citizenship"
-                      type="text"
-                      placeholder="Indonesia"
                       style={{
                         borderRadius: "8px",
                         padding: "10px",
@@ -183,7 +201,15 @@ const BookingFormPassenger = ({
                       }}
                       onChange={(e) => handlePassengerChange(index, e)}
                       value={passenger.citizenship || ""}
-                    />
+                    >
+                      <option value="">Pilih kewarganegaraan</option>
+                      <option value="Indonesia">Indonesia</option>
+                      <option value="Malaysia">Malaysia</option>
+                      <option value="Singapore">Singapore</option>
+                      <option value="Philippines">Philippines</option>
+                      <option value="Thailand">Thailand</option>
+                      <option value="Vietnam">Vietnam</option>
+                    </Form.Select>
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId={`ktp-${index}`}>
@@ -210,10 +236,8 @@ const BookingFormPassenger = ({
                     <Form.Label className="custom-label">
                       Publisher Country
                     </Form.Label>
-                    <Form.Control
+                    <Form.Select
                       name="publisherCountry"
-                      type="text"
-                      placeholder="Indonesia"
                       style={{
                         borderRadius: "8px",
                         padding: "10px",
@@ -221,7 +245,15 @@ const BookingFormPassenger = ({
                       }}
                       onChange={(e) => handlePassengerChange(index, e)}
                       value={passenger.publisherCountry || ""}
-                    />
+                    >
+                      <option value="">Select a country</option>
+                      <option value="Indonesia">Indonesia</option>
+                      <option value="Malaysia">Malaysia</option>
+                      <option value="Singapore">Singapore</option>
+                      <option value="Philippines">Philippines</option>
+                      <option value="Thailand">Thailand</option>
+                      <option value="Vietnam">Vietnam</option>
+                    </Form.Select>
                   </Form.Group>
 
                   <Form.Group className="mb-3" controlId={`expiredAt-${index}`}>
@@ -238,7 +270,7 @@ const BookingFormPassenger = ({
                         border: "1px black solid",
                       }}
                       onChange={(e) => handlePassengerChange(index, e)}
-                      value={passenger.expiredAt || ""}
+                      value={formatDate(passenger.expiredAt) || ""}
                     />
                   </Form.Group>
                 </Form>

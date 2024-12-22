@@ -307,7 +307,6 @@ function ChooseFlight() {
     mutationFn: (body) => chooseCheckout(body),
     onSuccess: (data) => {
       if (data) {
-
         toast.success("Berhasil Membuat Checkout Biodata");
         localStorage.removeItem("flightSearch"); // Menghapus item
         navigate({

@@ -80,6 +80,7 @@ function AccountSettings() {
   const handleLogout = () => {
     dispatch(setUser(null));
     dispatch(setToken(null));
+    localStorage.removeItem("flightSearch");
     navigate({ to: "/" });
   };
 

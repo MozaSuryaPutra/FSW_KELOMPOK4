@@ -15,7 +15,7 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { getCheckoutByID, updateCheckout } from "../services/checkout/checkout";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { Modal } from "react-bootstrap";
 import SeatSelector from "../components/SeatSelector/SeatSelector";
 import "../components/payment/payment.css";
 
@@ -36,16 +36,18 @@ function Index() {
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
     return user?.id; // Kembalikan id jika user ada
   });
+
   const { data: routeData, selectedClass } = location.state || {};
   const [userId, setUserId] = useState(0);
   const [transactionId, setTransactionId] = useState(0);
+  const [loading, setLoading] = useState(false); // State untuk kontrol loading
   //Ini Untuk Form isi
   const [formData, setFormData] = useState({
     userId: userIds,
     transactionId: routeData?.transaction?.id,
     orderer: {
       fullname: "",
-      familyName: "",
+
       numberPhone: "",
       email: "",
     },
@@ -61,7 +63,7 @@ function Index() {
           title: "",
           passengerType: "adult",
           fullname: "",
-          familyName: "",
+
           birthDate: "",
           citizenship: "",
           identityNumber: "",
@@ -74,7 +76,7 @@ function Index() {
           title: "",
           passengerType: "child",
           fullname: "",
-          familyName: "",
+
           birthDate: "",
           citizenship: "",
           identityNumber: "",
@@ -98,16 +100,34 @@ function Index() {
 
   const handleOrdererChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      orderer: { ...prev.orderer, [name]: value },
-    }));
+    setFormData((prev) => {
+      const updatedOrderer = { ...prev.orderer };
+
+      if (value === undefined) {
+        // Hapus properti jika nilai undefined
+        delete updatedOrderer[name];
+      } else {
+        // Perbarui nilai properti
+        updatedOrderer[name] = value;
+      }
+
+      return { ...prev, orderer: updatedOrderer };
+    });
   };
+
   const handlePassengerChange = (index, e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
       const updatedPassengers = [...prev.passengers];
-      updatedPassengers[index][name] = value;
+
+      if (value === undefined) {
+        // Hapus properti jika nilai undefined
+        delete updatedPassengers[index][name];
+      } else {
+        // Perbarui nilai properti
+        updatedPassengers[index][name] = value;
+      }
+
       return { ...prev, passengers: updatedPassengers };
     });
   };
@@ -122,19 +142,21 @@ function Index() {
   const { mutate: updateCheckouts } = useMutation({
     mutationFn: (body) => {
       console.log("Login mutation called with body:", body);
+      setLoading(true);
       return updateCheckout(body);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("Berhasil Menyimpan Data");
       console.log("Data on success:", data);
+
       if (data) {
-        queryClient.invalidateQueries("detail"); // Nama query yang perlu dirujuk ulang
-      } else {
-        console.error("Token or user not found in response");
+        await queryClient.invalidateQueries("detail"); // Nama query yang perlu dirujuk ulang
       }
+      setLoading(false);
     },
     onError: (err) => {
       toast.error(err?.message);
+      setLoading(false);
     },
   });
 
@@ -143,7 +165,7 @@ function Index() {
     data: details,
     isSuccess,
     isLoading,
-    isSuccess,
+
     isError,
     error,
   } = useQuery({
@@ -213,45 +235,81 @@ function Index() {
     const handleSubmit = async (e) => {
       e.preventDefault();
 
-      // Validasi untuk memastikan semua field terisi
-      const isOrdererComplete = Object.values(formData.orderer).every(
-        (value) => value.trim() !== ""
-      );
+      const missingFields = {
+        orderer: [],
+        passengers: [],
+      };
 
-      const arePassengersComplete = formData.passengers.every((passenger) => {
-        const { familyName, ...otherFields } = passenger;
-        return Object.values(otherFields).every((value) => value.trim() !== "");
+      // Validasi untuk field pemesan (orderer)
+      Object.entries(formData.orderer).forEach(([key, value]) => {
+        if (value.trim() === "") {
+          missingFields.orderer.push(key);
+        }
       });
 
-      // const isSeatSelected = formData.seatIds.length > 0;
+      // Validasi untuk field penumpang (passengers)
+      formData.passengers.forEach((passenger, index) => {
+        Object.entries(passenger).forEach(([key, value]) => {
+          if (value.trim() === "") {
+            missingFields.passengers.push(`Penumpang ${index + 1}: ${key}`);
+          }
+        });
+      });
 
-      if (!isOrdererComplete) {
-        toast.error("Harap lengkapi semua informasi pemesan.");
+      const errors = [];
+      if (missingFields.orderer.length > 0) {
+        errors.push(
+          <li key="orderer">
+            Informasi pemesan yang belum lengkap:
+            <ul>
+              {missingFields.orderer.map((field) => (
+                <li key={field}> {field}</li>
+              ))}
+            </ul>
+          </li>
+        );
+      }
+      if (missingFields.passengers.length > 0) {
+        errors.push(
+          <li key="passengers">
+            Informasi penumpang yang belum lengkap:
+            <ul>
+              {missingFields.passengers.map((field, idx) => (
+                <li key={`${field}-${idx}`}>{field}</li>
+              ))}
+            </ul>
+          </li>
+        );
+      }
+
+      if (errors.length > 0) {
+        toast(
+          <div>
+            <strong>Harap lengkapi data berikut:</strong>
+            <ul>{errors}</ul>
+          </div>,
+          {
+            position: "top-right",
+            closeOnClick: true,
+            hideProgressBar: true,
+          }
+        );
         return;
       }
 
-      if (!arePassengersComplete) {
-        toast.error("Harap lengkapi semua data penumpang.");
-        return;
-      }
-
-      // if (!isSeatSelected) {
-      //   toast.error("Harap pilih kursi untuk semua penumpang.");
-      //   return;
-      // }
-
+      // Jika validasi lolos, lanjutkan
       const data = {
         ...formData,
-
         userId: parseInt(userIds, 10),
-
         transactionId: parseInt(formData?.transactionId, 10),
         orderer: JSON.stringify(formData?.orderer),
         passengers: JSON.stringify(formData?.passengers),
         seatIds: JSON.stringify([...outboundSeatIds, ...returnSeatIds]), // Gabungkan seatIds dari pergi dan kembali
       };
+
       console.log("Data siap dikirim:", data.seatIds);
       console.log("Data asli:", data);
+
       updateCheckouts(data);
     };
     const Countdown = ({ expiredFilling }) => {
@@ -365,6 +423,16 @@ function Index() {
     return (
       <form onSubmit={handleSubmit}>
         <div className="row g-3 m-0">
+          {loading && (
+            <Modal show={true} backdrop="static" keyboard={false}>
+              <Modal.Body>
+                <div style={{ textAlign: "center" }}>
+                  <h4>Loading...</h4>
+                  {/* Anda bisa menambahkan spinner atau elemen loading lainnya */}
+                </div>
+              </Modal.Body>
+            </Modal>
+          )}
           <div
             className="border-bottom border-dark p-2 mb-2 border-opacity-10"
             style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
@@ -472,12 +540,13 @@ function Index() {
                         : "#7126B5",
                       color: "white",
                       width: "30rem",
-                      cursor: details?.orderer?.email
-                        ? "not-allowed"
-                        : "pointer",
-                      opacity: details?.orderer?.email ? 0.6 : 1,
+                      cursor:
+                        details?.orderer?.email || loading
+                          ? "not-allowed"
+                          : "pointer", // Disable cursor jika loading atau email ada
+                      opacity: details?.orderer?.email || loading ? 0.6 : 1, // Menurunkan opacity saat loading atau ada email
                     }}
-                    disabled={!!details?.orderer?.email}
+                    disabled={details?.orderer?.email || loading} // Tombol dinonaktifkan jika ada email atau sedang loading
                   >
                     Submit
                   </button>
