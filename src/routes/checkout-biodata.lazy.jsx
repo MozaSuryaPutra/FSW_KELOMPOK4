@@ -17,6 +17,7 @@ import { getCheckoutByID, updateCheckout } from "../services/checkout/checkout";
 import { useQueryClient } from "@tanstack/react-query";
 import { Modal } from "react-bootstrap";
 import SeatSelector from "../components/SeatSelector/SeatSelector";
+import { createPayment } from "../services/checkout/payment";
 import "../components/payment/payment.css";
 
 export const Route = createLazyFileRoute("/checkout-biodata")({
@@ -159,7 +160,21 @@ function Index() {
       setLoading(false);
     },
   });
-
+  const { mutate: create, isPending } = useMutation({
+    mutationFn: (request) => createPayment(request),
+    onSuccess: (data) => {
+      console.log("ini isi payment : ", data);
+      navigate({
+        to: "/checkout-success",
+        state: {
+          transactionId,
+        },
+      });
+    },
+    onError: (error) => {
+      toast.error(error?.message);
+    },
+  });
   // Default hooks harus tetap dipanggil
   const {
     data: details,
@@ -312,6 +327,16 @@ function Index() {
 
       updateCheckouts(data);
     };
+
+    const inSubmit = async (event) => {
+      event.preventDefault();
+
+      const request = {
+        userId: userIds,
+        transactionId,
+      };
+      create(request);
+    };
     const Countdown = ({ expiredFilling }) => {
       // 1. Menghitung selisih waktu pada saat komponen pertama kali dimuat
       const calculateTimeLeft = () => {
@@ -421,52 +446,52 @@ function Index() {
     console.log("Ini form data :", formData);
     // Render utama
     return (
-      <form onSubmit={handleSubmit}>
-        <div className="row g-3 m-0">
-          {loading && (
-            <Modal show={true} backdrop="static" keyboard={false}>
-              <Modal.Body>
-                <div style={{ textAlign: "center" }}>
-                  <h4>Loading...</h4>
-                  {/* Anda bisa menambahkan spinner atau elemen loading lainnya */}
-                </div>
-              </Modal.Body>
-            </Modal>
-          )}
-          <div
-            className="border-bottom border-dark p-2 mb-2 border-opacity-10"
-            style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
-          >
-            <div className="fs-5 text-dark">
-              <BreadCrumb />
-            </div>
-            <div className="text-center">
-              <div className="container">
-                <div
-                  className="p-3 fw-bolder fs-6 border rounded-3"
-                  style={{
-                    backgroundColor: details?.orderer?.email
-                      ? "rgba(115, 202, 92, 1)" // Warna hijau jika validasi terpenuhi
-                      : "#dc3545", // Warna merah jika tidak
-                    color: "white",
-                    borderColor: details?.orderer?.email
-                      ? "rgba(115, 202, 92, 0.8)" // Sesuaikan dengan warna hijau
-                      : "#dc3545",
-                  }}
-                >
-                  {details?.orderer?.email ? (
-                    "Data Anda berhasil tersimpan!" // Pesan sukses
-                  ) : (
-                    <Countdown
-                      expiredFilling={details?.transaction?.expiredFilling}
-                    />
-                  )}
-                </div>
+      <div className="row g-3 m-0">
+        {(loading || isPending) && (
+          <Modal show={true} backdrop="static" keyboard={false}>
+            <Modal.Body>
+              <div style={{ textAlign: "center" }}>
+                <h4>Loading...</h4>
+                {/* Anda bisa menambahkan spinner atau elemen loading lainnya */}
+              </div>
+            </Modal.Body>
+          </Modal>
+        )}
+        <div
+          className="border-bottom border-dark p-2 mb-2 border-opacity-10"
+          style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
+        >
+          <div className="fs-5 text-dark">
+            <BreadCrumb />
+          </div>
+          <div className="text-center">
+            <div className="container">
+              <div
+                className="p-3 fw-bolder fs-6 border rounded-3"
+                style={{
+                  backgroundColor: details?.orderer?.email
+                    ? "rgba(115, 202, 92, 1)" // Warna hijau jika validasi terpenuhi
+                    : "#dc3545", // Warna merah jika tidak
+                  color: "white",
+                  borderColor: details?.orderer?.email
+                    ? "rgba(115, 202, 92, 0.8)" // Sesuaikan dengan warna hijau
+                    : "#dc3545",
+                }}
+              >
+                {details?.orderer?.email ? (
+                  "Data Anda berhasil tersimpan!" // Pesan sukses
+                ) : (
+                  <Countdown
+                    expiredFilling={details?.transaction?.expiredFilling}
+                  />
+                )}
               </div>
             </div>
           </div>
-          <div className="container content-container">
-            <div className="d-flex justify-content-center gap-5">
+        </div>
+        <div className="container content-container">
+          <div className="d-flex justify-content-center gap-5">
+            <form onSubmit={handleSubmit}>
               <div>
                 <div
                   className="container"
@@ -552,36 +577,27 @@ function Index() {
                   </button>
                 </div>
               </div>
-
-              <div className="flight-detail-layout w-25">
-                <div className="container row">
-                  <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
-                  <FlightDetail flighter={details} />
-                  {details?.orderer?.email && (
-                    <div className="text-center pt-3">
-                      <button
-                        className="btn btn-danger w-100"
-                        onClick={() =>
-                          navigate({
-                            to: "/checkout-success",
-                            state: {
-                              // userId,
-                              transactionId,
-                            },
-                          })
-                        }
-                        style={{ fontWeight: "bold" }}
-                      >
-                        Lanjut Bayar
-                      </button>
-                    </div>
-                  )}
-                </div>
+            </form>
+            <div className="flight-detail-layout w-25">
+              <div className="container row">
+                <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
+                <FlightDetail flighter={details} />
+                {details?.orderer?.email && (
+                  <div className="text-center pt-3">
+                    <button
+                      className="btn btn-danger w-100"
+                      onClick={inSubmit}
+                      style={{ fontWeight: "bold" }}
+                    >
+                      Lanjut Bayar
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </div>
-      </form>
+      </div>
     );
   };
 
