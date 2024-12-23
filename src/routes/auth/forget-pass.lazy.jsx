@@ -33,7 +33,7 @@ function ResetPassword() {
         autoClose: 4000,
       });
       setTimeout(() => navigate({ to: '/auth/login' }), 4000);
-      setIsSubmitting(false); // Set ulang state meskipun gagal
+      setIsSubmitting(true); // Set ulang state meskipun gagal
     },
     
     onError: (error) => {

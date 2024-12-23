@@ -23,6 +23,7 @@
     "axios": "^1.7.9",
     "bootstrap": "^5.3.3",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "lucide-react": "^0.464.0",
     "otp": "^1.1.2",
     "prop-types": "^15.8.1",

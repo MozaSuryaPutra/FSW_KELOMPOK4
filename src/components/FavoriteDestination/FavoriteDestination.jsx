@@ -5,12 +5,13 @@ import {
   getFavDestination,
   getContinents,
 } from "../../services/homepage/homepage";
-import { format } from "date-fns";
 import PassengersPopup from "../PassengersPopup/PassengeresPopup"; // Import the PassengersPopup component
 import { chooseCheckout } from "../../services/checkout/checkout";
 import { toast } from "react-toastify";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
+import { formatInTimeZone} from "date-fns-tz";
+
 
 const FavoriteDestination = () => {
   const navigate = useNavigate();
@@ -19,6 +20,7 @@ const FavoriteDestination = () => {
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
     return user?.id; // Kembalikan id jika user ada
   });
+  
   const [selectedContinent, setSelectedContinent] = useState([0]); // Default: Semua
   const [modalShow, setModalShow] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
@@ -31,11 +33,11 @@ const FavoriteDestination = () => {
   const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
 
   const formatDate = (dateString) => {
-    return format(new Date(dateString), "d MMMM yyyy");
+    return formatInTimeZone(dateString, 'UTC', 'd MMMM yyyy');
   };
 
   const formatTime = (dateString) => {
-    return format(new Date(dateString), "HH:mm");
+    return formatInTimeZone(dateString, 'UTC', 'HH:mm'); // Mengonversi dan memformat waktu ke UTC
   };
 
   // Fetch continents data

@@ -149,7 +149,8 @@ function OTPInputUI() {
       {counter === 0 && (
         <div
           style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
-          onClick={handleResendOtp}
+          onClick={isDisabled ? null : handleResendOtp}
+          disabled={isLoading || isResending}
         >
           Kirim ulang OTP
         </div>
