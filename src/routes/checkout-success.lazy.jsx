@@ -73,6 +73,7 @@ function RouteComponent() {
         // Sekarang coba untuk embed Snap
         snapEmbed(details.transaction.snapToken, "snap-container", {
           onSuccess: async (result) => {
+            console.log(result);
             toast.success("Pembayaran Berhasil Dilakukan");
             const notificationRequest = {
               userId: userId, // Misalnya userId dari hasil update
@@ -93,6 +94,7 @@ function RouteComponent() {
               console.error("Notification Error:", notificationError);
             }
           },
+
           onPending: (result) => {
             navigate({ to: "/orderHistory" });
           },
