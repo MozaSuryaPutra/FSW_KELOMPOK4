@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import useSnap from "../hooks/useSnap";
 import FlightDetailPayment from "../components/payment/flightDetailPayment.jsx";
+import FlightDetailReturnPayment from "../components/payment/flightDetailPaymentReturn.jsx";
+import FlightDetailReturn from "../components/payment/flightDetailReturn.jsx";
 import { getCheckoutByID } from "../services/checkout/checkout";
 import { toast } from "react-toastify";
 import { createNotification } from "../services/notifications/index.js";
@@ -250,7 +252,7 @@ function RouteComponent() {
               style={{
                 display: snapVisible ? "block" : "none",
                 minHeight: "500px",
-                width: "30rem",
+                width: "100%",
                 marginBottom: "50px",
               }}
             ></div>
@@ -270,6 +272,23 @@ function RouteComponent() {
                 <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
               )}
               <FlightDetailPayment data={details} />
+
+              {details?.flights?.return && (
+                <FlightDetailReturn flighter={details} />
+              )}
+              <div className="detailPrice row px-2 pt-3">
+                <div className="col-6">Tax</div>
+                <div className="col-6 text-end">
+                  IDR {details?.priceDetails?.tax?.toLocaleString("id-ID") || 0}
+                </div>
+                <div className="col-6 fw-bolder fs-5">Total</div>
+                <div
+                  className="col-6 fw-bolder fs-5 text-end"
+                  style={{ color: "#7126B5" }}
+                >
+                  {details?.priceDetails?.totalPayAfterTax || "Unknown Money"}
+                </div>
+              </div>
             </div>
           </div>
         </div>

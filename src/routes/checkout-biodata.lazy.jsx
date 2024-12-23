@@ -2,6 +2,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import PemesananItem from "../components/payment/paymentPemesanan";
 import BookingFormPassanger from "../components/payment/paymentPassenger";
 import FlightDetail from "../components/payment/flightDetail";
+import FlightDetailReturn from "../components/payment/flightDetailReturn";
 import FlightDetailPayment from "../components/payment/flightDetailPayment";
 import DataPassangers from "../data/data.json";
 import AlertDanger from "../components/payment/alertDanger";
@@ -637,6 +638,24 @@ function Index() {
               <div className="container row">
                 <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
                 <FlightDetail flighter={details} />
+                {details?.flights?.return && (
+                  <FlightDetailReturn flighter={details} />
+                )}
+
+                <div className="detailPrice row px-2 pt-3">
+                  <div className="col-6">Tax</div>
+                  <div className="col-6 text-end">
+                    IDR{" "}
+                    {details?.priceDetails?.tax?.toLocaleString("id-ID") || 0}
+                  </div>
+                  <div className="col-6 fw-bolder fs-5">Total</div>
+                  <div
+                    className="col-6 fw-bolder fs-5 text-end"
+                    style={{ color: "#7126B5" }}
+                  >
+                    {details?.priceDetails?.totalPayAfterTax || "Unknown Money"}
+                  </div>
+                </div>
                 {details?.orderer?.email &&
                   details?.transaction?.status !== "issued" && (
                     <div className="text-center pt-3">

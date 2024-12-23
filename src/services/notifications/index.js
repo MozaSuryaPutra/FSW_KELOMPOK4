@@ -75,11 +75,12 @@ export const deleteNotification = async (notifId) => {
       method: "DELETE",
     }
   );
-
+  console.log(response);
   // get the data if fetching succeed!
   const result = await response.json();
   if (!response.ok) {
     throw new Error(result?.message);
   }
+  console.log(result);
   return result;
 };

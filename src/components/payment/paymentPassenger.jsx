@@ -87,9 +87,19 @@ const BookingFormPassenger = ({
                       onChange={(e) => handlePassengerChange(index, e)}
                       value={passenger.title || ""}
                     >
-                      <option value="">Silahkan Pilih</option>
-                      <option value="mr">Mr</option>
-                      <option value="mrs">Mrs</option>
+                      {passenger.passengerType === "adult" ? (
+                        <>
+                          <option value="">Silahkan Pilih</option>
+                          <option value="mr">Mr</option>
+                          <option value="mrs">Mrs</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="">Silahkan Pilih</option>
+                          <option value="boy">Boy</option>
+                          <option value="girl">Girl</option>
+                        </>
+                      )}
                     </Form.Select>
                   </Form.Group>
 
