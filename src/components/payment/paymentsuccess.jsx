@@ -47,9 +47,9 @@ const paymentSuccess = () => {
           </div>
           <div className="fw-medium">Transaksi Pembayaran Tiket sukses!</div>
         </div>
-        <div className="btn-get-ticket w-25  mx-auto">
-          onClick=
-          {async () => {
+        <div
+          className="btn-get-ticket w-25 mx-auto"
+          onClick={async () => {
             setLoading(true); // Set loading true saat proses dimulai
             try {
               const file = await getTicket(transactionId); // Mendapatkan file PDF
@@ -70,13 +70,15 @@ const paymentSuccess = () => {
               setLoading(false); // Set loading false setelah proses selesai
             }
           }}
-          <div>
-            className="p-2 text-white text-center fw-semibold fs-6 border
-            border-success-subtle rounded-3 mt-4" style=
-            {{ backgroundColor: "#7126B5" }}
+        >
+          <div
+            className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-4"
+            style={{ backgroundColor: "#7126B5" }}
+          >
             Terbitkan Tiket
           </div>
         </div>
+
         <div className="btn-search-ticket w-25 mx-auto">
           <div
             className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-2"
