@@ -8,7 +8,7 @@ import { verifOTP, resendOTP } from "../../services/auth/auth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-
+import "../../styles/global.css";
 export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
 });
@@ -31,7 +31,6 @@ function OTPInputUI() {
     },
     onError: (error) => {
       toast.error(error?.message || "Verifikasi OTP gagal");
-
     },
   });
 
@@ -47,12 +46,10 @@ function OTPInputUI() {
     },
   });
 
-
   useEffect(() => {
     if (counter > 0) {
       const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
       return () => clearInterval(timer); // Cleanup timer when component unmounts
-
     }
   }, [counter]);
 
@@ -84,7 +81,6 @@ function OTPInputUI() {
     };
     ResendOtp(request);
   };
-
 
   return (
     <div
@@ -129,7 +125,7 @@ function OTPInputUI() {
       >
         Kirim Ulang OTP dalam {counter} detik
       </p>
-      
+
       {counter === 0 && (
         <div
           style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
@@ -164,9 +160,7 @@ function OTPInputUI() {
         }}
         disabled={isLoading || isResending}
       >
-
         {isLoading || isResending ? "Memproses..." : "Verifikasi OTP"}
-
       </button>
     </div>
   );

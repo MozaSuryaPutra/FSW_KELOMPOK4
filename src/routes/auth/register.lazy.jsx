@@ -9,7 +9,7 @@ import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { setUser } from "../../redux/slices/auth";
 import BgTiketkuImage from "/BG-Tiketku.png?url";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import "../../styles/global.css";
 export const Route = createLazyFileRoute("/auth/register")({
   component: Register,
 });
@@ -33,7 +33,7 @@ function Register() {
   useEffect(() => {
     // get token from local storage
     if (token) {
-        navigate({ to: "/" });
+      navigate({ to: "/" });
     }
   }, [token, navigate]);
 
@@ -51,13 +51,13 @@ function Register() {
       toast.error("Register Error:", error.message);
     },
   });
-  
+
   const onSubmit = (event) => {
     event.preventDefault();
     const body = {
       name,
       email,
-      numberPhone:phoneNumber,
+      numberPhone: phoneNumber,
       password,
     };
     registerUser(body);
@@ -136,7 +136,19 @@ function Register() {
                     onClick={togglePassword}
                     style={{ textDecoration: "none" }}
                   >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? (
+                      <FaEyeSlash
+                        style={{
+                          color: "#7126B5",
+                        }}
+                      />
+                    ) : (
+                      <FaEye
+                        style={{
+                          color: "#7126B5",
+                        }}
+                      />
+                    )}
                   </Button>
                 </div>
               </Form.Group>
@@ -144,10 +156,10 @@ function Register() {
               <Button
                 variant="primary"
                 type="submit"
-                className="w-100"
+                className="w-100 custom-button"
                 style={{
                   borderRadius: "12px",
-                  backgroundColor: "#6C63FF",
+                  backgroundColor: "#7126B5",
                   border: "none",
                 }}
               >
@@ -156,7 +168,10 @@ function Register() {
             </Form>
             <p className="text-center mt-4">
               Sudah punya akun?{" "}
-              <a href="/auth/login" style={{ color: "#6C63FF", fontWeight: "500" }}>
+              <a
+                href="/auth/login"
+                style={{ color: "#7126B5", fontWeight: "500" }}
+              >
                 Masuk di sini
               </a>
             </p>

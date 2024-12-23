@@ -3,6 +3,7 @@ import { FiList, FiBell, FiUser } from "react-icons/fi";
 import { FaUser } from "react-icons/fa";
 import { Navbar, Container, Nav, Button } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
+import "./navbar.css";
 import { useSelector } from "react-redux";
 
 import { useNavigate } from "@tanstack/react-router";

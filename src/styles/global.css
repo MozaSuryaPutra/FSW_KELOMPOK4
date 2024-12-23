@@ -1,0 +1,109 @@
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+
+body {
+  font-family: "Plus Jakarta Sans", sans-serif !important;
+  line-height: 1.6 !important;
+  color: #000000 !important;
+}
+
+h1 {
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+}
+
+h2,
+.subtitle {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+}
+
+.title-large {
+  font-size: 3rem !important;
+  font-weight: 800 !important;
+}
+
+p {
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+}
+
+/* --------------------------Search Box */
+.search-box-layout {
+  background-color: #ffffff; /* Warna latar belakang putih */
+  border: 1px solid #ddd; /* Border ringan */
+  border-radius: 12px; /* Membuat sudut membulat */
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15); /* Bayangan lembut */
+  padding: 20px; /* Ruang dalam */
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease; /* Efek animasi */
+}
+
+.search-box-layout:hover {
+  transform: translateY(-5px); /* Sedikit mengangkat saat hover */
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2); /* Bayangan lebih tegas */
+  border-color: #7126b5; /* Border menjadi warna utama */
+}
+
+.search-box-layout h3 {
+  color: #7126b5; /* Warna teks utama */
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center; /* Teks tengah */
+  margin-bottom: 16px;
+}
+
+.search-box-layout p {
+  color: #666666; /* Warna teks deskripsi */
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.search-box-layout button {
+  background-color: #7126b5;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-box-layout button:hover {
+  background-color: #8a46d4; /* Warna ungu lebih terang */
+}
+/* -------------------------------------------------- */
+
+.search-box-layout .custom-input {
+  line-height: 1.5 !important;
+  color: #7126b5 !important;
+  font-weight: 500 !important;
+  border-bottom: 0.5px solid #7126b5 !important;
+  font-size: 1.3vw !important;
+}
+.custom-button:hover {
+  background-color: #7126b5 !important; /* Warna lebih gelap */
+  cursor: pointer !important; /* Tambahkan pointer */
+  box-shadow: 0 4px 10px #7126b540 !important; /* Tambahkan bayangan */
+  transform: scale(1.001) !important;
+  border: 1px solid #7126b51a !important;
+}
+
+.custom-switch .form-check-input {
+  background-color: #e3e3e3; /* Warna dasar */
+  border-color: #7126b5; /* Warna border */
+  transform: scale(1.5); /* Memperbesar ukuran switch */
+}
+
+.custom-switch .form-check-input:checked {
+  background-color: #7126b5; /* Warna saat switch aktif */
+  border-color: #7126b5; /* Warna border saat aktif */
+}
+
+.custom-switch .form-check-label {
+  font-size: 18px; /* Memperbesar ukuran label */
+  color: #000000; /* Warna label yang selaras */
+}

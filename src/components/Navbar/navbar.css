@@ -1,0 +1,72 @@
+/* Navbar Container */
+.navbar {
+  background-color: #ffffff; /* Warna latar putih */
+  border-bottom: 3px solid #7126b51a; /* Border bawah */
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Efek bayangan */
+  padding: 0.7rem 1rem;
+}
+
+/* Brand Logo */
+.navbar-brand img {
+  max-height: 70px; /* Ukuran logo */
+  cursor: pointer; /* Tunjukkan pointer saat hover */
+}
+
+/* Navbar Toggle Button */
+.navbar-toggler {
+  border: none;
+  outline: none;
+}
+
+.navbar-toggler:focus {
+  box-shadow: none;
+}
+
+/* Login Button */
+.navbar .btn-primary {
+  border: none;
+  border-radius: 20px; /* Membuat sudut tombol membulat */
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  transition:
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.navbar .btn-primary:hover {
+  box-shadow: 0px 4px 10px rgba(113, 38, 181, 0.4); /* Efek hover bayangan */
+}
+
+/* Icon Group (After Login) */
+.navbar .d-flex .me-3 {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.navbar .d-flex .me-3:hover {
+}
+
+/* Icon Profile */
+.navbar .d-flex svg:last-child {
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.navbar .d-flex svg:last-child:hover {
+}
+
+/* Mobile View Adjustments */
+@media (max-width: 991.98px) {
+  .navbar .btn-primary {
+    width: 100%; /* Tombol login memenuhi lebar pada layar kecil */
+    text-align: center;
+    margin: 0.5rem 0;
+  }
+
+  .navbar .d-flex {
+    justify-content: center;
+  }
+}
