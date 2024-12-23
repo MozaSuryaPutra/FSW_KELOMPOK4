@@ -4,7 +4,7 @@ import Successimage from "../../../public/🦆 illustration _Cart shopping list_
 import "../payment/payment.css";
 import { getTicket } from "../../services/ticket";
 import { useLocation } from "@tanstack/react-router";
-
+import { toast } from "react-toastify";
 const paymentSuccess = () => {
   //coba
   const [loading, setLoading] = useState(false);
