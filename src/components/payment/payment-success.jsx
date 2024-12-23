@@ -1,8 +1,10 @@
 import React from "react";
+import { useState } from "react";
 import Successimage from "../../../public/🦆 illustration _Cart shopping list_.png";
 import "../payment/payment.css";
 import { getTicket } from "../../services/ticket";
 import { useLocation } from "@tanstack/react-router";
+
 const paymentSuccess = () => {
   //coba
   const [loading, setLoading] = useState(false);
