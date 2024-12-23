@@ -93,6 +93,7 @@ function RouteComponent() {
               toast.error("Gagal mengirim notifikasi");
               console.error("Notification Error:", notificationError);
             }
+            navigate({ to: `${result.finish_redirect_url}` });
           },
 
           onPending: (result) => {
