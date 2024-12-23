@@ -93,7 +93,8 @@ function RouteComponent() {
               toast.error("Gagal mengirim notifikasi");
               console.error("Notification Error:", notificationError);
             }
-            navigate({ to: `${result.finish_redirect_url}` });
+            if (result.transaction_status === "settlement")
+              navigate({ to: "/payment-success" });
           },
 
           onPending: (result) => {
