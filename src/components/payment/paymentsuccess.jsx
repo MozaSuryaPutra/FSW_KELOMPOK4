@@ -4,6 +4,7 @@ import "../payment/payment.css";
 import { getTicket } from "../../services/ticket";
 import { useLocation } from "@tanstack/react-router";
 const paymentSuccess = () => {
+  //coba
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const { transactionId } = location.state || {};
