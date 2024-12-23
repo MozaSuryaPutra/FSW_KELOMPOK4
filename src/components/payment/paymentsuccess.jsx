@@ -47,31 +47,32 @@ const paymentSuccess = () => {
           <div className="fw-medium">Transaksi Pembayaran Tiket sukses!</div>
         </div>
         <div className="btn-get-ticket w-25  mx-auto">
-          <div
-            className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-4"
-            style={{ backgroundColor: "#7126B5" }}
-            onClick={async () => {
-              setLoading(true); // Set loading true saat proses dimulai
-              try {
-                const file = await getTicket(transactionId); // Mendapatkan file PDF
-                if (file) {
-                  toast.success("Berhasil cetak tiket!");
-                  // Menangani pengunduhan atau menampilkan file PDF
-                  const link = document.createElement("a");
-                  link.href = URL.createObjectURL(file);
-                  link.download = `ticket-${transactionId}.pdf`;
-                  link.click();
-                } else {
-                  toast.error("Tiket tidak ditemukan.");
-                }
-              } catch (err) {
-                toast.error("Terjadi kesalahan saat mengambil data tiket.");
-                console.error(err);
-              } finally {
-                setLoading(false); // Set loading false setelah proses selesai
+          onClick=
+          {async () => {
+            setLoading(true); // Set loading true saat proses dimulai
+            try {
+              const file = await getTicket(transactionId); // Mendapatkan file PDF
+              if (file) {
+                toast.success("Berhasil cetak tiket!");
+                // Menangani pengunduhan atau menampilkan file PDF
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(file);
+                link.download = `ticket-${transactionId}.pdf`;
+                link.click();
+              } else {
+                toast.error("Tiket tidak ditemukan.");
               }
-            }}
-          >
+            } catch (err) {
+              toast.error("Terjadi kesalahan saat mengambil data tiket.");
+              console.error(err);
+            } finally {
+              setLoading(false); // Set loading false setelah proses selesai
+            }
+          }}
+          <div>
+            className="p-2 text-white text-center fw-semibold fs-6 border
+            border-success-subtle rounded-3 mt-4" style=
+            {{ backgroundColor: "#7126B5" }}
             Terbitkan Tiket
           </div>
         </div>
