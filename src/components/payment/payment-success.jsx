@@ -4,10 +4,11 @@ import "../payment/payment.css";
 import { getTicket } from "../../services/ticket";
 import { useLocation } from "@tanstack/react-router";
 import { toast } from "react-toastify";
-
+import { useNavigate } from "@tanstack/react-router";
 const PaymentSuccess = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { transactionId } = location.state || {};
 
   const handleGetTicket = async () => {
