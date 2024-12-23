@@ -63,3 +63,23 @@ export const createNotification = async (request) => {
 
   return result;
 };
+
+export const deleteNotification = async (notifId) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/notification/${notifId}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      method: "DELETE",
+    }
+  );
+
+  // get the data if fetching succeed!
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result?.message);
+  }
+  return result;
+};

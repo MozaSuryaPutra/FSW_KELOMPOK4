@@ -17,6 +17,9 @@ import {
   getNotificationById,
   updateNotification,
 } from "../services/notifications";
+import { toast } from "react-toastify";
+import { deleteNotification } from "../services/notifications";
+import { confirmAlert } from "react-confirm-alert";
 
 export const Route = createLazyFileRoute("/notifications")({
   component: NotificationsList,
@@ -83,7 +86,35 @@ function NotificationsList() {
       console.error("Gagal mengupdate notifikasi:", err);
     },
   });
-
+  const { mutate: deleteNotifications, isLoading: isDeleting } = useMutation({
+    mutationFn: deleteNotification, // Fungsi mutasi untuk menghapus
+    onSuccess: (_, notifId) => {
+      toast.success("Notification deleted successfully!");
+      queryClient.setQueryData(
+        ["notification", userId],
+        (oldData) => oldData?.filter((notif) => notif.id !== notifId) || []
+      );
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete Notification");
+    },
+  });
+  const onDelete = (notifId) => {
+    confirmAlert({
+      title: "Confirm to delete",
+      message: "Are you sure to delete this Notification?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => deleteNotifications(notifId), // Kirim `notifId` ke mutasi
+        },
+        {
+          label: "No",
+          onClick: () => {},
+        },
+      ],
+    });
+  };
   const handleNotificationClick = (notifId) => {
     markAsRead(notifId);
   };
@@ -334,6 +365,14 @@ function NotificationsList() {
                   }}
                 />
               </p>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => onDelete(notif.id)} // Panggil `onDelete`
+                disabled={isDeleting}
+              >
+                Hapus
+              </Button>
             </Col>
           </Row>
         ))
