@@ -7,7 +7,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { login } from "../../services/auth/auth";
 
 import BgTiketkuImage from "../../../public/BG-Tiketku.png";
-
+import "../../styles/global.css";
 //import logo from "../../assets/img/BG-Tiketku.png";
 import { useDispatch } from "react-redux";
 

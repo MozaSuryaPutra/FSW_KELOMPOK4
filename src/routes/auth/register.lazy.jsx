@@ -9,7 +9,7 @@ import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
 import { setUser } from "../../redux/slices/auth";
 import BgTiketkuImage from "/BG-Tiketku.png?url";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import "../../styles/global.css";
 export const Route = createLazyFileRoute("/auth/register")({
   component: Register,
 });
@@ -147,7 +147,19 @@ function Register() {
                     onClick={togglePassword}
                     style={{ textDecoration: "none" }}
                   >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? (
+                      <FaEyeSlash
+                        style={{
+                          color: "#7126B5",
+                        }}
+                      />
+                    ) : (
+                      <FaEye
+                        style={{
+                          color: "#7126B5",
+                        }}
+                      />
+                    )}
                   </Button>
                 </div>
               </Form.Group>

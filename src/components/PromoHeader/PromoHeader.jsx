@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import SearchBox from "../SearchBox/SearchBox";
 import { Image } from "react-bootstrap";
 import FavoriteDestination from "../FavoriteDestination/FavoriteDestination";
+import "../../styles/global.css";
 
 function PromoHeader() {
   // const promoHeaderContainer = document.getElementById(

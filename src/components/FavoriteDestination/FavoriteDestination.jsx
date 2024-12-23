@@ -77,11 +77,12 @@ const FavoriteDestination = () => {
     },
     onError: (err) => {
       console.error("error:", err.message);
-      if(err.message == "jwt malformed"){
-              toast.error("Upss!! Kamu belum melakukan login, Silahlan Login terlebih dahulu");
-      }else{
+      if (err.message == "jwt malformed") {
+        toast.error(
+          "Upss!! Kamu belum melakukan login, Silahlan Login terlebih dahulu"
+        );
+      } else {
         toast.error(err.message);
-
       }
       setIsSubmitting(false); // Atur state menjadi true
     },
@@ -217,8 +218,7 @@ const FavoriteDestination = () => {
                       2: "/Newyork2.jpg",
                       7: "/Samarinda7.jpg",
                       3: "/Berlin3.jpg",
-                      4:"/Rio4.jpg",
-
+                      4: "/Rio4.jpg",
                     }[destination.destinationCityId] || "/defaultImage.jpg"
                   }
                   alt={destination.destinationCity}
@@ -315,18 +315,19 @@ const FavoriteDestination = () => {
               <Row>
                 <Col xs={12} className="mb-3">
                   <img
-src={
-  {
-    1: "/Jakarta1.jpg",
-    6: "/Bandung6.jpg",
-    5: "/Sydney5.jpg",
-    2: "/Newyork2.jpg",
-    7: "/Samarinda7.jpg",
-    3: "/Berlin3.jpg",
-    4:"/Rio4.jpg",
-
-  }[selectedDestination.destinationCityId] || "/defaultImage.jpg"
-}                    alt={selectedDestination.destinationAirportName}
+                    src={
+                      {
+                        1: "/Jakarta1.jpg",
+                        6: "/Bandung6.jpg",
+                        5: "/Sydney5.jpg",
+                        2: "/Newyork2.jpg",
+                        7: "/Samarinda7.jpg",
+                        3: "/Berlin3.jpg",
+                        4: "/Rio4.jpg",
+                      }[selectedDestination.destinationCityId] ||
+                      "/defaultImage.jpg"
+                    }
+                    alt={selectedDestination.destinationAirportName}
                     style={{
                       width: "100%",
                       height: "200px",

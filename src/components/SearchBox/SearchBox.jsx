@@ -18,6 +18,8 @@ import Penumpang from "/penumpang.png";
 import Vector from "/Vector.png";
 import Return from "/return.png";
 import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jika diperlukan
+import "../../styles/global.css";
+
 const SearchBox = () => {
  // Menetapkan tanggal saat ini ke input date
  const today = new Date();
@@ -178,7 +180,7 @@ const SearchBox = () => {
 //   text-overflow: ellipsis;
 // }
 `}</style> */}
-      <div>
+      <div className="search-box-layout">
         <Row className="justify-content-center">
           <Col md={12} sm={12} xs={12}>
             <Form
@@ -196,7 +198,7 @@ const SearchBox = () => {
                 </Col>
               </Row>
               <Row className="mb-3">
-                <Col md={5} sm={12}>
+                <Col md={5} sm={12} className="buat-style-font">
                   <Form.Group
                     controlId="fromCity"
                     className="mb-3 d-flex align-items-center"
@@ -207,13 +209,20 @@ const SearchBox = () => {
                         src={Planelogo}
                         alt=""
                         style={{
-                          width: "16px",
-                          height: "16px",
+                          width: "20px",
+                          height: "20px",
                           marginRight: "8px",
+                          marginTop: "10px",
                         }}
                       />
-                      <span style={{ color: "#8A8A8A", fontSize: 12 }}>
-                        From
+                      <span
+                        style={{
+                          color: "#000000",
+                          fontSize: 12,
+                          marginTop: "10px",
+                        }}
+                      >
+                        From:
                       </span>
                     </Form.Label>
                     <Form.Control
@@ -230,6 +239,7 @@ const SearchBox = () => {
                         cursor: "pointer",
                         fontSize: "2vw",
                         color: "#7126B5" || "#FFFFFF",
+                        // textTransform: "uppercase",
                       }}
                     />
                   </Form.Group>
@@ -237,7 +247,7 @@ const SearchBox = () => {
                 <Col
                   md={2}
                   sm={12}
-                  className="d-flex justify-content-center align-items-center"
+                  className="d-flex justify-content-center align-items-center custom-switch"
                 >
                   <img onClick={swapCities} src={Return} alt="" />
                 </Col>
@@ -252,12 +262,21 @@ const SearchBox = () => {
                         src={Planelogo}
                         alt=""
                         style={{
-                          width: "16px",
-                          height: "16px",
+                          width: "20px",
+                          height: "20px",
                           marginRight: "8px",
+                          marginTop: "10px",
                         }}
                       />
-                      <span style={{ color: "#8A8A8A", fontSize: 12 }}>To</span>
+                      <span
+                        style={{
+                          color: "#000000",
+                          fontSize: 12,
+                          marginTop: "10px",
+                        }}
+                      >
+                        To:
+                      </span>
                       <span style={{ color: "white" }}>xx</span>
                     </Form.Label>
                     <Form.Control
@@ -286,12 +305,19 @@ const SearchBox = () => {
                       src={Vector}
                       alt=""
                       style={{
-                        width: "16px",
-                        height: "16px",
+                        width: "20px",
+                        height: "20px",
                         marginRight: "8px",
                       }}
                     />
-                    <span style={{ color: "#8A8A8A", fontSize: 12 }}>Date</span>
+                    <span
+                      style={{
+                        color: "#000000",
+                        fontSize: 12,
+                      }}
+                    >
+                      Date:
+                    </span>
                   </Form.Label>
 
                   {/* Kolom Tanggal Keberangkatan */}
@@ -382,13 +408,24 @@ const SearchBox = () => {
                     </Form.Label>
                   </Col> */}
                 </Col>
-                <Col md={2}>
+                <Col md={2} className="d-flex ">
                   <Form.Check
                     type="switch"
                     id="returnSwitch"
                     onChange={handleSwitchChange}
-                    label="PP"
+                    label=""
+                    className="custom-switch"
+                    style={{ color: "#ffffff" }}
                   />
+                  <p
+                    style={{
+                      textAlign: "center",
+                      marginLeft: "2px",
+                      color: "#7126b5",
+                    }}
+                  >
+                    PP
+                  </p>
                 </Col>
                 <Col md={5} className="d-flex align-items-center ">
                   <Form.Label className="fw-bold mb-1 me-2 d-flex align-items-center">
@@ -396,12 +433,12 @@ const SearchBox = () => {
                       src={Penumpang}
                       alt=""
                       style={{
-                        width: "16px",
-                        height: "16px",
+                        width: "20px",
+                        height: "20px",
                         marginRight: "8px",
                       }}
                     />
-                    <span style={{ color: "#8A8A8A", fontSize: 12 }}>To</span>
+                    <span style={{ color: "#000000", fontSize: 14 }}>To:</span>
                     <span style={{ color: "white" }}>xx</span>
                   </Form.Label>
 
@@ -438,7 +475,7 @@ const SearchBox = () => {
                           outline: "none",
                           boxShadow: "none",
                           cursor: "pointer",
-                          fontSize: "1.4vw",
+                          // fontSize: "1.4vw" !important,
                           color: "#7126B5" || "#FFFFFF",
                         }}
                       />
@@ -496,10 +533,12 @@ const SearchBox = () => {
                       // onClick={() =>
                       //   navigate({ to: "/choose", state: flightSearch })
                       // }
-                      className="w-100"
+                      className="w-100 py-2 custom-button"
                       style={{
                         backgroundColor: "#7126B5",
                         borderRadius: "0 0 5px 5px",
+                        fontSize: "18px",
+                        letterSpacing: "0.5px",
                       }}
                     >
                       <span style={{ fontWeight: "bold" }}>

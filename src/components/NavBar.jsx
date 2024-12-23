@@ -19,7 +19,6 @@ const NavBar = () => {
 
         <Navbar.Brand as={Link} to="/" className="text-primary">
           <Image src="./public/logo.png" fluid />
-
         </Navbar.Brand>
 
         {/* Toggle Button */}
@@ -31,7 +30,7 @@ const NavBar = () => {
 
           <Button variant="primary" className="d-flex align-items-center">
             <FaUser className="me-2" />
-            Masuk
+            <p>Masuk</p>
           </Button>
         </Navbar.Collapse>
       </Container>

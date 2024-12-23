@@ -8,13 +8,14 @@ import { verifOTP, resendOTP } from "../../services/auth/auth";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-
+import "../../styles/global.css";
 export const Route = createLazyFileRoute("/auth/otp")({
   component: OTPInputUI,
 });
 
 function OTPInputUI() {
   const navigate = useNavigate();
+
 
   const [isDisabled, setIsDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
@@ -49,7 +50,6 @@ function OTPInputUI() {
       toast.error(error?.message || "Gagal mengirim OTP");
     },
   });
-
 
   useEffect(() => {
     if (counter > 0) {
@@ -87,7 +87,6 @@ function OTPInputUI() {
     const request = {
       userId: userId,
     };
-
     // Disable the button after it's clicked
     setIsDisabled(true);
     ResendOtp(request)
@@ -146,7 +145,16 @@ function OTPInputUI() {
       >
         Kirim Ulang OTP dalam {counter} detik
       </p>
-      
+
+      {counter === 0 && (
+        <div
+          style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
+          onClick={handleResendOtp}
+        >
+          Kirim ulang OTP
+        </div>
+      )}
+
       {counter === 0 && (
         <div
           style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
@@ -173,9 +181,7 @@ function OTPInputUI() {
         }}
         disabled={isLoading || isResending || isSubmitting}
       >
-
         {isLoading || isResending || isSubmitting ? "Memproses..." : "Verifikasi OTP"}
-
       </button>
     </div>
   );

@@ -1,3 +1,5 @@
+import "../styles/global.css";
+
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 
 import PromoHeader from "../components/PromoHeader/PromoHeader";
