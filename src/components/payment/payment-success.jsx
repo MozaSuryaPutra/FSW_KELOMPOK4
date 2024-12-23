@@ -1,17 +1,13 @@
 import React from "react";
 import Successimage from "../../../public/🦆 illustration _Cart shopping list_.png";
 import "../payment/payment.css";
-import { useNavigate } from "@tanstack/react-router";
-
+import { getTicket } from "../../services/ticket";
+import { useLocation } from "@tanstack/react-router";
 const paymentSuccess = () => {
-  const navigate = useNavigate();
-
-  const handleSearchOtherFlights = () => {
-    navigate({
-      to: "/",
-    });
-  };
-
+  //coba
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const { transactionId } = location.state || {};
   return (
     <div>
       <div>
@@ -21,9 +17,12 @@ const paymentSuccess = () => {
             aria-label="breadcrumb"
           >
             <ol className="breadcrumb">
-              <li className="breadcrumb-item ">Isi Data Diri</li>
-              <li className="breadcrumb-item ">Bayar Selesai</li>
-              <li className="breadcrumb-item">Bayar</li>
+              <li className="breadcrumb-item">
+                <a href="#">Home</a>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                Library
+              </li>
             </ol>
           </nav>
         </div>
@@ -48,7 +47,30 @@ const paymentSuccess = () => {
           </div>
           <div className="fw-medium">Transaksi Pembayaran Tiket sukses!</div>
         </div>
-        <div className="btn-get-ticket w-25  mx-auto">
+        <div
+          className="btn-get-ticket w-25 mx-auto"
+          onClick={async () => {
+            setLoading(true); // Set loading true saat proses dimulai
+            try {
+              const file = await getTicket(transactionId); // Mendapatkan file PDF
+              if (file) {
+                toast.success("Berhasil cetak tiket!");
+                // Menangani pengunduhan atau menampilkan file PDF
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(file);
+                link.download = `ticket-${transactionId}.pdf`;
+                link.click();
+              } else {
+                toast.error("Tiket tidak ditemukan.");
+              }
+            } catch (err) {
+              toast.error("Terjadi kesalahan saat mengambil data tiket.");
+              console.error(err);
+            } finally {
+              setLoading(false); // Set loading false setelah proses selesai
+            }
+          }}
+        >
           <div
             className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-4"
             style={{ backgroundColor: "#7126B5" }}
@@ -57,14 +79,13 @@ const paymentSuccess = () => {
           </div>
         </div>
 
-        <div className="btn-search-ticket w-25">
-          <button
+        <div className="btn-search-ticket w-25 mx-auto">
+          <div
             className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-2"
-            style={{ backgroundColor: "#D0B7E6", marginLeft: "60px" }}
-            onClick={handleSearchOtherFlights}
+            style={{ backgroundColor: "#D0B7E6" }}
           >
             Cari Penerbangan Lain
-          </button>
+          </div>
         </div>
       </div>
     </div>
