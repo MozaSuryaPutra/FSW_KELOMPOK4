@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Container, Row, Col, Button, Card } from "react-bootstrap";
+import "../../styles/global.css";
 
 // Data contoh untuk destinasi favorit berdasarkan kategori
 const destinationData = {
@@ -61,7 +62,7 @@ const FavoriteDestination = () => {
           <Col xs="auto" className="mb-3" key={index}>
             <Button
               variant="light"
-              className="text-dark"
+              className="text-dark custom-button"
               onClick={() => setSelectedCategory(region)}
               style={{
                 backgroundColor:
