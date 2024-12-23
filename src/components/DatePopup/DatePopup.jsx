@@ -26,6 +26,8 @@ const DatePopup = ({ show, handleClose, onSelectDates }) => {
     }
   };
 
+    const today = new DateObject(); // Mendapatkan tanggal hari ini
+
   return (
     <Modal show={show} onHide={handleClose} centered>
       <div style={{ width: "100%", maxWidth: "100vw", overflowX: "auto" }}>
@@ -33,6 +35,7 @@ const DatePopup = ({ show, handleClose, onSelectDates }) => {
           color="purple"
           value={values}
           onChange={handleDateChange}
+          minDate={today}
           range
           numberOfMonths={2}
           showOtherDays

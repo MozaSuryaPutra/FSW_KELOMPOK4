@@ -1,7 +1,7 @@
 export const getCities = async () => {
   const token = localStorage.getItem("token");
 
-  let url = `${import.meta.env.VITE_API_URL}/api/homepage/cities`;
+  let url = `${import.meta.env.VITE_API_URL}/api/cities`;
 
   const response = await fetch(url, {
     headers: {
@@ -44,7 +44,7 @@ export const getSearchedFlight = async (
   }
 
   let url =
-    `${import.meta.env.VITE_API_URL}/api/homepage/search?` +
+    `${import.meta.env.VITE_API_URL}/api/flights/search?` +
     new URLSearchParams(params);
   console.log(url);
   const response = await fetch(url, {
@@ -57,5 +57,51 @@ export const getSearchedFlight = async (
   // get data
   const result = await response.json();
   console.log(result);
+  return result?.data;
+};
+
+export const getFavDestination = async (
+continent,
+
+) => {
+  console.log("ISI KONTINEN : ",continent)
+  const token = localStorage.getItem("token");
+  let params = {};
+  if (continent) {
+    params.continent = continent;
+  }
+
+  
+
+  let url =
+    `${import.meta.env.VITE_API_URL}/api/flights/favorites?` +
+    new URLSearchParams(params);
+  console.log(url);
+  const response = await fetch(url, {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+    method: "GET",
+  });
+  console.log(response);
+  // get data
+  const result = await response.json();
+  console.log(result);
+  return result?.data;
+};
+
+export const getContinents = async () => {
+  const token = localStorage.getItem("token");
+
+  let url = `${import.meta.env.VITE_API_URL}/api/continents`;
+
+  const response = await fetch(url, {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+    method: "GET",
+  });
+
+  const result = await response.json();
   return result?.data;
 };

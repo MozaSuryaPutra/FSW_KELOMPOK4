@@ -17,8 +17,10 @@ export const login = async (request) => {
   console.log(result); // Debugging log
   console.log(response);
   if (!response.ok) {
-    throw new Error(result?.message);
-  }
+       // Tambahkan properti `details` ke Error untuk menyimpan detail error
+       const error = new Error(result.message || "An error occurred.");
+       error.details = result.details; // Tambahkan array `details` dari respons
+       throw error;  }
 
   return result;
 };
@@ -39,10 +41,12 @@ export const register = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
+  console.log(result);
   if (!response.ok) {
-    throw new Error(result?.message);
+       // Tambahkan properti `details` ke Error untuk menyimpan detail error
+       const error = new Error(result.message || "An error occurred.");
+       error.details = result.details; // Tambahkan array `details` dari respons
+       throw error;
   }
 
   return result;

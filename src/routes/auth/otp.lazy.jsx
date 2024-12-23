@@ -16,6 +16,9 @@ export const Route = createLazyFileRoute("/auth/otp")({
 function OTPInputUI() {
   const navigate = useNavigate();
 
+
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
   const [otp, setOtp] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
@@ -28,9 +31,11 @@ function OTPInputUI() {
     onSuccess: () => {
       toast.success("OTP berhasil diverifikasi!");
       navigate({ to: "/auth/login" }); // Redirect after success
+      setIsSubmitting(false);
     },
     onError: (error) => {
       toast.error(error?.message || "Verifikasi OTP gagal");
+      setIsSubmitting(false);
     },
   });
 
@@ -50,6 +55,7 @@ function OTPInputUI() {
     if (counter > 0) {
       const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
       return () => clearInterval(timer); // Cleanup timer when component unmounts
+
     }
   }, [counter]);
 
@@ -61,6 +67,8 @@ function OTPInputUI() {
       return;
     }
 
+    if (isSubmitting) return; // Cegah klik berulang
+    setIsSubmitting(true); // Atur state menjadi true
     setIsLoading(true);
 
     const body = {
@@ -79,7 +87,19 @@ function OTPInputUI() {
     const request = {
       userId: userId,
     };
-    ResendOtp(request);
+    // Disable the button after it's clicked
+    setIsDisabled(true);
+    ResendOtp(request)
+      .then(() => {
+        // Optionally reset the state after success
+        setTimeout(() => {
+          setIsDisabled(false);
+        }, 60000); // Enable button after 60 seconds
+      })
+      .catch(() => {
+        // Re-enable the button if there is an error
+        setIsDisabled(false);
+      });
   };
 
   return (
@@ -138,7 +158,8 @@ function OTPInputUI() {
       {counter === 0 && (
         <div
           style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
-          onClick={handleResendOtp}
+          onClick={isDisabled ? null : handleResendOtp}
+          disabled={isLoading || isResending}
         >
           Kirim ulang OTP
         </div>
@@ -148,7 +169,7 @@ function OTPInputUI() {
         type="submit"
         onClick={onSubmit}
         style={{
-          backgroundColor: "#6C63FF",
+          backgroundColor: isSubmitting ? "#CCC" : "#6C63FF",
           color: "white",
           fontSize: "16px",
           fontWeight: "bold",
@@ -158,9 +179,9 @@ function OTPInputUI() {
           cursor: "pointer",
           marginTop: "20px",
         }}
-        disabled={isLoading || isResending}
+        disabled={isLoading || isResending || isSubmitting}
       >
-        {isLoading || isResending ? "Memproses..." : "Verifikasi OTP"}
+        {isLoading || isResending || isSubmitting ? "Memproses..." : "Verifikasi OTP"}
       </button>
     </div>
   );

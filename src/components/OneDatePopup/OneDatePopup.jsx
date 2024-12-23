@@ -21,6 +21,10 @@ const OneDatePopup = ({ show, handleClose, onSelectDate }) => {
     onSelectDate(date.format("YYYY-MM-DD")); // Mengembalikan tanggal dalam format penyimpanan (YYYY-MM-DD)
     handleClose(); // Tutup modal setelah memilih tanggal
   };
+
+  const today = new DateObject(); // Mendapatkan tanggal hari ini
+
+
   return (
     <Modal
       value={selectedDate}
@@ -34,6 +38,7 @@ const OneDatePopup = ({ show, handleClose, onSelectDate }) => {
         color="purple"
         value={selectedDate}
         onChange={handleDateChange}
+        minDate={today}
       />
     </Modal>
   );

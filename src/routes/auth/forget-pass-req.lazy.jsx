@@ -24,13 +24,9 @@ function ResetRequest() {
     },
 
     onError: (error) => {
-      if (error.response?.status === 404) {
-        toast.error("Your email was not found.", {
+        toast.error(error.message, {
           autoClose: 4000,
-        });
-      } else {
-        toast.error("An unexpected error occured");
-      }
+        })
     },
   });
 

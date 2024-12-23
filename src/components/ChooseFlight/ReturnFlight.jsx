@@ -259,6 +259,8 @@ function ReturnFlight() {
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
     return user?.id; // Kembalikan id jika user ada
   });
+
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
   const [flightList, setFlight] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
   const location = useLocation();
@@ -321,9 +323,11 @@ function ReturnFlight() {
       return chooseCheckout(body); // Fungsi untuk melakukan request
     },
     onSuccess: (data) => {
+      setIsSubmitting(true); // Atur state menjadi true
       if (data) {
         console.log("Data on success:", data); // Pastikan data sudah ada sebelum navigasi
         toast.success("Berhasil Membuat Checkout Biodata");
+        localStorage.removeItem("flightSearch"); // Menghapus item
         navigate({
           to: "/checkout-biodata",
           state: {
@@ -343,6 +347,8 @@ function ReturnFlight() {
     onError: (err) => {
       console.error("error:", err.message);
       toast.error(err?.message);
+      setIsSubmitting(false); // Atur state menjadi true
+
     },
   });
   console.log({ selectedPassengers });
@@ -407,7 +413,8 @@ function ReturnFlight() {
   };
   const onSubmit = async (event, flightIds) => {
     event.preventDefault();
-
+    if (isSubmitting) return; // Cegah klik berulang
+    setIsSubmitting(true); // Atur state menjadi true
     const selectedPassengersJson = JSON.stringify(selectedPassengers);
 
     const body = {
@@ -577,6 +584,8 @@ function ReturnFlight() {
               </div>
             ) : filteredFlights?.length > 0 ? (
               filteredFlights.map((flight, idx) => (
+                <>
+                <h3>Return Flight</h3>
                 <Accordion
                   key={flight.id}
                   defaultActiveKey="0"
@@ -671,10 +680,11 @@ function ReturnFlight() {
                         >
                           <strong>IDR {flight.price.toLocaleString()}</strong>
                           <Button
+                          disabled={isSubmitting}
                             onClick={(event) => onSubmit(event, flight.id)}
-                            variant="primary"
+                            variant={isSubmitting?"secondary":"primary"}
                           >
-                            Pilih
+                            {isSubmitting?"Memproses...":"Pilih"}
                           </Button>
                         </div>
                       </div>
@@ -789,6 +799,7 @@ function ReturnFlight() {
                     </Accordion.Body>
                   </Accordion.Item>
                 </Accordion>
+                </>
               ))
             ) : (
               <div className="text-center mt-4">

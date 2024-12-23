@@ -19,8 +19,9 @@ function ResetPassword() {
   const token = searchParams.get("token");
   const navigate = useNavigate();
   // State lainnya
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePassword = () => setShowPassword(!showPassword);
@@ -31,12 +32,13 @@ function ResetPassword() {
       toast.success("Password reset successful. Redirecting to login page...", {
         autoClose: 4000,
       });
-      setTimeout(() => navigate({ to: "/auth/login" }), 4000);
+      setTimeout(() => navigate({ to: '/auth/login' }), 4000);
+      setIsSubmitting(false); // Set ulang state meskipun gagal
     },
+    
     onError: (error) => {
-      toast.error(
-        error.response?.data?.message || "An unexpected error occurred."
-      );
+      toast.error(error.response?.data?.message || 'An unexpected error occurred.');
+      setIsSubmitting(false); // Set ulang state meskipun gagal
     },
   });
 
@@ -54,6 +56,8 @@ function ResetPassword() {
       toast.error("Invalid or missing token.");
       return;
     }
+    if (isSubmitting) return; // Cegah klik berulang
+    setIsSubmitting(true); // Atur state menjadi true
     const data = { token, newPassword, confirmPassword };
     savePassword(data);
   };
@@ -142,9 +146,9 @@ function ResetPassword() {
 
             <Button
               type="submit"
-              className="w-100"
-              disabled={isPending}
-              style={{ borderRadius: "16px" }}
+              className="w-100 mt-3"
+              disabled={isPending || isSubmitting}
+              style={{ borderRadius: '16px' }}
             >
               {isPending ? "Resetting..." : "Reset Password"}
             </Button>
