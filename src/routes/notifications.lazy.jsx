@@ -39,10 +39,6 @@ function NotificationsList() {
     return user?.id; // Kembalikan id jika user ada
   });
 
-  console.log(userId); // Akan mencetak "1" jika data benar
-
-  console.log(userId); // Tidak perlu JSON.parse
-
   useEffect(() => {
     if (!token) {
       navigate({ to: "/" });

@@ -143,13 +143,11 @@ function Index() {
   };
   const { mutate: updateCheckouts } = useMutation({
     mutationFn: (body) => {
-      console.log("Login mutation called with body:", body);
       setLoading(true);
       return updateCheckout(body);
     },
     onSuccess: async (data) => {
       toast.success("Berhasil Menyimpan Data");
-      console.log("Data on success:", data);
 
       if (data) {
         await queryClient.invalidateQueries("detail"); // Nama query yang perlu dirujuk ulang
@@ -164,7 +162,6 @@ function Index() {
   const { mutate: create, isPending } = useMutation({
     mutationFn: (request) => createPayment(request),
     onSuccess: (data) => {
-      console.log("ini isi payment : ", data);
       navigate({
         to: "/checkout-success",
         state: {
@@ -275,7 +272,6 @@ function Index() {
     }
 
     if (isError) {
-      console.error("Error fetching flight data:", error);
       return (
         <div className="text-center">
           <p>Error: Tidak dapat memuat data. Silakan coba lagi nanti.</p>
@@ -356,9 +352,6 @@ function Index() {
         passengers: JSON.stringify(formData?.passengers),
         seatIds: JSON.stringify([...outboundSeatIds, ...returnSeatIds]), // Gabungkan seatIds dari pergi dan kembali
       };
-
-      console.log("Data siap dikirim:", data.seatIds);
-      console.log("Data asli:", data);
 
       updateCheckouts(data);
     };
@@ -475,10 +468,7 @@ function Index() {
         </div>
       );
     };
-    console.log("saya details", details);
-    console.log(outboundSeatIds);
-    console.log(returnSeatIds);
-    console.log("Ini form data :", formData);
+
     // Render utama
     return (
       <div className="row g-3 m-0">

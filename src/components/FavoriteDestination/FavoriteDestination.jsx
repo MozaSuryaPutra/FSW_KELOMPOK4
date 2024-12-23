@@ -76,7 +76,6 @@ const FavoriteDestination = () => {
       setIsSubmitting(false); // Atur state menjadi true
     },
     onError: (err) => {
-      console.error("error:", err.message);
       if (err.message == "jwt malformed") {
         toast.error(
           "Upss!! Kamu belum melakukan login, Silahlan Login terlebih dahulu"
@@ -101,7 +100,6 @@ const FavoriteDestination = () => {
   // Function to update passenger details
   const handleSelectCounts = (counts) => {
     setPassengerDetails(counts); // Update passenger details with selected counts
-    console.log("Selected passenger details:", counts);
   };
 
   // Function to close passenger modal

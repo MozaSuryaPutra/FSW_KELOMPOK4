@@ -21,11 +21,9 @@ import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jik
 import "../../styles/global.css";
 
 const SearchBox = () => {
- // Menetapkan tanggal saat ini ke input date
- const today = new Date();
- const formattedDate = today.toLocaleDateString('en-CA'); // 'en-CA' menghasilkan format yyyy-mm-dd
- console.log("Tanggal sekarang : ", formattedDate);
- 
+  // Menetapkan tanggal saat ini ke input date
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("en-CA"); // 'en-CA' menghasilkan format yyyy-mm-dd
 
   const defaultData = {
     isReturnEnabled: false,
@@ -43,7 +41,7 @@ const SearchBox = () => {
       name: "Bandung",
       cityCode: "BDOA",
     },
-    selectedReturnDate:false,
+    selectedReturnDate: false,
   };
 
   const [modalShow, setModalShow] = useState(false); // State untuk modal destinasi
@@ -52,11 +50,21 @@ const SearchBox = () => {
   const [ClassModalShow, setClassModalShow] = useState(false); // State untuk modal Class
   const [PassengersModalShow, setPassengersModalShow] = useState(false); // State untuk modal Class
   const [isReturnEnabled, setIsReturnEnabled] = useState(false); // State untuk switch
-  const [selectedDepartureCity, setSelectedDepartureCity] = useState(defaultData.selectedDepartureCity||""); // State untuk milih kota
-  const [selectedReturnCity, setSelectedReturnCity] = useState(defaultData.selectedReturnCity||""); // State untuk milih kota kemana
-  const [selectedDepartureDate, setSelectedDepartureDate] = useState(defaultData.selectedDepartureDate||""); 
-  const [selectedReturnDate, setSelectedReturnDate] = useState(defaultData.selectedReturnDate||"");  
-  const [selectedClass, setSelectedClass] = useState(defaultData.selectedClass||""); // Tambahkan state untuk kelas
+  const [selectedDepartureCity, setSelectedDepartureCity] = useState(
+    defaultData.selectedDepartureCity || ""
+  ); // State untuk milih kota
+  const [selectedReturnCity, setSelectedReturnCity] = useState(
+    defaultData.selectedReturnCity || ""
+  ); // State untuk milih kota kemana
+  const [selectedDepartureDate, setSelectedDepartureDate] = useState(
+    defaultData.selectedDepartureDate || ""
+  );
+  const [selectedReturnDate, setSelectedReturnDate] = useState(
+    defaultData.selectedReturnDate || ""
+  );
+  const [selectedClass, setSelectedClass] = useState(
+    defaultData.selectedClass || ""
+  ); // Tambahkan state untuk kelas
   const [selectedPassengers, setSelectedPassengers] = useState({
     adult: 1,
     child: 0,
@@ -78,8 +86,8 @@ const SearchBox = () => {
   // State untuk jumlah penumpang
   const navigate = useNavigate();
 
-   // Ambil data dari localStorage saat pertama kali komponen dimuat
-   useEffect(() => {
+  // Ambil data dari localStorage saat pertama kali komponen dimuat
+  useEffect(() => {
     const savedData = localStorage.getItem("flightSearch");
     if (savedData) {
       const parsedData = JSON.parse(savedData);
@@ -91,7 +99,6 @@ const SearchBox = () => {
       setSelectedPassengers(parsedData.selectedPassengers);
     }
   }, []);
-
 
   const handleSelectCounts = (counts) => {
     setSelectedPassengers(counts); // Update state dengan jumlah penumpang yang dipilih
@@ -139,7 +146,6 @@ const SearchBox = () => {
     event.preventDefault();
     localStorage.setItem("flightSearch", JSON.stringify(flightSearch));
 
-
     // Validasi input
     if (
       !selectedDepartureCity ||
@@ -162,7 +168,7 @@ const SearchBox = () => {
     toast.success("Berhasil Melakukan Pencarian");
     navigate({ to: "/choose", state: flightSearch });
   };
-  console.log(passengersAmount);
+
   return (
     <>
       {/* <style>{`

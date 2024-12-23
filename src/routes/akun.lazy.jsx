@@ -94,11 +94,9 @@ function AccountSettings() {
           );
         } catch (notificationError) {
           toast.error("Gagal mengirim notifikasi");
-          console.error("Notification Error:", notificationError);
         }
       },
       onError: (error) => {
-        console.error("Update Error:", error.message);
         toast.error("Terjadi kesalahan saat memperbarui profil");
       },
     });

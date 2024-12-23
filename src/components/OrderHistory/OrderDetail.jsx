@@ -39,7 +39,7 @@ const OrderDetail = ({ data }) => {
       )
     );
   };
-  console.log("ini adalah", orders);
+
   return (
     <div>
       {orders.map((order) => (
@@ -476,7 +476,6 @@ const OrderDetail = ({ data }) => {
                     }
                   } catch (err) {
                     toast.error("Terjadi kesalahan saat mengambil data tiket.");
-                    console.error(err);
                   } finally {
                     setLoading(false); // Set loading false setelah proses selesai
                   }

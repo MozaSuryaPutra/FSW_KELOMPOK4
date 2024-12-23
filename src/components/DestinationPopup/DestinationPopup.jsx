@@ -31,8 +31,7 @@ const DestinationPopup = ({ show, handleClose, onSelectCity }) => {
       setCities(data);
     }
   }, [data, isSuccess]);
-  console.log(data);
-  console.log(cities);
+
   // Filter daftar kota berdasarkan input pencarian
   const filteredCities = cities.filter((city) =>
     city.name.toLowerCase().includes(searchText.toLowerCase())
