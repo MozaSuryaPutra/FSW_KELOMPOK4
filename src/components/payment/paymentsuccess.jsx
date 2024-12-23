@@ -1,8 +1,12 @@
 import React from "react";
 import Successimage from "../../../public/🦆 illustration _Cart shopping list_.png";
 import "../payment/payment.css";
-
+import { getTicket } from "../../services/ticket";
+import { useLocation } from "@tanstack/react-router";
 const paymentSuccess = () => {
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const { transactionId } = location.state || {};
   return (
     <div>
       <div>
@@ -46,6 +50,27 @@ const paymentSuccess = () => {
           <div
             className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-4"
             style={{ backgroundColor: "#7126B5" }}
+            onClick={async () => {
+              setLoading(true); // Set loading true saat proses dimulai
+              try {
+                const file = await getTicket(transactionId); // Mendapatkan file PDF
+                if (file) {
+                  toast.success("Berhasil cetak tiket!");
+                  // Menangani pengunduhan atau menampilkan file PDF
+                  const link = document.createElement("a");
+                  link.href = URL.createObjectURL(file);
+                  link.download = `ticket-${transactionId}.pdf`;
+                  link.click();
+                } else {
+                  toast.error("Tiket tidak ditemukan.");
+                }
+              } catch (err) {
+                toast.error("Terjadi kesalahan saat mengambil data tiket.");
+                console.error(err);
+              } finally {
+                setLoading(false); // Set loading false setelah proses selesai
+              }
+            }}
           >
             Terbitkan Tiket
           </div>

@@ -94,7 +94,12 @@ function RouteComponent() {
               console.error("Notification Error:", notificationError);
             }
             if (result.transaction_status === "settlement") {
-              navigate({ to: "/payment-success" });
+              navigate({
+                to: "/payment-success",
+                state: {
+                  transactionId,
+                },
+              });
             }
           },
 
