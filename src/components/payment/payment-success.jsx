@@ -1,19 +1,44 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import Successimage from "../../../public/🦆 illustration _Cart shopping list_.png";
 import "../payment/payment.css";
 import { getTicket } from "../../services/ticket";
 import { useLocation } from "@tanstack/react-router";
 import { toast } from "react-toastify";
-const paymentSuccess = () => {
-  //coba
+
+const PaymentSuccess = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation();
   const { transactionId } = location.state || {};
+
+  const handleGetTicket = async () => {
+    setLoading(true); // Mulai loading
+    try {
+      const file = await getTicket(transactionId); // Mendapatkan file PDF
+      if (file) {
+        toast.success("Berhasil cetak tiket!");
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(file);
+        link.download = `ticket-${transactionId}.pdf`;
+        link.click();
+      } else {
+        toast.error("Tiket tidak ditemukan.");
+      }
+    } catch (err) {
+      toast.error("Terjadi kesalahan saat mengambil data tiket.");
+      console.error(err);
+    } finally {
+      setLoading(false); // Selesai loading
+    }
+  };
+
+  const handleSearchTicket = () => {
+    navigate({ to: "/" }); // Navigasi ke halaman utama
+  };
+
   return (
     <div>
       <div>
-        <div className="container fw-bolder ">
+        <div className="container fw-bolder">
           <nav
             style={{ "--bs-breadcrumb-divider": "'>'" }}
             aria-label="breadcrumb"
@@ -39,8 +64,8 @@ const paymentSuccess = () => {
       </div>
 
       <div className="container vh-75 d-flex flex-column justify-content-center align-items-center">
-        <div className="container text-center ">
-          <img src={Successimage} alt="" />
+        <div className="container text-center">
+          <img src={Successimage} alt="Success Illustration" />
         </div>
 
         <div className="text-center">
@@ -49,49 +74,24 @@ const paymentSuccess = () => {
           </div>
           <div className="fw-medium">Transaksi Pembayaran Tiket sukses!</div>
         </div>
-        <div
-          className="btn-get-ticket w-25 mx-auto"
-          onClick={async () => {
-            setLoading(true); // Set loading true saat proses dimulai
-            try {
-              const file = await getTicket(transactionId); // Mendapatkan file PDF
-              if (file) {
-                toast.success("Berhasil cetak tiket!");
-                // Menangani pengunduhan atau menampilkan file PDF
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(file);
-                link.download = `ticket-${transactionId}.pdf`;
-                link.click();
-              } else {
-                toast.error("Tiket tidak ditemukan.");
-              }
-            } catch (err) {
-              toast.error("Terjadi kesalahan saat mengambil data tiket.");
-              console.error(err);
-            } finally {
-              setLoading(false); // Set loading false setelah proses selesai
-            }
-          }}
-        >
-          <div
-            className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-4"
-            style={{ backgroundColor: "#7126B5" }}
-          >
-            Terbitkan Tiket
-          </div>
-        </div>
 
-        <div className="btn-search-ticket w-25 mx-auto">
-          <div
-            className="p-2 text-white text-center fw-semibold fs-6 border border-success-subtle rounded-3 mt-2"
-            style={{ backgroundColor: "#D0B7E6" }}
-          >
-            Cari Penerbangan Lain
-          </div>
-        </div>
+        <button
+          className="btn-get-ticket w-25 mx-auto btn btn-primary mt-4"
+          onClick={handleGetTicket}
+          disabled={loading} // Disable tombol saat loading
+        >
+          {loading ? "Sedang Memproses..." : "Terbitkan Tiket"}
+        </button>
+
+        <button
+          className="btn-search-ticket w-25 mx-auto btn btn-secondary mt-2"
+          onClick={handleSearchTicket}
+        >
+          Cari Penerbangan Lain
+        </button>
       </div>
     </div>
   );
 };
 
-export default paymentSuccess;
+export default PaymentSuccess;
