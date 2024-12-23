@@ -28,6 +28,8 @@ function Login() {
   const { token } = useSelector((state) => state.auth);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
+
 
   const { mutate: loginUser } = useMutation({
     mutationFn: (body) => {
@@ -46,10 +48,22 @@ function Login() {
       } else {
         console.error("Token or user not found in response");
       }
+      setIsSubmitting(false);
     },
-    onError: (err) => {
-      console.error("Login error:", err.message);
-      toast.error(err?.message);
+    onError: (error) => {
+// Cek apakah error memiliki properti details
+if (Array.isArray(error?.details)) {
+  // Iterasi dan tampilkan setiap error menggunakan toast
+  error.details.forEach((message) => {
+    toast.error(message); // Menampilkan pesan error
+  });
+} else {
+  // Tampilkan pesan error umum jika details tidak ada
+  const errorMessage = error?.message || "An unexpected error occurred.";
+  toast.error(`${errorMessage}`);
+}
+setIsSubmitting(false);
+
     },
   });
 
@@ -61,6 +75,8 @@ function Login() {
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    if (isSubmitting) return; // Cegah klik berulang
+    setIsSubmitting(true); // Atur state menjadi true
     const body = {
       email,
       password,
@@ -162,6 +178,7 @@ function Login() {
             <Button
               type="submit"
               className="w-100"
+              disabled={isSubmitting}
               style={{
                 backgroundColor: "#7126B5",
                 borderColor: "#7126B5",

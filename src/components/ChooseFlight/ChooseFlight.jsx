@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import {
   Container,
@@ -21,234 +21,6 @@ import { useMutation } from "@tanstack/react-query";
 import { chooseCheckout } from "../../services/checkout/checkout";
 import { getSearchedFlight } from "../../services/homepage/homepage";
 import { toast } from "react-toastify";
-// Data dummy penerbangan
-const flightData = [
-  {
-    id: 1,
-    airline: "Jet Air",
-    class: "Economy",
-    departureTime: "07:00",
-    arrivalTime: "11:00",
-    departureAirport: "Soekarno Hatta - Terminal 1A Domestik",
-    arrivalAirport: "Melbourne International Airport",
-    duration: "4 jam (Direct)",
-    price: 4950000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "In-Flight Entertainment",
-    date: "2023-03-01",
-  },
-  {
-    id: 2,
-    airline: "Jet Air",
-    class: "Economy",
-    departureTime: "08:00",
-    arrivalTime: "12:00",
-    departureAirport: "Soekarno Hatta - Terminal 1A Domestik",
-    arrivalAirport: "Melbourne International Airport",
-    duration: "4 jam (Direct)",
-    price: 6950000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "In-Flight Entertainment",
-    date: "2023-03-02",
-  },
-  {
-    id: 3,
-    airline: "Garuda Indonesia",
-    class: "Economy",
-    departureTime: "09:00",
-    arrivalTime: "13:00",
-    departureAirport: "Soekarno Hatta - Terminal 2E",
-    arrivalAirport: "Sydney International Airport",
-    duration: "4 jam 30 menit (Direct)",
-    price: 7500000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "In-Flight Entertainment",
-    date: "2023-03-03",
-  },
-  {
-    id: 4,
-    airline: "AirAsia",
-    class: "Economy",
-    departureTime: "10:00",
-    arrivalTime: "14:00",
-    departureAirport: "Soekarno Hatta - Terminal 2D",
-    arrivalAirport: "Kuala Lumpur International Airport",
-    duration: "4 jam (Direct)",
-    price: 4500000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "None",
-    date: "2023-03-01",
-  },
-  {
-    id: 5,
-    airline: "Lion Air",
-    class: "Economy",
-    departureTime: "11:00",
-    arrivalTime: "15:00",
-    departureAirport: "Soekarno Hatta - Terminal 1C Domestik",
-    arrivalAirport: "Denpasar Ngurah Rai Airport",
-    duration: "3 jam 30 menit (Direct)",
-    price: 5500000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "In-Flight Entertainment",
-    date: "2023-03-02",
-  },
-  {
-    id: 6,
-    airline: "Singapore Airlines",
-    class: "Business",
-    departureTime: "12:00",
-    arrivalTime: "16:00",
-    departureAirport: "Soekarno Hatta - Terminal 3",
-    arrivalAirport: "Singapore Changi Airport",
-    duration: "3 jam 30 menit (Direct)",
-    price: 15000000,
-    baggage: "40 kg",
-    cabinBaggage: "15 kg",
-    entertainment: "In-Flight Entertainment, Wifi",
-    date: "2023-03-03",
-  },
-  {
-    id: 7,
-    airline: "Emirates",
-    class: "Economy",
-    departureTime: "13:00",
-    arrivalTime: "17:00",
-    departureAirport: "Soekarno Hatta - Terminal 3",
-    arrivalAirport: "Dubai International Airport",
-    duration: "8 jam (Direct)",
-    price: 10500000,
-    baggage: "30 kg",
-    cabinBaggage: "10 kg",
-    entertainment: "In-Flight Entertainment, Wifi",
-    date: "2023-03-01",
-  },
-  {
-    id: 8,
-    airline: "Qatar Airways",
-    class: "Economy",
-    departureTime: "14:00",
-    arrivalTime: "18:00",
-    departureAirport: "Soekarno Hatta - Terminal 3",
-    arrivalAirport: "Hamad International Airport",
-    duration: "8 jam (Direct)",
-    price: 12000000,
-    baggage: "30 kg",
-    cabinBaggage: "10 kg",
-    entertainment: "In-Flight Entertainment, Wifi",
-    date: "2023-03-02",
-  },
-  {
-    id: 9,
-    airline: "Cathay Pacific",
-    class: "Business",
-    departureTime: "15:00",
-    arrivalTime: "19:00",
-    departureAirport: "Soekarno Hatta - Terminal 2",
-    arrivalAirport: "Hong Kong International Airport",
-    duration: "7 jam (Direct)",
-    price: 25000000,
-    baggage: "40 kg",
-    cabinBaggage: "15 kg",
-    entertainment: "In-Flight Entertainment, Wifi",
-    date: "2023-03-04",
-  },
-  {
-    id: 10,
-    airline: "Sriwijaya Air",
-    class: "Economy",
-    departureTime: "16:00",
-    arrivalTime: "20:00",
-    departureAirport: "Soekarno Hatta - Terminal 1A Domestik",
-    arrivalAirport: "Yogyakarta Adisucipto International Airport",
-    duration: "1 jam 30 menit (Direct)",
-    price: 3500000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "None",
-    date: "2023-03-01",
-  },
-  {
-    id: 11,
-    airline: "Garuda Indonesia",
-    class: "Economy",
-    departureTime: "17:00",
-    arrivalTime: "21:00",
-    departureAirport: "Soekarno Hatta - Terminal 2E",
-    arrivalAirport: "Surabaya Juanda International Airport",
-    duration: "1 jam 30 menit (Direct)",
-    price: 4500000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "None",
-    date: "2023-03-02",
-  },
-  {
-    id: 12,
-    airline: "Jet Air",
-    class: "Business",
-    departureTime: "18:00",
-    arrivalTime: "22:00",
-    departureAirport: "Soekarno Hatta - Terminal 3",
-    arrivalAirport: "Singapore Changi Airport",
-    duration: "3 jam 30 menit (Direct)",
-    price: 8500000,
-    baggage: "30 kg",
-    cabinBaggage: "10 kg",
-    entertainment: "In-Flight Entertainment, Wifi",
-    date: "2023-03-03",
-  },
-  {
-    id: 13,
-    airline: "Lion Air",
-    class: "Economy",
-    departureTime: "19:00",
-    arrivalTime: "23:00",
-    departureAirport: "Soekarno Hatta - Terminal 1A Domestik",
-    arrivalAirport: "Makassar Sultan Hasanuddin International Airport",
-    duration: "2 jam 30 menit (Direct)",
-    price: 4800000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "None",
-    date: "2023-03-04",
-  },
-  {
-    id: 14,
-    airline: "AirAsia",
-    class: "Economy",
-    departureTime: "20:00",
-    arrivalTime: "00:00",
-    departureAirport: "Soekarno Hatta - Terminal 2D",
-    arrivalAirport: "Penang International Airport",
-    duration: "5 jam (Direct)",
-    price: 5500000,
-    baggage: "20 kg",
-    cabinBaggage: "7 kg",
-    entertainment: "None",
-    date: "2023-03-05",
-  },
-  {
-    id: 15,
-    airline: "Singapore Airlines",
-    class: "First Class",
-    departureTime: "21:00",
-    arrivalTime: "01:00",
-    departureAirport: "Soekarno Hatta - Terminal 3",
-    arrivalAirport: "Singapore Changi Airport",
-    duration: "3 jam 30 menit (Direct)",
-    price: 35000000,
-    baggage: "50 kg",
-    cabinBaggage: "20 kg",
-    entertainment: "In-Flight Entertainment, Wifi, Fully Reclining Seat",
-    date: "2023-03-06",
-  },
-];
 
 function ChooseFlight() {
   const navigate = useNavigate();
@@ -259,6 +31,7 @@ function ChooseFlight() {
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
     return user?.id; // Kembalikan id jika user ada
   });
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
   const [flightList, setFlight] = useState([]);
   const [filteredFlights, setFilteredFlights] = useState([]);
   const location = useLocation();
@@ -307,7 +80,6 @@ function ChooseFlight() {
     mutationFn: (body) => chooseCheckout(body),
     onSuccess: (data) => {
       if (data) {
-
         toast.success("Berhasil Membuat Checkout Biodata");
         localStorage.removeItem("flightSearch"); // Menghapus item
         navigate({
@@ -325,10 +97,13 @@ function ChooseFlight() {
       } else {
         console.error("Token or user not found in response");
       }
+      setIsSubmitting(false); // Atur state menjadi true
+
     },
     onError: (err) => {
       console.error("error:", err.message);
-      toast.error(err?.message);
+      toast.error("Upss!! Kamu belum melakukan login, Silahlan Login terlebih dahulu");
+      setIsSubmitting(false); // Atur state menjadi true
     },
   });
 
@@ -393,7 +168,8 @@ function ChooseFlight() {
 
   const onSubmit = async (event, flightId) => {
     event.preventDefault();
-
+    if (isSubmitting) return; // Cegah klik berulang
+    setIsSubmitting(true); // Atur state menjadi true
     const body = {
       passengers: JSON.stringify(selectedPassengers),
       userId: userIds,
@@ -535,6 +311,8 @@ function ChooseFlight() {
               </div>
             ) : filteredFlights?.length > 0 ? (
               filteredFlights.map((flight, idx) => (
+                <>
+                <h3>Departure Flight</h3>
                 <Accordion
                   key={flight.id}
                   defaultActiveKey="0"
@@ -629,6 +407,7 @@ function ChooseFlight() {
                         >
                           <strong>IDR {flight.price.toLocaleString()}</strong>
                           <Button
+                          disabled={isSubmitting}
                             onClick={(event) => {
                               if (isReturnEnabled) {
                                 chooseReturns(event, flight.id); // Panggil chooseReturn jika isReturnEnabled true
@@ -636,9 +415,9 @@ function ChooseFlight() {
                                 onSubmit(event, flight.id); // Panggil onSubmit jika isReturnEnabled false
                               }
                             }}
-                            variant="primary"
+                            variant={isSubmitting?"secondary":"primary"}
                           >
-                            Pilih
+                            {isSubmitting? "Memproses...":"Pilih"}
                           </Button>
                         </div>
                       </div>
@@ -756,6 +535,7 @@ function ChooseFlight() {
                     </Accordion.Body>
                   </Accordion.Item>
                 </Accordion>
+                </>
               ))
             ) : (
               <div className="text-center mt-4">
@@ -802,7 +582,7 @@ function ChooseFlight() {
           </Modal.Body>
           <Modal.Footer>
             <Button variant="primary" onClick={() => setShowModal(false)}>
-              Pilih
+            Pilih
             </Button>
           </Modal.Footer>
         </Modal>

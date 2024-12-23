@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,48 +19,52 @@ function Register() {
   const dispatch = useDispatch();
   const { token } = useSelector((state) => state.auth);
 
-  //Register Form Data
+  // Register Form Data
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
 
   const togglePassword = () => {
     setShowPassword(!showPassword);
   };
 
   useEffect(() => {
-    // get token from local storage
     if (token) {
-        navigate({ to: "/" });
+      navigate({ to: "/" });
     }
   }, [token, navigate]);
 
   const { mutate: registerUser } = useMutation({
     mutationFn: (body) => {
-      console.log("Register body:", body);
-      return register(body); // Ensure register is correctly defined and returns a Promise
+      return register(body);
     },
     onSuccess: (result) => {
-      console.log("Register Success:", result?.user);
       dispatch(setUser(result?.user));
       navigate({ to: "/auth/otp" });
+      setIsSubmitting(false); // Set ulang state setelah selesai
     },
     onError: (error) => {
-      console.log(error);
-      // Pastikan error.message ada, atau tampilkan error default
-      const errorMessage = error?.message || 'An unexpected error occurred.';
-      toast.error(`Register Error: ${errorMessage}`); // Menampilkan pesan error menggunakan toast
+      if (Array.isArray(error?.details)) {
+        error.details.forEach((message) => toast.error(message));
+      } else {
+        const errorMessage = error?.message || "An unexpected error occurred.";
+        toast.error(`Register Error: ${errorMessage}`);
+      }
+      setIsSubmitting(false); // Set ulang state meskipun gagal
     },
   });
-  
+
   const onSubmit = (event) => {
     event.preventDefault();
+    if (isSubmitting) return; // Cegah klik berulang
+    setIsSubmitting(true); // Atur state menjadi true
     const body = {
       name,
       email,
-      numberPhone:phoneNumber,
+      numberPhone: phoneNumber,
       password,
     };
     registerUser(body);
@@ -97,6 +101,7 @@ function Register() {
                   type="text"
                   placeholder="Nama Lengkap"
                   value={name}
+                  required
                   onChange={(e) => setName(e.target.value)}
                   style={{ borderRadius: "12px" }}
                 />
@@ -107,6 +112,7 @@ function Register() {
                 <Form.Control
                   type="email"
                   placeholder="Contoh: johndoe@gmail.com"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   style={{ borderRadius: "12px" }}
@@ -117,7 +123,8 @@ function Register() {
                 <Form.Label>Nomor Telepon</Form.Label>
                 <Form.Control
                   type="tel"
-                  placeholder="+62"
+                  placeholder="08xxxxxxxxxx"
+                  required
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   style={{ borderRadius: "12px" }}
@@ -131,6 +138,7 @@ function Register() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Buat Password"
                     value={password}
+                    required
                     onChange={(e) => setPassword(e.target.value)}
                     style={{ borderRadius: "12px" }}
                   />
@@ -148,20 +156,21 @@ function Register() {
                 variant="primary"
                 type="submit"
                 className="w-100"
+                disabled={isSubmitting} // Disable tombol saat proses
                 style={{
                   borderRadius: "12px",
-                  backgroundColor: "#6C63FF",
+                  backgroundColor: isSubmitting ? "#CCC" : "#6C63FF",
                   border: "none",
                 }}
               >
-                Daftar
+                {isSubmitting ? "Processing..." : "Daftar"}
               </Button>
             </Form>
             <p className="text-center mt-4">
               Sudah punya akun?{" "}
-              <a href="/auth/login" style={{ color: "#6C63FF", fontWeight: "500" }}>
+              <Link href="/auth/login" style={{ color: "#6C63FF", fontWeight: "500" }}>
                 Masuk di sini
-              </a>
+              </Link>
             </p>
           </Card>
         </Col>
@@ -169,3 +178,5 @@ function Register() {
     </Container>
   );
 }
+
+export default Register;

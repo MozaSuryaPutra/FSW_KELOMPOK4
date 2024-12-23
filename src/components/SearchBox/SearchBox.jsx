@@ -19,24 +19,49 @@ import Vector from "/Vector.png";
 import Return from "/return.png";
 import id from "date-fns/locale/id"; // Import untuk format bahasa Indonesia jika diperlukan
 const SearchBox = () => {
+ // Menetapkan tanggal saat ini ke input date
+ const today = new Date();
+ const formattedDate = today.toLocaleDateString('en-CA'); // 'en-CA' menghasilkan format yyyy-mm-dd
+ console.log("Tanggal sekarang : ", formattedDate);
+ 
+
+  const defaultData = {
+    isReturnEnabled: false,
+    selectedClass: "economy",
+    selectedDepartureCity: {
+      id: "1",
+      countryId: "1",
+      name: "Jakarta",
+      cityCode: "JKT",
+    },
+    selectedDepartureDate: formattedDate,
+    selectedReturnCity: {
+      id: "6",
+      countryId: "1",
+      name: "Bandung",
+      cityCode: "BDOA",
+    },
+    selectedReturnDate:false,
+  };
+
   const [modalShow, setModalShow] = useState(false); // State untuk modal destinasi
   const [returnmodalShow, setReturnModalShow] = useState(false); // State untuk modal destinasi
   const [dateModalShow, setDateModalShow] = useState(false); // State untuk modal tanggal
   const [ClassModalShow, setClassModalShow] = useState(false); // State untuk modal Class
   const [PassengersModalShow, setPassengersModalShow] = useState(false); // State untuk modal Class
   const [isReturnEnabled, setIsReturnEnabled] = useState(false); // State untuk switch
-  const [selectedDepartureCity, setSelectedDepartureCity] = useState(""); // State untuk milih kota
-  const [selectedReturnCity, setSelectedReturnCity] = useState(""); // State untuk milih kota kemana
-  const [selectedDepartureDate, setSelectedDepartureDate] = useState(""); // State untuk menyimpan tanggal keberangkatan (format YYYY-MM-DD)
-  const [selectedReturnDate, setSelectedReturnDate] = useState(""); // State untuk tanggal kembali
-  const [selectedClass, setSelectedClass] = useState(""); // Tambahkan state untuk kelas
+  const [selectedDepartureCity, setSelectedDepartureCity] = useState(defaultData.selectedDepartureCity||""); // State untuk milih kota
+  const [selectedReturnCity, setSelectedReturnCity] = useState(defaultData.selectedReturnCity||""); // State untuk milih kota kemana
+  const [selectedDepartureDate, setSelectedDepartureDate] = useState(defaultData.selectedDepartureDate||""); 
+  const [selectedReturnDate, setSelectedReturnDate] = useState(defaultData.selectedReturnDate||"");  
+  const [selectedClass, setSelectedClass] = useState(defaultData.selectedClass||""); // Tambahkan state untuk kelas
   const [selectedPassengers, setSelectedPassengers] = useState({
-    adult: 0,
+    adult: 1,
     child: 0,
     baby: 0,
   });
   const [validated, setValidated] = useState(false);
-  const [passengersAmount, setPassengersAmount] = useState(0);
+  const [passengersAmount, setPassengersAmount] = useState(1);
   const flightSearch = {
     selectedDepartureCity,
     selectedReturnCity,
@@ -62,7 +87,6 @@ const SearchBox = () => {
       setSelectedReturnDate(parsedData.selectedReturnDate);
       setSelectedClass(parsedData.selectedClass);
       setSelectedPassengers(parsedData.selectedPassengers);
-      setIsReturnEnabled(parsedData.isReturnEnabled);
     }
   }, []);
 
