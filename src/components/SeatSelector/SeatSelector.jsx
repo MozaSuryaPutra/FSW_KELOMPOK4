@@ -13,7 +13,9 @@ const SeatSelector = ({
   const [classChoosen] = useState(`${classs}`);
   // Total kursi yang diperbolehkan untuk dipilih
   const maxSeats = passengerCount?.adult + passengerCount?.child;
-
+  const availableSeatsCount = seats.filter(
+    (seat) => seat.status === "available"
+  ).length;
   const handleSeatClick = (seatId) => {
     // Jika kursi yang dipilih sudah dalam daftar, hapus dari pilihan
     if (selectedSeats.includes(seatId)) {
@@ -56,7 +58,7 @@ const SeatSelector = ({
               fontWeight: "500",
             }}
           >
-            {classChoosen} -
+            {classChoosen} - {availableSeatsCount} Seats Available
           </Card.Subtitle>
           <Card.Body>
             <div className="seat-grid">

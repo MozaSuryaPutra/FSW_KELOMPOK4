@@ -1,14 +1,15 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "@tanstack/react-router";
-import { createPayment } from "../services/checkout/payment.js";
-import { getCheckoutByID } from "../services/checkout/checkout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import useSnap from "../hooks/useSnap";
-//import FlightDetail from "../components/payment/flightDetail";
 import FlightDetailPayment from "../components/payment/flightDetailPayment.jsx";
+import FlightDetailReturnPayment from "../components/payment/flightDetailPaymentReturn.jsx";
+import FlightDetailReturn from "../components/payment/flightDetailReturn.jsx";
+import { getCheckoutByID } from "../services/checkout/checkout";
 import { toast } from "react-toastify";
+import { createNotification } from "../services/notifications/index.js";
 export const Route = createLazyFileRoute("/checkout-success")({
   component: RouteComponent,
 });
@@ -19,13 +20,14 @@ function RouteComponent() {
   const { token } = useSelector((state) => state.auth);
 
   const [snapVisible, setSnapVisible] = useState(false);
-  const { snapEmbed } = useSnap();
-  // The state object contains userId and transactionId
+  const { snapEmbed } = useSnap(); // Assuming snapEmbed is available
+
   const userId = useSelector((state) => {
-    const userString = state.auth.user; // Ambil string JSON dari state
-    const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
-    return user?.id; // Kembalikan id jika user ada
+    const userString = state.auth.user;
+    const user = userString ? JSON.parse(userString) : null;
+    return user?.id;
   });
+
   const { transactionId } = location.state || {};
 
   const {
@@ -39,33 +41,6 @@ function RouteComponent() {
     enabled: !!token,
   });
 
-  const { mutate: create, isPending } = useMutation({
-    mutationFn: (request) => createPayment(request),
-    onSuccess: (data) => {
-      if (data.snapToken) {
-        setSnapVisible(true); // Ubah tampilan snap
-        snapEmbed(data.snapToken, "snap-container", {
-          onSuccess: (result) => {
-            if (result.transaction_status == "settlement") {
-              navigate({
-                to: "/payment-finish",
-              });
-            }
-          },
-          onPending: (result) => {
-            console.log("Snap Closed", result);
-          },
-          onClose: () => {
-            console.log("Snap Closed");
-          },
-        });
-      }
-    },
-    onError: (error) => {
-      toast.error(error?.message);
-    },
-  });
-
   useEffect(() => {
     if (!token) {
       navigate({ to: "/" });
@@ -74,21 +49,63 @@ function RouteComponent() {
     }
   }, [details, isSuccess, error, token, navigate]);
 
-  // Now you can use userId and transactionId in your component logic
-  const onSubmit = async (event) => {
-    event.preventDefault();
+  useEffect(() => {
+    if (
+      details?.transaction?.snapToken &&
+      details?.transaction?.status === "unpaid"
+    ) {
+      if (!snapVisible) {
+        setSnapVisible(true);
+      }
+    }
+  }, [details, snapVisible]);
 
-    const request = {
-      userId,
-      transactionId,
-    };
-    create(request);
-  };
+  useEffect(() => {
+    if (snapVisible && details?.transaction?.snapToken) {
+      // Hapus kontainer snap yang ada sebelumnya jika ada, hanya dilakukan ketika snapVisible pertama kali true
+      const snapContainer = document.getElementById("snap-container");
+      if (snapContainer && !snapContainer.hasChildNodes()) {
+        snapContainer.innerHTML = ""; // Hapus konten lama hanya jika tidak ada konten sebelumnya
+      }
 
-  // mengubah format expiredFilling :
+      // Menunggu beberapa saat untuk memastikan kontainer bersih sebelum embedding
+      setTimeout(() => {
+        // Sekarang coba untuk embed Snap
+        snapEmbed(details.transaction.snapToken, "snap-container", {
+          onSuccess: async (result) => {
+            toast.success("Pembayaran Berhasil Dilakukan");
+            const notificationRequest = {
+              userId: userId, // Misalnya userId dari hasil update
+              notifType: "Pembayaran",
+              title: "Pembayaran Berhasil",
+              message: `Pembayaran Berhasil ${details?.orderer?.bookingCode} Dilakukan`,
+            };
+
+            try {
+              // Tunggu hingga notifikasi berhasil terkirim
+              const notificationResult =
+                await createNotification(notificationRequest);
+              toast.success(
+                notificationResult.message || "Notifikasi berhasil dikirim"
+              );
+            } catch (notificationError) {
+              toast.error("Gagal mengirim notifikasi");
+              console.error("Notification Error:", notificationError);
+            }
+          },
+          onPending: (result) => {
+            navigate({ to: "/orderHistory" });
+          },
+          onClose: () => {
+            navigate({ to: "/orderHistory" });
+          },
+        });
+      }, 300);
+    }
+  }, [snapVisible, details, snapEmbed, navigate]);
+
   function formatToLocalDateTime(isoString) {
     const date = new Date(isoString);
-
     const options = {
       day: "2-digit",
       month: "long",
@@ -98,13 +115,60 @@ function RouteComponent() {
       hour12: false,
       timeZone: "Asia/Jakarta",
     };
-
     return new Intl.DateTimeFormat("id-ID", options).format(date);
+  }
+  if (!transactionId) {
+    return (
+      <div className="text-center">
+        <h1>Anda harus memilih terlebih dahulu</h1>
+        <button
+          className="btn btn-primary mt-3"
+          onClick={() => navigate({ to: "/" })}
+        >
+          Kembali ke Beranda
+        </button>
+      </div>
+    );
   }
   if (isLoading) {
     return (
-      <div className="text-center">
-        <p>Loading...</p>
+      <div
+        className="text-center"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          fontFamily: "'Comic Sans MS', cursive, sans-serif",
+          color: "#4b6584",
+        }}
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/1995/1995584.png" // Gambar pesawat
+          alt="Loading"
+          style={{
+            width: "120px",
+            animation: "fly 3s infinite",
+            marginBottom: "20px",
+          }}
+        />
+        <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+          Sedang memproses penerbanganmu... ✈️
+        </p>
+        <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+          Pesawat kami sedang lepas landas menuju pembayaran! Tunggu sebentar
+          ya... 🚀
+        </p>
+        <style>
+          {`
+          @keyframes fly {
+            0% { transform: translateX(-50px) translateY(0); }
+            50% { transform: translateX(50px) translateY(-20px); }
+            100% { transform: translateX(-50px) translateY(0); }
+          }
+        `}
+        </style>
       </div>
     );
   }
@@ -116,20 +180,19 @@ function RouteComponent() {
           className="border-bottom border-dark p-2 mb-2 border-opacity-10"
           style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
         >
-          <div className="container fw-bolder fs-5 text-dark">
+          <div className="container fw-bolder ">
             <nav
               style={{ "--bs-breadcrumb-divider": "'>'" }}
               aria-label="breadcrumb"
             >
               <ol className="breadcrumb">
-                <li className="breadcrumb-item">
-                  <a>Isi Data Diri</a>
-                </li>
-                <li className="breadcrumb-item active" aria-current="page">
-                  <a href="#">Bayar</a>
-                </li>
-                <li className="breadcrumb-item">
-                  <a>Selesai</a>
+                <li className="breadcrumb-item ">Isi Data Diri</li>
+                <li className="breadcrumb-item ">Bayar Selesai</li>
+                <li
+                  className="breadcrumb-item"
+                  style={{ color: "#6c757d", opacity: 0.6 }}
+                >
+                  Bayar
                 </li>
               </ol>
             </nav>
@@ -154,13 +217,11 @@ function RouteComponent() {
         </div>
         <div className="d-flex justify-content-center gap-5">
           <div className="left-layout fw-bolder fs-5" style={{ width: "32%" }}>
-            {/* <div className="container">Isi Data Pembayaran</div> */}
-            {/* Accordion section */}
             {!snapVisible && (
               <div className="container">
                 <div className="accordion pt-2" id="accordionExample">
-                  <div className="accordion-item mb-3 ">
-                    <h2 className="accordion-header " id="headingOne">
+                  <div className="accordion-item mb-3">
+                    <h2 className="accordion-header" id="headingOne">
                       <button
                         className="accordion-button fs-5 fw-medium bg-dark text-white"
                         type="button"
@@ -179,57 +240,7 @@ function RouteComponent() {
                       data-bs-parent="#accordionExample"
                     >
                       <div className="accordion-body">
-                        {/* Isikan form atau konten lainnya di sini */}
                         Form pembayaran atau informasi lainnya di sini.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="accordion-item mb-3">
-                    <h2 className="accordion-header" id="headingTwo">
-                      <button
-                        className="accordion-button fs-5 fw-medium bg-dark text-white"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapseTwo"
-                        aria-expanded="false"
-                        aria-controls="collapseTwo"
-                      >
-                        Credit Card
-                      </button>
-                    </h2>
-                    <div
-                      id="collapseTwo"
-                      className="accordion-collapse collapse"
-                      aria-labelledby="headingTwo"
-                      data-bs-parent="#accordionExample"
-                    >
-                      <div className="accordion-body">
-                        {/* Isi dengan metode pembayaran */}
-                        Pilih metode pembayaran Anda.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="accordion-item mb-4">
-                    <h2 className="accordion-header" id="headingThree">
-                      <button
-                        className="accordion-button fs-5 fw-medium bg-dark text-white"
-                        type="button"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapseThree"
-                        aria-expanded="false"
-                        aria-controls="collapseThree"
-                      >
-                        Credit Card
-                      </button>
-                    </h2>
-                    <div
-                      id="collapseThree"
-                      className="accordion-collapse collapse"
-                      aria-labelledby="headingThree"
-                      data-bs-parent="#accordionExample"
-                    >
-                      <div className="accordion-body">
-                        <div className=""></div>
                       </div>
                     </div>
                   </div>
@@ -241,48 +252,43 @@ function RouteComponent() {
               style={{
                 display: snapVisible ? "block" : "none",
                 minHeight: "500px",
-                width: "30rem",
+                width: "100%",
                 marginBottom: "50px",
               }}
             ></div>
           </div>
 
-          {/* ----------------------------------------------------------- */}
-          <div className=" flight-detail-layout w-25">
+          <div className="flight-detail-layout w-25">
             <div className="container row">
               {snapVisible && (
                 <div className="fw-bolder fs-5 pt-1">
                   Booking Code :{" "}
                   <span style={{ color: "#7126B5" }}>
-                    {" "}
                     {details.orderer.bookingCode}
                   </span>
                 </div>
               )}
-
               {!snapVisible && (
                 <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
               )}
               <FlightDetailPayment data={details} />
-              {!snapVisible && (
-                <form onSubmit={onSubmit}>
-                  {/* <div className="container pt-3"> */}
-                  <button
-                    type="submit"
-                    className="btn btn-kirim fw-bolder"
-                    disabled={isPending}
-                    style={{
-                      backgroundColor: "#7126B5",
-                      color: "white",
-                      width: "23rem",
-                      marginTop: "20px",
-                    }}
-                  >
-                    Bayar Sekarang
-                  </button>
-                  {/* </div> */}
-                </form>
+
+              {details?.flights?.return && (
+                <FlightDetailReturn flighter={details} />
               )}
+              <div className="detailPrice row px-2 pt-3">
+                <div className="col-6">Tax</div>
+                <div className="col-6 text-end">
+                  IDR {details?.priceDetails?.tax?.toLocaleString("id-ID") || 0}
+                </div>
+                <div className="col-6 fw-bolder fs-5">Total</div>
+                <div
+                  className="col-6 fw-bolder fs-5 text-end"
+                  style={{ color: "#7126B5" }}
+                >
+                  {details?.priceDetails?.totalPayAfterTax || "Unknown Money"}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -290,3 +296,5 @@ function RouteComponent() {
     </div>
   );
 }
+
+export default RouteComponent;

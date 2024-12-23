@@ -1,17 +1,14 @@
 import React from "react";
 import planeLogo from "../../../public/plane-logo-Image.png";
 
-const flightDetail = (details) => {
+const FlightDetailReturnPayment = (details) => {
   return (
     <div className="departureFlight p-4 bg-light rounded-3 shadow-sm">
       {/* Departure Flight Information */}
       <div className="departureFlightInformation border-bottom border-secondary pb-3 mb-4">
         <div className="row">
-          <div className="col-12 text-center fw-bolder mb-3">
-            Keberangkatan Anda
-          </div>
           <div className="col-6 fw-bold fs-5 text-primary">
-            {details.data.flights.departure.departureDate
+            {details.data.flights.return.departureDate
               .toString()
               .substring(11, 16)}
           </div>
@@ -20,7 +17,7 @@ const flightDetail = (details) => {
           </div>
           <div className="departureDate text-secondary fs-6">
             {new Date(
-              details.data.flights.departure.departureDate
+              details.data.flights.return.departureDate
             ).toLocaleDateString("id-ID", {
               day: "numeric",
               month: "long",
@@ -37,18 +34,18 @@ const flightDetail = (details) => {
             <img
               className="logo-img"
               style={{ width: "30px", height: "30px" }}
-              src={details.data.flights.departure.airplane.airline.logo}
+              src={details.data.flights.return.airplane.airline.logo}
               alt="airline logo"
             />
           </div>
           <div className="col-11">
             <div className="planeClass fw-bold text-dark">
-              {details.data.flights.departure.airplane.airline.name} -{" "}
-              {details.data.flights.departure.departureTerminal.name}{" "}
-              {details.data.flights.departure.class}
+              {details.data.flights.return.airplane.airline.name || " "} -{" "}
+              {details.data.flights.return.departureTerminal.name || " "}{" "}
+              {details.data.flights.return.class}
             </div>
             <div className="plateType text-muted">
-              {details.data.flights.departure.airplane.airplaneCode}
+              {details.data.flights.return.airplane.airplaneCode}
             </div>
           </div>
         </div>
@@ -57,12 +54,10 @@ const flightDetail = (details) => {
         <div className="row pt-2">
           <div className="col-12 text-dark">
             <div className="fw-semibold">Informasi:</div>
+            <div>Baggage {details.data.flights.return.airplane.baggage} kg</div>
             <div>
-              Baggage {details.data.flights.departure.airplane.baggage} kg
-            </div>
-            <div>
-              Cabin Baggage{" "}
-              {details.data.flights.departure.airplane.cabinBaggage} kg
+              Cabin Baggage {details.data.flights.return.airplane.cabinBaggage}{" "}
+              kg
             </div>
             <div>In-Flight Entertainment</div>
           </div>
@@ -73,7 +68,7 @@ const flightDetail = (details) => {
       <div className="arrivaFlightInformation border-bottom border-secondary pb-3 mb-4">
         <div className="row">
           <div className="col-6 fw-bold text-primary">
-            {details.data.flights.departure.arrivalTime
+            {details.data.flights.return.arrivalTime
               .toString()
               .substring(11, 16)}
           </div>
@@ -82,7 +77,7 @@ const flightDetail = (details) => {
           </div>
           <div className="departureDate text-secondary fs-6">
             {new Date(
-              details.data.flights.departure.arrivalDate
+              details.data.flights.return.arrivalDate
             ).toLocaleDateString("id-ID", {
               day: "numeric",
               month: "long",
@@ -90,7 +85,7 @@ const flightDetail = (details) => {
             })}
           </div>
           <div className="departureTerminal fw-semibold text-muted">
-            {details.data.flights.departure.departureAirport.name} Airport
+            {details.data.flights.return.departureAirport.name} Airport
           </div>
         </div>
       </div>
@@ -100,7 +95,7 @@ const flightDetail = (details) => {
         <div className="col-12 fw-bold fs-5 text-dark">Rincian Harga</div>
         {Object.entries(
           details.data.priceDetails.passenger
-            ?.filter((item) => item.flightType === "departure")
+            ?.filter((item) => item.flightType === "return")
             .reduce((acc, item) => {
               if (acc[item.type]) {
                 acc[item.type].count += item.count;
@@ -127,8 +122,18 @@ const flightDetail = (details) => {
       </div>
 
       {/* Total Price */}
+      <div className="detailPrice row px-3 pt-3">
+        <div className="col-6 fw-bold fs-5">Total</div>
+        <div
+          className="col-6 fw-bold fs-5 text-end text-primary"
+          style={{ color: "#7126B5" }}
+        >
+          IDR{" "}
+          {details.data.priceDetails.totalPayAfterTax.toLocaleString("id-ID")}
+        </div>
+      </div>
     </div>
   );
 };
 
-export default flightDetail;
+export default FlightDetailReturnPayment;

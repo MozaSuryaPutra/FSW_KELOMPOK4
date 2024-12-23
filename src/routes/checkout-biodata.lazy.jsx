@@ -2,6 +2,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import PemesananItem from "../components/payment/paymentPemesanan";
 import BookingFormPassanger from "../components/payment/paymentPassenger";
 import FlightDetail from "../components/payment/flightDetail";
+import FlightDetailReturn from "../components/payment/flightDetailReturn";
 import FlightDetailPayment from "../components/payment/flightDetailPayment";
 import DataPassangers from "../data/data.json";
 import AlertDanger from "../components/payment/alertDanger";
@@ -15,8 +16,9 @@ import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { getCheckoutByID, updateCheckout } from "../services/checkout/checkout";
 import { useQueryClient } from "@tanstack/react-query";
-
+import { Modal } from "react-bootstrap";
 import SeatSelector from "../components/SeatSelector/SeatSelector";
+import { createPayment } from "../services/checkout/payment";
 import "../components/payment/payment.css";
 
 export const Route = createLazyFileRoute("/checkout-biodata")({
@@ -36,16 +38,18 @@ function Index() {
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
     return user?.id; // Kembalikan id jika user ada
   });
+
   const { data: routeData, selectedClass } = location.state || {};
   const [userId, setUserId] = useState(0);
   const [transactionId, setTransactionId] = useState(0);
+  const [loading, setLoading] = useState(false); // State untuk kontrol loading
   //Ini Untuk Form isi
   const [formData, setFormData] = useState({
     userId: userIds,
     transactionId: routeData?.transaction?.id,
     orderer: {
       fullname: "",
-      familyName: "",
+
       numberPhone: "",
       email: "",
     },
@@ -61,7 +65,7 @@ function Index() {
           title: "",
           passengerType: "adult",
           fullname: "",
-          familyName: "",
+
           birthDate: "",
           citizenship: "",
           identityNumber: "",
@@ -74,7 +78,7 @@ function Index() {
           title: "",
           passengerType: "child",
           fullname: "",
-          familyName: "",
+
           birthDate: "",
           citizenship: "",
           identityNumber: "",
@@ -98,16 +102,34 @@ function Index() {
 
   const handleOrdererChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      orderer: { ...prev.orderer, [name]: value },
-    }));
+    setFormData((prev) => {
+      const updatedOrderer = { ...prev.orderer };
+
+      if (value === undefined) {
+        // Hapus properti jika nilai undefined
+        delete updatedOrderer[name];
+      } else {
+        // Perbarui nilai properti
+        updatedOrderer[name] = value;
+      }
+
+      return { ...prev, orderer: updatedOrderer };
+    });
   };
+
   const handlePassengerChange = (index, e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
       const updatedPassengers = [...prev.passengers];
-      updatedPassengers[index][name] = value;
+
+      if (value === undefined) {
+        // Hapus properti jika nilai undefined
+        delete updatedPassengers[index][name];
+      } else {
+        // Perbarui nilai properti
+        updatedPassengers[index][name] = value;
+      }
+
       return { ...prev, passengers: updatedPassengers };
     });
   };
@@ -122,27 +144,44 @@ function Index() {
   const { mutate: updateCheckouts } = useMutation({
     mutationFn: (body) => {
       console.log("Login mutation called with body:", body);
+      setLoading(true);
       return updateCheckout(body);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success("Berhasil Menyimpan Data");
       console.log("Data on success:", data);
+
       if (data) {
-        queryClient.invalidateQueries("detail"); // Nama query yang perlu dirujuk ulang
-      } else {
-        console.error("Token or user not found in response");
+        await queryClient.invalidateQueries("detail"); // Nama query yang perlu dirujuk ulang
       }
+      setLoading(false);
     },
     onError: (err) => {
       toast.error(err?.message);
+      setLoading(false);
     },
   });
-
+  const { mutate: create, isPending } = useMutation({
+    mutationFn: (request) => createPayment(request),
+    onSuccess: (data) => {
+      console.log("ini isi payment : ", data);
+      navigate({
+        to: "/checkout-success",
+        state: {
+          transactionId,
+        },
+      });
+    },
+    onError: (error) => {
+      toast.error(error?.message);
+    },
+  });
   // Default hooks harus tetap dipanggil
   const {
     data: details,
-    isLoading,
     isSuccess,
+    isLoading,
+
     isError,
     error,
   } = useQuery({
@@ -195,8 +234,42 @@ function Index() {
 
     if (isLoading) {
       return (
-        <div className="text-center">
-          <p>Loading...</p>
+        <div
+          className="text-center"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100vh",
+            fontFamily: "'Comic Sans MS', cursive, sans-serif",
+            color: "#2f3640",
+          }}
+        >
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/201/201623.png" // Ikon tiket pesawat
+            alt="Loading"
+            style={{
+              width: "120px",
+              animation: "fly 2s infinite ease-in-out",
+              marginBottom: "20px",
+            }}
+          />
+          <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+            Sedang memproses checkout pesawatmu... 🛫
+          </p>
+          <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+            Tiketmu hampir siap untuk lepas landas! Tunggu sebentar ya... ✈️
+          </p>
+          <style>
+            {`
+          @keyframes fly {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+          }
+        `}
+          </style>
         </div>
       );
     }
@@ -212,46 +285,92 @@ function Index() {
     const handleSubmit = async (e) => {
       e.preventDefault();
 
-      // Validasi untuk memastikan semua field terisi
-      const isOrdererComplete = Object.values(formData.orderer).every(
-        (value) => value.trim() !== ""
-      );
+      const missingFields = {
+        orderer: [],
+        passengers: [],
+      };
 
-      const arePassengersComplete = formData.passengers.every((passenger) => {
-        const { familyName, ...otherFields } = passenger;
-        return Object.values(otherFields).every((value) => value.trim() !== "");
+      // Validasi untuk field pemesan (orderer)
+      Object.entries(formData.orderer).forEach(([key, value]) => {
+        if (value.trim() === "") {
+          missingFields.orderer.push(key);
+        }
       });
 
-      // const isSeatSelected = formData.seatIds.length > 0;
+      // Validasi untuk field penumpang (passengers)
+      formData.passengers.forEach((passenger, index) => {
+        Object.entries(passenger).forEach(([key, value]) => {
+          if (value.trim() === "") {
+            missingFields.passengers.push(`Penumpang ${index + 1}: ${key}`);
+          }
+        });
+      });
 
-      if (!isOrdererComplete) {
-        toast.error("Harap lengkapi semua informasi pemesan.");
+      const errors = [];
+      if (missingFields.orderer.length > 0) {
+        errors.push(
+          <li key="orderer">
+            Informasi pemesan yang belum lengkap:
+            <ul>
+              {missingFields.orderer.map((field) => (
+                <li key={field}> {field}</li>
+              ))}
+            </ul>
+          </li>
+        );
+      }
+      if (missingFields.passengers.length > 0) {
+        errors.push(
+          <li key="passengers">
+            Informasi penumpang yang belum lengkap:
+            <ul>
+              {missingFields.passengers.map((field, idx) => (
+                <li key={`${field}-${idx}`}>{field}</li>
+              ))}
+            </ul>
+          </li>
+        );
+      }
+
+      if (errors.length > 0) {
+        toast(
+          <div>
+            <strong>Harap lengkapi data berikut:</strong>
+            <ul>{errors}</ul>
+          </div>,
+          {
+            position: "top-right",
+            closeOnClick: true,
+            hideProgressBar: true,
+          }
+        );
         return;
       }
 
-      if (!arePassengersComplete) {
-        toast.error("Harap lengkapi semua data penumpang.");
-        return;
-      }
-
-      // if (!isSeatSelected) {
-      //   toast.error("Harap pilih kursi untuk semua penumpang.");
-      //   return;
-      // }
-
+      // Jika validasi lolos, lanjutkan
       const data = {
         ...formData,
-
         userId: parseInt(userIds, 10),
-
         transactionId: parseInt(formData?.transactionId, 10),
         orderer: JSON.stringify(formData?.orderer),
         passengers: JSON.stringify(formData?.passengers),
         seatIds: JSON.stringify([...outboundSeatIds, ...returnSeatIds]), // Gabungkan seatIds dari pergi dan kembali
       };
+
       console.log("Data siap dikirim:", data.seatIds);
       console.log("Data asli:", data);
+
       updateCheckouts(data);
+    };
+
+    const inSubmit = async (event) => {
+      event.preventDefault();
+
+      const request = {
+        userId: userIds,
+        transactionId,
+      };
+      create(request);
     };
     const Countdown = ({ expiredFilling }) => {
       // 1. Menghitung selisih waktu pada saat komponen pertama kali dimuat
@@ -362,42 +481,73 @@ function Index() {
     console.log("Ini form data :", formData);
     // Render utama
     return (
-      <form onSubmit={handleSubmit}>
-        <div className="row g-3 m-0">
-          <div
-            className="border-bottom border-dark p-2 mb-2 border-opacity-10"
-            style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
-          >
-            <div className="fs-5 text-dark">
-              <BreadCrumb />
+      <div className="row g-3 m-0">
+        {(loading || isPending) && (
+          <Modal show={true} backdrop="static" keyboard={false}>
+            <Modal.Body>
+              <div style={{ textAlign: "center" }}>
+                <h4>Loading...</h4>
+                {/* Anda bisa menambahkan spinner atau elemen loading lainnya */}
+              </div>
+            </Modal.Body>
+          </Modal>
+        )}
+        <div
+          className="border-bottom border-dark p-2 mb-2 border-opacity-10"
+          style={{ boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)" }}
+        >
+          <div className="fs-5 text-dark">
+            <div className="container fw-bolder ">
+              <nav
+                style={{ "--bs-breadcrumb-divider": "'>'" }}
+                aria-label="breadcrumb"
+              >
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item active">Isi Data Diri</li>
+                  <li
+                    className="breadcrumb-item"
+                    style={{ color: "#6c757d", opacity: 0.6 }}
+                  >
+                    Bayar Selesai
+                  </li>
+                  <li
+                    className="breadcrumb-item"
+                    style={{ color: "#6c757d", opacity: 0.6 }}
+                  >
+                    Bayar
+                  </li>
+                </ol>
+              </nav>
             </div>
-            <div className="text-center">
-              <div className="container">
-                <div
-                  className="p-3 fw-bolder fs-6 border rounded-3"
-                  style={{
-                    backgroundColor: details?.orderer?.email
-                      ? "rgba(115, 202, 92, 1)" // Warna hijau jika validasi terpenuhi
-                      : "#dc3545", // Warna merah jika tidak
-                    color: "white",
-                    borderColor: details?.orderer?.email
-                      ? "rgba(115, 202, 92, 0.8)" // Sesuaikan dengan warna hijau
-                      : "#dc3545",
-                  }}
-                >
-                  {details?.orderer?.email ? (
-                    "Data Anda berhasil tersimpan!" // Pesan sukses
-                  ) : (
-                    <Countdown
-                      expiredFilling={details?.transaction?.expiredFilling}
-                    />
-                  )}
-                </div>
+          </div>
+          <div className="text-center">
+            <div className="container">
+              <div
+                className="p-3 fw-bolder fs-6 border rounded-3"
+                style={{
+                  backgroundColor: details?.orderer?.email
+                    ? "rgba(115, 202, 92, 1)" // Warna hijau jika validasi terpenuhi
+                    : "#dc3545", // Warna merah jika tidak
+                  color: "white",
+                  borderColor: details?.orderer?.email
+                    ? "rgba(115, 202, 92, 0.8)" // Sesuaikan dengan warna hijau
+                    : "#dc3545",
+                }}
+              >
+                {details?.orderer?.email ? (
+                  "Data Anda berhasil tersimpan!" // Pesan sukses
+                ) : (
+                  <Countdown
+                    expiredFilling={details?.transaction?.expiredFilling}
+                  />
+                )}
               </div>
             </div>
           </div>
-          <div className="container content-container">
-            <div className="d-flex justify-content-center gap-5">
+        </div>
+        <div className="container content-container">
+          <div className="d-flex justify-content-center gap-5">
+            <form onSubmit={handleSubmit}>
               <div>
                 <div
                   className="container"
@@ -471,47 +621,58 @@ function Index() {
                         : "#7126B5",
                       color: "white",
                       width: "30rem",
-                      cursor: details?.orderer?.email
-                        ? "not-allowed"
-                        : "pointer",
-                      opacity: details?.orderer?.email ? 0.6 : 1,
+                      cursor:
+                        details?.orderer?.email || loading
+                          ? "not-allowed"
+                          : "pointer", // Disable cursor jika loading atau email ada
+                      opacity: details?.orderer?.email || loading ? 0.6 : 1, // Menurunkan opacity saat loading atau ada email
                     }}
-                    disabled={!!details?.orderer?.email}
+                    disabled={details?.orderer?.email || loading} // Tombol dinonaktifkan jika ada email atau sedang loading
                   >
                     Submit
                   </button>
                 </div>
               </div>
+            </form>
+            <div className="flight-detail-layout w-25">
+              <div className="container row">
+                <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
+                <FlightDetail flighter={details} />
+                {details?.flights?.return && (
+                  <FlightDetailReturn flighter={details} />
+                )}
 
-              <div className="flight-detail-layout w-25">
-                <div className="container row">
-                  <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
-                  <FlightDetail flighter={details} />
-                  {details?.orderer?.email && (
+                <div className="detailPrice row px-2 pt-3">
+                  <div className="col-6">Tax</div>
+                  <div className="col-6 text-end">
+                    IDR{" "}
+                    {details?.priceDetails?.tax?.toLocaleString("id-ID") || 0}
+                  </div>
+                  <div className="col-6 fw-bolder fs-5">Total</div>
+                  <div
+                    className="col-6 fw-bolder fs-5 text-end"
+                    style={{ color: "#7126B5" }}
+                  >
+                    {details?.priceDetails?.totalPayAfterTax || "Unknown Money"}
+                  </div>
+                </div>
+                {details?.orderer?.email &&
+                  details?.transaction?.status !== "issued" && (
                     <div className="text-center pt-3">
                       <button
                         className="btn btn-danger w-100"
-                        onClick={() =>
-                          navigate({
-                            to: "/checkout-success",
-                            state: {
-                              // userId,
-                              transactionId,
-                            },
-                          })
-                        }
+                        onClick={inSubmit}
                         style={{ fontWeight: "bold" }}
                       >
                         Lanjut Bayar
                       </button>
                     </div>
                   )}
-                </div>
               </div>
             </div>
           </div>
         </div>
-      </form>
+      </div>
     );
   };
 

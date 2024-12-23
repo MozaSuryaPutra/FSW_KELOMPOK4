@@ -13,12 +13,13 @@ import NotFoundPict from "../../public/NotFoundHistory.png";
 import { getOrderHistoryById } from "../services/OrderHistory";
 import { useSelector } from "react-redux";
 import { createLazyFileRoute } from "@tanstack/react-router";
-
+import { useNavigate } from "@tanstack/react-router";
 export const Route = createLazyFileRoute("/orderHistory")({
   component: OrderHistory,
 });
 
 function OrderHistory() {
+  const navigate = useNavigate();
   const userId = useSelector((state) => {
     const userString = state.auth.user; // Ambil string JSON dari state
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
@@ -159,11 +160,79 @@ function OrderHistory() {
   }
 
   if (historyLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center vh-100 text-center">
+        <div
+          className="spinner-border text-primary"
+          role="status"
+          style={{ width: "3rem", height: "3rem" }}
+        ></div>
+        <p className="mt-3 fs-5 text-secondary">
+          Memuat riwayat Anda, harap tunggu...
+        </p>
+      </div>
+    );
   }
 
   if (historyError) {
-    return <div>Error: {error.message}</div>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+          fontFamily: "'Comic Sans MS', cursive, sans-serif",
+          color: "#FF8C00",
+          textAlign: "center",
+          padding: "20px",
+        }}
+      >
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/839/839794.png"
+          alt="No History"
+          style={{
+            width: "150px",
+            marginBottom: "20px",
+            animation: "bounce 2s infinite",
+          }}
+        />
+        <h3 style={{ fontSize: "20px", fontWeight: "bold" }}>
+          Oops! Kosong nih... 😅
+        </h3>
+        <p style={{ fontSize: "16px", margin: "10px 0" }}>
+          Sepertinya kamu belum pernah melakukan pemesanan. 🎫
+        </p>
+        <p style={{ fontSize: "14px", fontStyle: "italic" }}>
+          Jangan khawatir, kamu bisa mulai petualangan baru kapan saja! 🚀
+        </p>
+        <button
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#FF8C00",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            fontSize: "14px",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+          }}
+          onClick={() => navigate({ to: "/" })}
+        >
+          Coba Lagi atau Mulai Sekarang! 🛫
+        </button>
+        <style>
+          {`
+          @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+          }
+        `}
+        </style>
+      </div>
+    );
   }
 
   return (

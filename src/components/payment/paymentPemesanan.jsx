@@ -75,7 +75,6 @@ const BookingForm = ({ ordererData, handleOrdererChange }) => {
               onChange={handleOrdererChange}
             />
           </Form.Group>
-
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="8" className="custom-label">
               Punya Nama Keluarga?
@@ -85,7 +84,18 @@ const BookingForm = ({ ordererData, handleOrdererChange }) => {
                 type="switch"
                 id="hasLastName"
                 checked={hasLastName}
-                onChange={(e) => setHasLastName(e.target.checked)}
+                onChange={(e) => {
+                  setHasLastName(e.target.checked);
+                  if (!e.target.checked) {
+                    handleOrdererChange({
+                      target: { name: "familyName", value: undefined },
+                    });
+                  } else {
+                    handleOrdererChange({
+                      target: { name: "familyName", value: "" },
+                    });
+                  }
+                }}
                 className="custom-switch"
               />
             </Col>

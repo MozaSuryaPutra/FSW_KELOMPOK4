@@ -32,7 +32,7 @@ const useSnap = () => {
         },
         onPending: function (result) {
           console.log("panding", result);
-          action.onPanding(result);
+          action.onPending(result);
         },
         onClose: function () {
           action.onClose();

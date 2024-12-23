@@ -4,11 +4,13 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-
+import { getTicket } from "../../services/ticket";
+import { toast } from "react-toastify";
+import ReactLoading from "react-loading";
 const OrderDetail = ({ data }) => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState(data); // Menyimpan data dalam state
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     setOrders(data); // Mengupdate state ketika props data berubah
   }, [data]);
@@ -37,7 +39,7 @@ const OrderDetail = ({ data }) => {
       )
     );
   };
-  console.log(orders);
+  console.log("ini adalah", orders);
   return (
     <div>
       {orders.map((order) => (
@@ -456,22 +458,49 @@ const OrderDetail = ({ data }) => {
                 color: "white",
               }}
               className="w-100"
-              disabled={order.departureFlight.status === "Canceled"}
-              onClick={() =>
-                navigate({
-                  to: "/checkout-success",
-                  replace: false, // Set to true if you want to replace the current entry in history
-                  state: {
-                    transactionId: order.transactionId, // Kirim transactionId sebagai state
-                  },
-                })
-              } // Memperbarui status saat tombol ditekan
+              disabled={order.departureFlight.status === "Canceled" || loading} // Tombol disable jika canceled atau loading
+              onClick={async () => {
+                if (order.departureFlight.status === "Issued") {
+                  setLoading(true); // Set loading true saat proses dimulai
+                  try {
+                    const file = await getTicket(order.transactionId); // Mendapatkan file PDF
+                    if (file) {
+                      toast.success("Berhasil cetak tiket!");
+                      // Menangani pengunduhan atau menampilkan file PDF
+                      const link = document.createElement("a");
+                      link.href = URL.createObjectURL(file);
+                      link.download = `ticket-${order.transactionId}.pdf`;
+                      link.click();
+                    } else {
+                      toast.error("Tiket tidak ditemukan.");
+                    }
+                  } catch (err) {
+                    toast.error("Terjadi kesalahan saat mengambil data tiket.");
+                    console.error(err);
+                  } finally {
+                    setLoading(false); // Set loading false setelah proses selesai
+                  }
+                } else if (order.departureFlight.status === "Unpaid") {
+                  // Logika untuk melanjutkan ke checkout
+                  navigate({
+                    to: "/checkout-success",
+                    replace: false,
+                    state: {
+                      transactionId: order.transactionId, // Kirim transactionId untuk proses pembayaran
+                    },
+                  });
+                }
+              }}
             >
-              {order.departureFlight.status === "Issued"
-                ? "Cetak Tiket"
-                : order.departureFlight.status === "Unpaid"
-                  ? "Lanjut Bayar"
-                  : "Canceled"}
+              {loading ? (
+                <ReactLoading type="spin" color="#fff" height={24} width={24} /> // Spinner loading
+              ) : order.departureFlight.status === "Issued" ? (
+                "Cetak Tiket"
+              ) : order.departureFlight.status === "Unpaid" ? (
+                "Lanjut Bayar"
+              ) : (
+                "Canceled"
+              )}
             </Button>
           </Card.Body>
         </Card>
