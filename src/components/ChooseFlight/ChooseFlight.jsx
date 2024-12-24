@@ -80,8 +80,6 @@ function ChooseFlight() {
     enabled: !!selectedDepartureCity && !!selectedReturnCity,
   });
 
-  console.log("FLIGHSDATAAA : ", flightsData);
-
   const { mutate: chooseCheckouts } = useMutation({
     mutationFn: (body) => chooseCheckout(body),
     onSuccess: (data) => {
@@ -171,42 +169,6 @@ function ChooseFlight() {
     setFilteredFlights(sorted);
     setShowModal(false);
   };
-
-  function calculateDuration(departureTime, arrivalTime) {
-    const minutes = differenceInMinutes(
-      new Date(arrivalTime),
-      new Date(departureTime)
-    );
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    return `${hours}h ${remainingMinutes}m`;
-  }
-
-  useEffect(() => {
-    if (
-      isSuccess &&
-      flightsData &&
-      Array.isArray(flightsData.departureFlights)
-    ) {
-      const durationData = flightsData.departureFlights.map((item) => {
-        const duration = calculateDuration(
-          item.departureTime,
-          item.arrivalTime
-        );
-        console.log("Durasi penerbangan:", duration);
-
-        return {
-          ...item,
-          duration,
-        };
-      });
-
-      setFilteredFlights(durationData);
-    } else if (!isSuccess) {
-      console.error("Gagal mengambil data penerbangan");
-    }
-  }, [isSuccess, flightsData]);
 
   const onSubmit = async (event, flightId) => {
     event.preventDefault();
@@ -349,7 +311,8 @@ function ChooseFlight() {
               <div className="text-center mt-4">
                 <Image src="ilustrasi (1).png"></Image>
               </div>
-            ) : isError ? (
+            ) : isError && error.message == "Maaf, Tiket terjual habis. Coba cari perjalanan lain."
+ ? (
               <div className="text-center mt-4">
                 <Image src="ticket_habis.png" alt="Ticket Habis"></Image>
                 <p className="mb-0">Maaf ticket terjual habis</p>
@@ -364,10 +327,24 @@ function ChooseFlight() {
             ) : filteredFlights?.length > 0 ? (
               filteredFlights.map((flight, idx) => {
                 // Menghitung durasi penerbangan
+                const formatDate = (dateString) => {
+                  return format(new Date(dateString), "d MMMM yyyy", { locale: id });
+                };
+              
+                const formatTime = (dateString) => {
+                  return format(new Date(dateString), "HH:mm");
+                };
+                
                 const departureTime = new Date(flight.departureTime);
-                const arrivalTime = new Date(flight.arrivalTime);
+                let arrivalTime = new Date(flight.arrivalTime);
+                if (arrivalTime < departureTime) {
+                  // Menambahkan 24 jam (dalam milidetik) pada waktu kedatangan
+                  arrivalTime = new Date(
+                    arrivalTime.getTime() + 24 * 60 * 60 * 1000
+                  );
+                }                
+                
                 const durationInMillis = arrivalTime - departureTime;
-
                 // Mengonversi durasi dalam milidetik ke format jam dan menit
                 const durationHours = Math.floor(
                   durationInMillis / (1000 * 60 * 60)
@@ -415,9 +392,7 @@ function ChooseFlight() {
                                         style={{ gap: "1px" }}
                                       >
                                         <div style={{ fontWeight: "bold" }}>
-                                          {flight.departureTime
-                                            .toString()
-                                            .substring(11, 16)}
+                                          {formatTime(flight.departureTime)}
                                         </div>
                                         <div>JKT</div>
                                       </Col>
@@ -453,9 +428,7 @@ function ChooseFlight() {
                                         style={{ gap: "1px" }}
                                       >
                                         <div style={{ fontWeight: "bold" }}>
-                                          {flight.arrivalTime
-                                            .toString()
-                                            .substring(11, 16)}
+                                          {formatTime(flight.arrivalTime)}
                                         </div>
                                         <div>JKT</div>
                                       </Col>
@@ -505,9 +478,7 @@ function ChooseFlight() {
                             <Col className="d-flex">
                               <p>
                                 <strong>
-                                  {flight.departureTime
-                                    .toString()
-                                    .substring(11, 16)}
+                                  {formatTime(flight.departureTime)}
                                 </strong>
                               </p>
                               <p
@@ -520,7 +491,7 @@ function ChooseFlight() {
                           </Row>
                           <Row>
                             <p>
-                              {flight.departureDate.toString().substring(0, 10)}
+                              {formatDate(flight.departureDate)}
                             </p>
                             <p>{flight.departureAirport.name}</p>
                             <hr style={{ width: "50%", margin: "0 auto" }}></hr>
@@ -589,9 +560,7 @@ function ChooseFlight() {
                             <Col className="d-flex">
                               <p>
                                 <strong>
-                                  {flight.arrivalTime
-                                    .toString()
-                                    .substring(11, 16)}
+                                  {formatTime(flight.arrivalTime)}
                                 </strong>
                               </p>
                               <p
@@ -604,7 +573,7 @@ function ChooseFlight() {
                           </Row>
                           <Row>
                             <p>
-                              {flight.arrivalDate.toString().substring(0, 10)}
+                              {formatDate(flight.arrivalDate)}
                             </p>
                             <p>{flight.destinationAirport.name}</p>
                           </Row>

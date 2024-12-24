@@ -5,7 +5,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { getTicket } from "../../services/ticket";
 import { toast } from "react-toastify";
 import ReactLoading from "react-loading";
-import { formatInTimeZone } from "date-fns-tz";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 const OrderDetail = ({ data }) => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState(data); // Menyimpan data dalam state
@@ -14,14 +15,12 @@ const OrderDetail = ({ data }) => {
     setOrders(data); // Mengupdate state ketika props data berubah
   }, [data]);
 
-
   const formatDate = (dateString) => {
-    return formatInTimeZone(dateString, 'UTC', 'd MMMM yyyy');
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
   };
-  
 
   const formatTime = (dateString) => {
-    return formatInTimeZone(dateString, 'UTC', 'HH:mm'); // Mengonversi dan memformat waktu ke UTC
+    return format(new Date(dateString), "HH:mm");
   };
 
   // Fungsi untuk memperbarui status pesanan

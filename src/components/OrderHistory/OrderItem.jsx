@@ -6,7 +6,6 @@ import LocationMark from "../../../public/location-icon.png";
 import { useMediaQuery } from "react-responsive";
 import { format, parse } from "date-fns";
 import { id } from "date-fns/locale";
-import { formatInTimeZone } from "date-fns-tz";
 
 const OrderItem = ({ data, onSelectOrder }) => {
   const [displayedData, setDisplayedData] = useState(data);
@@ -28,12 +27,11 @@ const OrderItem = ({ data, onSelectOrder }) => {
   };
 
   const formatDate = (dateString) => {
-    return formatInTimeZone(dateString, 'UTC', 'd MMMM yyyy');
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
   };
-  
 
   const formatTime = (dateString) => {
-    return formatInTimeZone(dateString, 'UTC', 'HH:mm'); // Mengonversi dan memformat waktu ke UTC
+    return format(new Date(dateString), "HH:mm");
   };
 
   const getBadgeClass = (status) => {

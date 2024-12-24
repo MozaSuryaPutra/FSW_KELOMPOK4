@@ -55,9 +55,14 @@ export const getSearchedFlight = async (
   });
   console.log(response);
   // get data
+  if (!response.ok) {
+    const errorResult = await response.json();
+    throw new Error(errorResult?.message || "Terjadi kesalahan pada server.");
+  }
+
   const result = await response.json();
-  console.log(result);
-  return result?.data;
+  console.log("RESULTTTTT : ",result);
+  return result?.data 
 };
 
 export const getFavDestination = async (
@@ -86,7 +91,7 @@ continent,
   console.log(response);
   // get data
   const result = await response.json();
-  console.log(result);
+  console.log("RESULTTTTT : ",result);
   return result?.data;
 };
 

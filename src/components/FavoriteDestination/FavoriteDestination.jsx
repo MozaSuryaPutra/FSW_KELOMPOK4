@@ -10,7 +10,8 @@ import { chooseCheckout } from "../../services/checkout/checkout";
 import { toast } from "react-toastify";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
-import { formatInTimeZone} from "date-fns-tz";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 
 const FavoriteDestination = () => {
@@ -33,11 +34,11 @@ const FavoriteDestination = () => {
   const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
 
   const formatDate = (dateString) => {
-    return formatInTimeZone(dateString, 'UTC', 'd MMMM yyyy');
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
   };
 
   const formatTime = (dateString) => {
-    return formatInTimeZone(dateString, 'UTC', 'HH:mm'); // Mengonversi dan memformat waktu ke UTC
+    return format(new Date(dateString), "HH:mm");
   };
 
   // Fetch continents data
