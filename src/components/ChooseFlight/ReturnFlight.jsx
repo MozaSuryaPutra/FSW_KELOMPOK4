@@ -99,6 +99,7 @@ function ReturnFlight() {
       if (data) {
         toast.success("Berhasil Membuat Checkout Biodata");
         localStorage.removeItem("flightSearch"); // Menghapus item
+        setIsSubmitting(true); // Atur state menjadi true
         navigate({
           to: "/checkout-biodata",
           state: {

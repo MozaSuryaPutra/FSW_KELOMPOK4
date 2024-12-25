@@ -61,6 +61,7 @@ const FavoriteDestination = () => {
       if (data) {
         toast.success("Berhasil Membuat Checkout Biodata");
         localStorage.removeItem("flightSearch"); // Menghapus item
+        setIsSubmitting(true); // Atur state menjadi true
         navigate({
           to: "/checkout-biodata",
           state: {
@@ -76,7 +77,6 @@ const FavoriteDestination = () => {
       } else {
         console.error("Token or user not found in response");
       }
-      setIsSubmitting(false); // Atur state menjadi true
     },
     onError: (err) => {
       if (err.message == "jwt malformed") {

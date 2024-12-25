@@ -48,7 +48,7 @@ function Login() {
       } else {
         console.error("Token or user not found in response");
       }
-      setIsSubmitting(false);
+      setIsSubmitting(true);
     },
     onError: (error) => {
 // Cek apakah error memiliki properti details

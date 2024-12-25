@@ -32,8 +32,9 @@ function ResetPassword() {
       toast.success("Password reset successful. Redirecting to login page...", {
         autoClose: 4000,
       });
+      setIsSubmitting(true); 
       setTimeout(() => navigate({ to: '/auth/login' }), 4000);
-      setIsSubmitting(true); // Set ulang state meskipun gagal
+   
     },
     
     onError: (error) => {
