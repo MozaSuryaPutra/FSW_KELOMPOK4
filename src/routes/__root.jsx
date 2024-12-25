@@ -20,7 +20,7 @@ export const Route = createRootRoute({
         {/* Tampilkan NavBar jika bukan route '/auth' */}
         <Outlet />
         {/* Debugging tool for router */}
-        <TanStackRouterDevtools />
+        {/* <TanStackRouterDevtools /> */}
         <ToastContainer theme="colored" />
       </>
     );

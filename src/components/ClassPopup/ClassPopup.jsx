@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Button, ListGroup } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
-
+import Centang from "/Vector (1).png";
 const ClassPopup = ({ show, handleClose, onSelectClass }) => {
   const [selectedClass, setSelectedClass] = useState("Economy");
 
@@ -59,7 +59,7 @@ const ClassPopup = ({ show, handleClose, onSelectClass }) => {
                 style={{ width: "30%" }}
               >
                 {selectedClass === flightClass.name && (
-                  <Image src="./public/Vector (1).png" fluid />
+                  <Image src={Centang} fluid />
                 )}
               </div>
             </ListGroup.Item>
