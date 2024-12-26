@@ -56,6 +56,7 @@ function Index() {
     passengers: [],
     seatIds: [],
   });
+  console.log("isi form data :", formData);
   const { selectedPassengers: passengers } = location.state || {};
   useEffect(() => {
     const generatePassengers = () => {
@@ -86,6 +87,7 @@ function Index() {
           expiredAt: "",
         });
       }
+
       setFormData((prev) => ({ ...prev, passengers: newPassengers }));
     };
 
@@ -328,6 +330,28 @@ function Index() {
         );
       }
 
+      // Cek apakah ada penumpang dengan flightType = 'return'
+      // Cek apakah ada penumpang dengan flightType = 'return'
+      const passengersWithReturnFlight = details?.passengers?.filter(
+        (passenger) => passenger.flightType === "return"
+      );
+
+      // Jika ada penumpang dengan flightType 'return', validasi jumlah kursi dan penumpang
+      if (passengersWithReturnFlight.length > 0) {
+        const totalSeats = outboundSeatIds.length + returnSeatIds.length; // Jumlah kursi
+        const totalPassengers = details?.passengers?.length; // Jumlah penumpang total
+
+        // Jika jumlah kursi tidak sama dengan jumlah penumpang
+        if (totalSeats !== totalPassengers) {
+          errors.push(
+            <li key="seats">
+              Jumlah kursi (seatIds) harus sama dengan jumlah penumpang. (Jumlah
+              kursi: {totalSeats}, Jumlah penumpang: {totalPassengers})
+            </li>
+          );
+        }
+      }
+
       if (errors.length > 0) {
         toast(
           <div>
@@ -462,8 +486,7 @@ function Index() {
 
       return (
         <div>
-          Selesaikan dalam{" "}
-          {`${timeLeft.hours}:${timeLeft.minutes}:${timeLeft.seconds}`}
+          Selesaikan dalam {`${timeLeft.minutes}:${timeLeft.seconds}`} Menit
           {showModal && <Modal />}
         </div>
       );
@@ -635,15 +658,18 @@ function Index() {
                 <div className="detailPrice row px-2 pt-3">
                   <div className="col-6">Tax</div>
                   <div className="col-6 text-end">
-                    IDR{" "}
+                    Rp{" "}
                     {details?.priceDetails?.tax?.toLocaleString("id-ID") || 0}
                   </div>
                   <div className="col-6 fw-bolder fs-5">Total</div>
                   <div
-                    className="col-6 fw-bolder fs-5 text-end"
+                    className="col-6 fw-bolder fs-sm-6 fs-md-5 fs-lg-4 text-end"
                     style={{ color: "#7126B5" }}
                   >
-                    {details?.priceDetails?.totalPayAfterTax || "Unknown Money"}
+                    Rp{" "}
+                    {details?.priceDetails?.totalPayAfterTax.toLocaleString(
+                      "id-ID"
+                    ) || "Unknown Money"}
                   </div>
                 </div>
                 {details?.orderer?.email &&

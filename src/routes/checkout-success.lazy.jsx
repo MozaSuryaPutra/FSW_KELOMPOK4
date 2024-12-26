@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import useSnap from "../hooks/useSnap";
 import FlightDetailPayment from "../components/payment/flightDetailPayment.jsx";
 import FlightDetailReturnPayment from "../components/payment/flightDetailPaymentReturn.jsx";
+import FlightDetail from "../components/payment/flightDetail.jsx";
 import FlightDetailReturn from "../components/payment/flightDetailReturn.jsx";
 import { getCheckoutByID } from "../services/checkout/checkout";
 import { toast } from "react-toastify";
@@ -98,14 +99,20 @@ function RouteComponent() {
                   transactionId,
                 },
               });
+            } else if (result.transaction_status === "pending") {
+              navigate({ to: "/orderHistory" });
             }
           },
 
           onPending: (result) => {
-            navigate({ to: "/orderHistory" });
+            if (result.transaction_status === "pending") {
+              navigate({ to: "/orderHistory" });
+            }
           },
-          onClose: () => {
-            navigate({ to: "/orderHistory" });
+          onClose: (result) => {
+            if (result.transaction_status === "pending") {
+              navigate({ to: "/orderHistory" });
+            }
           },
         });
       }, 300);
@@ -279,7 +286,7 @@ function RouteComponent() {
               {!snapVisible && (
                 <div className="fw-bolder fs-5 pt-1">Detail Penerbangan</div>
               )}
-              <FlightDetailPayment data={details} />
+              <FlightDetail flighter={details} />
 
               {details?.flights?.return && (
                 <FlightDetailReturn flighter={details} />
@@ -287,14 +294,17 @@ function RouteComponent() {
               <div className="detailPrice row px-2 pt-3">
                 <div className="col-6">Tax</div>
                 <div className="col-6 text-end">
-                  IDR {details?.priceDetails?.tax?.toLocaleString("id-ID") || 0}
+                  Rp {details?.priceDetails?.tax?.toLocaleString("id-ID") || 0}
                 </div>
                 <div className="col-6 fw-bolder fs-5">Total</div>
                 <div
                   className="col-6 fw-bolder fs-5 text-end"
                   style={{ color: "#7126B5" }}
                 >
-                  {details?.priceDetails?.totalPayAfterTax || "Unknown Money"}
+                  Rp{" "}
+                  {details?.priceDetails?.totalPayAfterTax.toLocaleString(
+                    "id-ID"
+                  ) || "Unknown Money"}
                 </div>
               </div>
             </div>

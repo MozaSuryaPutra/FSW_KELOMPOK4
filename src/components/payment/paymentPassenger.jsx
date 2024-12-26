@@ -19,10 +19,16 @@ const BookingFormPassenger = ({
   }, [ordererData?.passengers]);
 
   const passengersToDisplay = ordererData?.orderer?.fullname
-    ? ordererData.passengers?.filter(
-        (passenger) => passenger.flightType === "departure"
-      ) // Filter hanya passenger dengan flightType "departure"
-    : formData?.passengers; // Jika tidak, gunakan passengers dari formData
+    ? ordererData?.passengers?.filter(
+        (passenger) =>
+          passenger?.flightType === "departure" &&
+          passenger?.passengerType !== "baby"
+      )
+    : formData?.passengers?.filter(
+        (passenger) => passenger?.passengerType !== "baby"
+      );
+
+  // Jika tidak, gunakan passengers dari formData
   const formatDate = (isoString) => {
     if (!isoString) return "";
     const date = new Date(isoString);
@@ -58,14 +64,14 @@ const BookingFormPassenger = ({
                 }}
               >
                 Data Diri Penumpang {index + 1} - {passenger.passengerType}
-                {ordererData?.orderer?.familyName && (
+                {ordererData?.orderer?.fullname && (
                   <img
                     src="Vector (3).png"
                     alt="Icon"
                     style={{
                       position: "absolute",
                       right: "22px", // Adjust the position to your liking
-                      top: "8.5%", // Vertically center the icon
+                      top: "9.2%", // Vertically center the icon
                       transform: "translateY(-50%)", // Perfectly center the icon vertically
                       width: "20px", // Adjust icon size as needed
                     }}
@@ -191,7 +197,7 @@ const BookingFormPassenger = ({
                         border: "1px black solid",
                       }}
                       onChange={(e) => handlePassengerChange(index, e)}
-                      value={passenger.birthDate || ""}
+                      value={formatDate(passenger.birthDate) || ""}
                     />
                   </Form.Group>
 

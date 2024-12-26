@@ -17,7 +17,9 @@ const OrderItem = ({ data, onSelectOrder }) => {
       if (!departureDate) return acc;
 
       // Format bulan dan tahun dengan date-fns
-      const groupKey = format(new Date(departureDate), "MMMM yyyy", { locale: id }); // Contoh hasil: "Desember 2024"
+      const groupKey = format(new Date(departureDate), "MMMM yyyy", {
+        locale: id,
+      }); // Contoh hasil: "Desember 2024"
 
       if (!acc[groupKey]) acc[groupKey] = [];
       acc[groupKey].push(booking);
@@ -48,12 +50,11 @@ const OrderItem = ({ data, onSelectOrder }) => {
   const groupedBookings = groupByMonthYear(displayedData);
 
   // Menyortir berdasarkan urutan bulan dan tahun
-  const sortedGroupedBookings = Object.entries(groupedBookings)
-    .sort((a, b) => {
-      const dateA = parse(a[0], "MMMM yyyy", new Date(), { locale: id });
-      const dateB = parse(b[0], "MMMM yyyy", new Date(), { locale: id });
-      return dateA - dateB;
-    });
+  const sortedGroupedBookings = Object.entries(groupedBookings).sort((a, b) => {
+    const dateA = parse(a[0], "MMMM yyyy", new Date(), { locale: id });
+    const dateB = parse(b[0], "MMMM yyyy", new Date(), { locale: id });
+    return dateA - dateB;
+  });
 
   useEffect(() => {
     // Ubah status untuk setiap booking menjadi kapitalisasi pada huruf pertama
@@ -61,10 +62,12 @@ const OrderItem = ({ data, onSelectOrder }) => {
       ...booking,
       departureFlight: {
         ...booking.departureFlight,
-        status: booking.departureFlight.status.charAt(0).toUpperCase() + booking.departureFlight.status.slice(1).toLowerCase(),
+        status:
+          booking.departureFlight.status.charAt(0).toUpperCase() +
+          booking.departureFlight.status.slice(1).toLowerCase(),
       },
     }));
-    
+
     setDisplayedData(updatedData);
   }, [data]);
 
@@ -104,10 +107,10 @@ const OrderItem = ({ data, onSelectOrder }) => {
                   </Badge>
 
                   {booking.returnFlight && (
-                      <Badge className="bg-warning fs-6 px-3 py-2 rounded-pill">
-                        PP
-                      </Badge>
-                    )}
+                    <Badge className="bg-warning fs-6 px-3 py-2 rounded-pill">
+                      PP
+                    </Badge>
+                  )}
                 </div>
 
                 <Row className="align-items-center">
@@ -126,13 +129,20 @@ const OrderItem = ({ data, onSelectOrder }) => {
                       >
                         {booking.departureFlight.departure?.city}
                       </p>
-                      <p className="mb-1">{formatDate(booking.departureFlight.departure?.date)}</p>
-                      <p className="mb-0 ">{formatTime(booking.departureFlight.departure?.time)}</p>
+                      <p className="mb-1">
+                        {formatDate(booking.departureFlight.departure?.date)}
+                      </p>
+                      <p className="mb-0 ">
+                        {formatTime(booking.departureFlight.departure?.time)}
+                      </p>
                     </div>
                   </Col>
-                  <Col xs={isMiniMobile ? 2 : 4} className={isMiniMobile ? "text-center p-0" : "text-center"}>
+                  <Col
+                    xs={isMiniMobile ? 2 : 4}
+                    className={isMiniMobile ? "text-center p-0" : "text-center"}
+                  >
                     <div>{booking.duration}</div>
-                    <img src={Arrow} alt="Arrow" className="img-fluid"/>
+                    <img src={Arrow} alt="Arrow" className="img-fluid" />
                   </Col>
                   <Col xs={1} className="text-center p-1 mb-4">
                     <img
@@ -149,47 +159,83 @@ const OrderItem = ({ data, onSelectOrder }) => {
                       >
                         {booking.departureFlight.arrival?.city}
                       </p>
-                      <p className="mb-1">{formatDate(booking.departureFlight.arrival?.date)}</p>
-                      <p className="mb-0">{formatTime(booking.departureFlight.arrival?.time)}</p>
+                      <p className="mb-1">
+                        {formatDate(booking.departureFlight.arrival?.date)}
+                      </p>
+                      <p className="mb-0">
+                        {formatTime(booking.departureFlight.arrival?.time)}
+                      </p>
                     </div>
                   </Col>
                 </Row>
 
                 {booking.returnFlight && (
-                    <>
-                      {/* Return Flight (Duplicate Row for Return) */}
-                      <Row className="align-items-center mt-3">
-                        <Col xs={1} className="text-center p-1 mb-4">
-                          <img src={LocationMark} alt="Location-icons" className="img-fluid w-75" />
-                        </Col>
-                        <Col xs={isMiniMobile ? 4 : 3}>
-                          <div>
-                            <p className="fw-bold mb-1" style={{ fontSize: isMiniMobile ? "11px" : "15px" }}>
-                              {booking.returnFlight.departure?.city}
-                            </p>
-                            <p className="mb-1">{formatDate(booking.returnFlight.departure?.date)}</p>
-                            <p className="mb-0">{formatTime(booking.returnFlight.departure?.time)}</p>
-                          </div>
-                        </Col>
-                        <Col xs={isMiniMobile ? 2 : 4} className={isMiniMobile ? "text-center p-0" : "text-center"}>
-                          <div>{booking.duration}</div>
-                          <img src={Arrow} alt="Arrow" className="img-fluid"  style={{ transform: "rotate(180deg)" }}/>
-                        </Col>
-                        <Col xs={1} className="text-center p-1 mb-4">
-                          <img src={LocationMark} alt="Location-icons" className="img-fluid w-75" />
-                        </Col>
-                        <Col xs={isMiniMobile ? 4 : 3}>
-                          <div>
-                            <p className="fw-bold mb-1" style={{ fontSize: isMiniMobile ? "11px" : "15px" }}>
-                              {booking.returnFlight.arrival?.city}
-                            </p>
-                            <p className="mb-1">{formatDate(booking.returnFlight.arrival?.date)}</p>
-                            <p className="mb-0">{formatTime(booking.returnFlight.arrival?.time)}</p>
-                          </div>
-                        </Col>
-                      </Row>
-                    </>
-                  )}
+                  <>
+                    {/* Return Flight (Duplicate Row for Return) */}
+                    <Row className="align-items-center mt-3">
+                      <Col xs={1} className="text-center p-1 mb-4">
+                        <img
+                          src={LocationMark}
+                          alt="Location-icons"
+                          className="img-fluid w-75"
+                        />
+                      </Col>
+                      <Col xs={isMiniMobile ? 4 : 3}>
+                        <div>
+                          <p
+                            className="fw-bold mb-1"
+                            style={{ fontSize: isMiniMobile ? "11px" : "15px" }}
+                          >
+                            {booking.returnFlight.departure?.city}
+                          </p>
+                          <p className="mb-1">
+                            {formatDate(booking.returnFlight.departure?.date)}
+                          </p>
+                          <p className="mb-0">
+                            {formatTime(booking.returnFlight.departure?.time)}
+                          </p>
+                        </div>
+                      </Col>
+                      <Col
+                        xs={isMiniMobile ? 2 : 4}
+                        className={
+                          isMiniMobile ? "text-center p-0" : "text-center"
+                        }
+                      >
+                        <div>{booking.duration}</div>
+                        <img
+                          src={Arrow}
+                          alt="Arrow"
+                          className="img-fluid"
+                          style={{ transform: "rotate(180deg)" }}
+                        />
+                      </Col>
+                      <Col xs={1} className="text-center p-1 mb-4">
+                        <img
+                          src={LocationMark}
+                          alt="Location-icons"
+                          className="img-fluid w-75"
+                        />
+                      </Col>
+                      <Col xs={isMiniMobile ? 4 : 3}>
+                        <div>
+                          <p
+                            className="fw-bold mb-1"
+                            style={{ fontSize: isMiniMobile ? "11px" : "15px" }}
+                          >
+                            {booking.returnFlight.arrival?.city}
+                          </p>
+                          <p className="mb-1">
+                            {formatDate(booking.returnFlight.arrival?.date)}
+                          </p>
+                          <p className="mb-0">
+                            {formatTime(booking.returnFlight.arrival?.time)}
+                          </p>
+                        </div>
+                      </Col>
+                    </Row>
+                  </>
+                )}
 
                 <hr className="my-4" />
 
@@ -202,9 +248,12 @@ const OrderItem = ({ data, onSelectOrder }) => {
                     <p className="fw-bold mb-1 ">Class:</p>
                     <p>{booking.departureFlight.seatClass}</p>
                   </Col>
-                  <Col className="text-end">
-                    <h6 className="fw-bold" style={{ color:"#4B1979" }}>
-                      IDR {booking.priceDetails.totalPayAfterTax.toLocaleString()}
+                  <Col className="text-end ">
+                    <h6 className="fw-bold" style={{ color: "#4B1979" }}>
+                      Rp{" "}
+                      {booking.priceDetails.totalPayAfterTax.toLocaleString(
+                        "id-ID"
+                      )}
                     </h6>
                   </Col>
                 </Row>

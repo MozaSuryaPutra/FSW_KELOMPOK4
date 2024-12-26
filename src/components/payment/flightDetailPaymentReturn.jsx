@@ -111,13 +111,13 @@ const FlightDetailReturnPayment = (details) => {
               {data.count} {type.charAt(0).toUpperCase() + type.slice(1)}
             </div>
             <div className="col-6 text-end">
-              IDR {data.total.toLocaleString("id-ID")}
+              Rp {data.total.toLocaleString("id-ID")}
             </div>
           </React.Fragment>
         ))}
         <div className="col-6 text-dark">Tax</div>
         <div className="col-6 text-end text-muted">
-          IDR {details.data.priceDetails.tax.toLocaleString("id-ID") || 0}
+          Rp {details.data.priceDetails.tax.toLocaleString("id-ID") || 0}
         </div>
       </div>
 
@@ -128,7 +128,7 @@ const FlightDetailReturnPayment = (details) => {
           className="col-6 fw-bold fs-5 text-end text-primary"
           style={{ color: "#7126B5" }}
         >
-          IDR{" "}
+          Rp{" "}
           {details.data.priceDetails.totalPayAfterTax.toLocaleString("id-ID")}
         </div>
       </div>

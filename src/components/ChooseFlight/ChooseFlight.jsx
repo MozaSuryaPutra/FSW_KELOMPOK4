@@ -311,8 +311,9 @@ function ChooseFlight() {
               <div className="text-center mt-4">
                 <Image src="ilustrasi (1).png"></Image>
               </div>
-            ) : isError && error.message == "Maaf, Tiket terjual habis. Coba cari perjalanan lain."
- ? (
+            ) : isError &&
+              error.message ==
+                "Maaf, Tiket terjual habis. Coba cari perjalanan lain." ? (
               <div className="text-center mt-4">
                 <Image src="ticket_habis.png" alt="Ticket Habis"></Image>
                 <p className="mb-0">Maaf ticket terjual habis</p>
@@ -328,13 +329,15 @@ function ChooseFlight() {
               filteredFlights.map((flight, idx) => {
                 // Menghitung durasi penerbangan
                 const formatDate = (dateString) => {
-                  return format(new Date(dateString), "d MMMM yyyy", { locale: id });
+                  return format(new Date(dateString), "d MMMM yyyy", {
+                    locale: id,
+                  });
                 };
-              
+
                 const formatTime = (dateString) => {
                   return format(new Date(dateString), "HH:mm");
                 };
-                
+
                 const departureTime = new Date(flight.departureTime);
                 let arrivalTime = new Date(flight.arrivalTime);
                 if (arrivalTime < departureTime) {
@@ -342,8 +345,8 @@ function ChooseFlight() {
                   arrivalTime = new Date(
                     arrivalTime.getTime() + 24 * 60 * 60 * 1000
                   );
-                }                
-                
+                }
+
                 const durationInMillis = arrivalTime - departureTime;
                 // Mengonversi durasi dalam milidetik ke format jam dan menit
                 const durationHours = Math.floor(
@@ -448,7 +451,8 @@ function ChooseFlight() {
                               style={{ marginTop: "5%" }}
                             >
                               <strong>
-                                IDR {flight.price.toLocaleString()}
+                                Rp{" "}
+                                {Number(flight.price).toLocaleString("id-ID")}
                               </strong>
                               <Button
                                 disabled={isSubmitting}
@@ -490,9 +494,7 @@ function ChooseFlight() {
                             </Col>
                           </Row>
                           <Row>
-                            <p>
-                              {formatDate(flight.departureDate)}
-                            </p>
+                            <p>{formatDate(flight.departureDate)}</p>
                             <p>{flight.departureAirport.name}</p>
                             <hr style={{ width: "50%", margin: "0 auto" }}></hr>
                           </Row>
@@ -572,9 +574,7 @@ function ChooseFlight() {
                             </Col>
                           </Row>
                           <Row>
-                            <p>
-                              {formatDate(flight.arrivalDate)}
-                            </p>
+                            <p>{formatDate(flight.arrivalDate)}</p>
                             <p>{flight.destinationAirport.name}</p>
                           </Row>
                         </Accordion.Body>

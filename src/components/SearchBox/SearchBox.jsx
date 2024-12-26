@@ -243,7 +243,7 @@ const SearchBox = () => {
                         outline: "none",
                         boxShadow: "none",
                         cursor: "pointer",
-                        fontSize: "2vw",
+                        fontSize: "1vw",
                         color: "#7126B5" || "#FFFFFF",
                         // textTransform: "uppercase",
                       }}
@@ -449,13 +449,12 @@ const SearchBox = () => {
                   </Form.Label>
 
                   {/* Kolom Tanggal Keberangkatan */}
-                  <Col md={3.5} xs={4.5} className="mb-2">
+                  <Col md={3.5} xs={4.5} className="mb-2 w-100">
                     <Form.Label>
                       <span
                         style={{
                           color: "#8A8A8A",
                           fontSize: "clamp(10px, 1vw, 12px)",
-                          paddingLeft: "10px",
                         }}
                       >
                         Passengers
@@ -489,22 +488,22 @@ const SearchBox = () => {
                   </Col>
                   <Col md={1} xs={2}></Col>
                   {/* Kolom Tanggal Kembali */}
-                  <Col md={3.5} xs={4.5} className="mb-2 align-items-center">
-                    <Form.Label className>
+                  <Col md={3.5} xs={4.5} className="mb-2 w-100">
+                    <Form.Label className="w-100">
                       <span
                         style={{
                           color: "#8A8A8A",
                           fontSize: "clamp(10px, 1vw, 12px)",
-                          paddingLeft: "10px",
                         }}
                       >
-                        Seat Class
+                        <span style={{ opacity: 0 }}>hai</span>
+                        Class
                       </span>
                     </Form.Label>
 
                     <Form.Group
                       controlId="returnDate"
-                      className="d-flex align-items-center"
+                      className="d-flex w-100"
                       onClick={() => setClassModalShow(true)}
                     >
                       <Form.Control
@@ -512,7 +511,7 @@ const SearchBox = () => {
                         placeholder="Jenis Kursi"
                         readOnly
                         value={selectedClass || "Pilih Kelas"}
-                        className="border-0 border-bottom flex-grow-1  custom-input"
+                        className="border-0 border-bottom w-100 custom-input"
                         style={{
                           borderRadius: 0,
                           outline: "none",

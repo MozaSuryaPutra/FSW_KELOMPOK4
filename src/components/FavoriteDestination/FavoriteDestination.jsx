@@ -13,7 +13,6 @@ import { useSelector } from "react-redux";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-
 const FavoriteDestination = () => {
   const navigate = useNavigate();
   const userIds = useSelector((state) => {
@@ -21,7 +20,7 @@ const FavoriteDestination = () => {
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
     return user?.id; // Kembalikan id jika user ada
   });
-  
+
   const [selectedContinent, setSelectedContinent] = useState([0]); // Default: Semua
   const [modalShow, setModalShow] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
@@ -284,7 +283,7 @@ const FavoriteDestination = () => {
                   >
                     Mulai dari{" "}
                     <span style={{ color: "#A084CA" }}>
-                      IDR {destination.price.toLocaleString()}
+                      Rp {Number(destination.price).toLocaleString("id-ID")}
                     </span>
                   </Card.Text>
                 </Card.Body>
@@ -392,7 +391,10 @@ const FavoriteDestination = () => {
                   >
                     Price{": "}
                     <span style={{ color: "#A084CA" }}>
-                      IDR {selectedDestination.price.toLocaleString()}
+                      Rp{" "}
+                      {Number(selectedDestination.price).toLocaleString(
+                        "id-ID"
+                      )}
                     </span>
                   </Card.Text>
                 </Col>

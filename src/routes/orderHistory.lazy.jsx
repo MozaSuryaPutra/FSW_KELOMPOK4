@@ -132,17 +132,17 @@ function OrderHistory() {
     // Membuat objek Date untuk kedatangan dan keberangkatan
     const departureDate = new Date(departureTime);
     let arrivalDate = new Date(arrivalTime);
-  
+
     if (arrivalDate < departureDate) {
       // Menambahkan 24 jam ke waktu kedatangan
       arrivalDate = new Date(arrivalDate.getTime() + 24 * 60 * 60 * 1000);
     }
-  
+
     // Menghitung perbedaan waktu dalam menit
     const minutes = differenceInMinutes(arrivalDate, departureDate);
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
-  
+
     return `${hours}h ${remainingMinutes}m`;
   }
 
@@ -298,9 +298,7 @@ function OrderHistory() {
                 border: "none",
               }}
               onClick={() => setShowSearchModal(true)}
-            >
-              <FaSearch className="fs-3" style={{ color: "#9b59b6" }} />
-            </Button>
+            ></Button>
           </Col>
         </Row>
 

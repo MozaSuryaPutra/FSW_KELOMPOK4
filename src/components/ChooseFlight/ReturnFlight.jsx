@@ -20,7 +20,6 @@ import { chooseCheckout } from "../../services/checkout/checkout";
 import { getSearchedFlight } from "../../services/homepage/homepage";
 import { toast } from "react-toastify";
 
-
 function ReturnFlight() {
   const navigate = useNavigate();
   const { user, token } = useSelector((state) => state.auth);
@@ -375,7 +374,7 @@ function ReturnFlight() {
 
                 return (
                   <>
-                    <h3>Departure Flight</h3>
+                    <h3>Return Flight</h3>
                     <Accordion
                       key={flight.id}
                       defaultActiveKey="0"
@@ -472,7 +471,8 @@ function ReturnFlight() {
                               style={{ marginTop: "5%" }}
                             >
                               <strong>
-                                IDR {flight.price.toLocaleString()}
+                                Rp{" "}
+                                {Number(flight.price).toLocaleString("id-ID")}
                               </strong>
                               <Button
                                 disabled={isSubmitting}

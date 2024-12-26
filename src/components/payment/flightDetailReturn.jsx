@@ -27,13 +27,13 @@ const FlightDetailReturn = ({ flighter }) => {
             <div className="col-12 text-center fw-bolder mb-3">
               Kepulangan Anda
             </div>
-            <div className="col-6 fw-bolder">
+            <div className="col-5 fw-bolder">
               {flightData?.flights?.return?.departureDate
                 .toString()
                 .substring(11, 16)}
             </div>
             <div
-              className="col-6 text-end fw-semibold"
+              className="col-7 text-end fw-semibold mb-2"
               style={{ color: "#A06ECE" }}
             >
               Keberangkatan
@@ -146,11 +146,11 @@ const FlightDetailReturn = ({ flighter }) => {
               }, {})
           ).map(([type, data], index) => (
             <React.Fragment key={index}>
-              <div className="col-6">
+              <div className="col-5">
                 {data.count} {type.charAt(0).toUpperCase() + type.slice(1)}
               </div>
-              <div className="col-6 text-end">
-                IDR {data.total.toLocaleString("id-ID")}
+              <div className="col-7 text-end">
+                Rp {data.total.toLocaleString("id-ID")}
               </div>
             </React.Fragment>
           ))}

@@ -264,7 +264,7 @@ const OrderDetail = ({ data }) => {
                           (total, passenger) => total + passenger.total,
                           0
                         )
-                        .toLocaleString()}
+                        .toLocaleString("id-ID")}
                     </p>
                   </div>
 
@@ -302,7 +302,7 @@ const OrderDetail = ({ data }) => {
                             (total, passenger) => total + passenger.total,
                             0
                           )
-                          .toLocaleString()}
+                          .toLocaleString("id-ID")}
                       </p>
                     </div>
                   )}
@@ -341,7 +341,7 @@ const OrderDetail = ({ data }) => {
                             (total, passenger) => total + passenger.total,
                             0
                           )
-                          .toLocaleString()}
+                          .toLocaleString("id-ID")}
                       </p>
                     </div>
                   )}
@@ -377,7 +377,7 @@ const OrderDetail = ({ data }) => {
                               (total, passenger) => total + passenger.total,
                               0
                             )
-                            .toLocaleString()}
+                            .toLocaleString("id-ID")}
                         </p>
                       </div>
 
@@ -417,7 +417,7 @@ const OrderDetail = ({ data }) => {
                                 (total, passenger) => total + passenger.total,
                                 0
                               )
-                              .toLocaleString()}
+                              .toLocaleString("id-ID")}
                           </p>
                         </div>
                       )}

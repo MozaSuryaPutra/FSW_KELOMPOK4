@@ -11,9 +11,9 @@ const flightDetail = (details) => {
             Keberangkatan Anda
           </div>
           <div className="col-6 fw-bold fs-5 text-primary">
-            {details.data.flights.departure.departureDate
+            {/* {details.data.flights.departure.departureDate
               .toString()
-              .substring(11, 16)}
+              .substring(11, 16)} */}
           </div>
           <div className="col-6 text-end fw-semibold text-muted">
             Keberangkatan
@@ -116,13 +116,13 @@ const flightDetail = (details) => {
               {data.count} {type.charAt(0).toUpperCase() + type.slice(1)}
             </div>
             <div className="col-6 text-end">
-              IDR {data.total.toLocaleString("id-ID")}
+              Rp {data.total.toLocaleString("id-ID")}
             </div>
           </React.Fragment>
         ))}
         <div className="col-6 text-dark">Tax</div>
         <div className="col-6 text-end text-muted">
-          IDR {details.data.priceDetails.tax.toLocaleString("id-ID") || 0}
+          Rp {details.data.priceDetails.tax.toLocaleString("id-ID") || 0}
         </div>
       </div>
 

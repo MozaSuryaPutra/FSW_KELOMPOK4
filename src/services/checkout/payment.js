@@ -20,7 +20,8 @@ export const createPayment = async (request) => {
 
   // get the data if fetching succeed!
   const result = await response.json();
-
+  console.log("ini response : ", response);
+  console.log("ini adalah result", result);
   if (!response.ok) {
     throw new Error(result?.message);
   }

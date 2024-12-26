@@ -78,12 +78,32 @@ p {
 /* -------------------------------------------------- */
 
 .search-box-layout .custom-input {
-  line-height: 1.5 !important;
-  color: #7126b5 !important;
-  font-weight: 500 !important;
-  border-bottom: 0.5px solid #7126b5 !important;
-  font-size: 1.3vw !important;
+  line-height: 1.5 !important; /* Menjaga tinggi baris agar nyaman dibaca */
+  color: #7126b5 !important; /* Warna teks */
+  font-weight: 500 !important; /* Berat font */
+  border-bottom: 0.5px solid #7126b5 !important; /* Border bawah */
+  font-size: 1.3vw !important; /* Ukuran font responsif berdasarkan lebar layar */
+  padding: 10px 12px; /* Memberikan ruang dalam input untuk kenyamanan */
+  width: 100%; /* Lebar input menyesuaikan kontainer */
+  box-sizing: border-box; /* Menghitung padding dalam ukuran elemen */
+  margin-bottom: 15px; /* Jarak bawah untuk memisahkan elemen lain */
+  text-align: left; /* Memastikan teks dimulai dari kiri */
 }
+
+@media (max-width: 768px) {
+  .search-box-layout .custom-input {
+    font-size: 1.7vw !important; /* Ukuran font lebih kecil pada layar kecil */
+    padding: 8px 10px; /* Mengurangi padding di layar kecil */
+  }
+}
+
+@media (max-width: 576px) {
+  .search-box-layout .custom-input {
+    font-size: 1.7vw !important; /* Ukuran font lebih kecil pada layar sangat kecil */
+    padding: 6px 8px; /* Padding lebih kecil pada layar sangat kecil */
+  }
+}
+
 .custom-button:hover {
   background-color: #7126b5 !important; /* Warna lebih gelap */
   cursor: pointer !important; /* Tambahkan pointer */
@@ -95,7 +115,8 @@ p {
 .custom-switch .form-check-input {
   background-color: #e3e3e3; /* Warna dasar */
   border-color: #7126b5; /* Warna border */
-  transform: scale(1.5); /* Memperbesar ukuran switch */
+  transform: scale(clamp(1, 1.5vw, 1.5)); /* Responsif berdasarkan ruang */
+  transition: all 0.3s ease; /* Animasi transisi yang halus */
 }
 
 .custom-switch .form-check-input:checked {
@@ -104,6 +125,19 @@ p {
 }
 
 .custom-switch .form-check-label {
-  font-size: 18px; /* Memperbesar ukuran label */
+  font-size: clamp(14px, 2vw, 18px); /* Ukuran label responsif */
   color: #000000; /* Warna label yang selaras */
+  margin-left: 8px; /* Memberikan jarak antara label dan switch */
+  transition: font-size 0.2s ease; /* Animasi perubahan ukuran */
+}
+
+.custom-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Jarak antar elemen */
+}
+
+.custom-switch .form-check-input:focus {
+  box-shadow: 0 0 4px rgba(113, 38, 181, 0.6); /* Efek fokus */
 }
