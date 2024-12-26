@@ -29,17 +29,17 @@ const SearchBox = () => {
     isReturnEnabled: false,
     selectedClass: "economy",
     selectedDepartureCity: {
+      id: "5",
+      countryId: "5",
+      name: "Sydney",
+      cityCode: "SYD",
+    },
+    selectedDepartureDate: formattedDate,
+    selectedReturnCity: {
       id: "1",
       countryId: "1",
       name: "Jakarta",
       cityCode: "JKT",
-    },
-    selectedDepartureDate: formattedDate,
-    selectedReturnCity: {
-      id: "6",
-      countryId: "1",
-      name: "Bandung",
-      cityCode: "BDOA",
     },
     selectedReturnDate: false,
   };
