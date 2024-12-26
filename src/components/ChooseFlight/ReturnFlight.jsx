@@ -620,22 +620,22 @@ function ReturnFlight() {
           <Modal.Body>
             <ListGroup>
               {[
-                { label: "Termurah", value: "Harga - Termurah" },
-                { label: "Durasi Terpendek", value: "Durasi - Terpendek" },
+                { label: "Harga - Termurah", value: "Harga - Termurah" },
+                { label: "Durasi - Terpendek", value: "Durasi - Terpendek" },
                 {
-                  label: "Keberangkatan Paling Awal",
+                  label: "Keberangkatan - Paling Awal",
                   value: "Keberangkatan - Paling Awal",
                 },
                 {
-                  label: "Keberangkatan Paling Akhir",
+                  label: "Keberangkatan - Paling Akhir",
                   value: "Keberangkatan - Paling Akhir",
                 },
                 {
-                  label: "Kedatangan Paling Awal",
+                  label: "Kedatangan - Paling Awal",
                   value: "Kedatangan - Paling Awal",
                 },
                 {
-                  label: "Kedatangan Paling Akhir",
+                  label: "Kedatangan - Paling Akhir",
                   value: "Kedatangan - Paling Akhir",
                 },
               ].map((sortOption, idx) => (
