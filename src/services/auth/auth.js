@@ -14,13 +14,13 @@ export const login = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
+
   if (!response.ok) {
-       // Tambahkan properti `details` ke Error untuk menyimpan detail error
-       const error = new Error(result.message || "An error occurred.");
-       error.details = result.details; // Tambahkan array `details` dari respons
-       throw error;  }
+    // Tambahkan properti `details` ke Error untuk menyimpan detail error
+    const error = new Error(result.message || "An error occurred.");
+    error.details = result.details; // Tambahkan array `details` dari respons
+    throw error;
+  }
 
   return result;
 };
@@ -41,12 +41,12 @@ export const register = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result);
+
   if (!response.ok) {
-       // Tambahkan properti `details` ke Error untuk menyimpan detail error
-       const error = new Error(result.message || "An error occurred.");
-       error.details = result.details; // Tambahkan array `details` dari respons
-       throw error;
+    // Tambahkan properti `details` ke Error untuk menyimpan detail error
+    const error = new Error(result.message || "An error occurred.");
+    error.details = result.details; // Tambahkan array `details` dari respons
+    throw error;
   }
 
   return result;
@@ -55,8 +55,8 @@ export const register = async (request) => {
 export const forgotPassword = async (request) => {
   // Mengonversi request body menjadi URL-encoded string
   let urlEncodedData = new URLSearchParams(request).toString();
-    // Mengganti %40 kembali menjadi @ setelah URL encoding
-    urlEncodedData = urlEncodedData.replace(/%40/g, '@');
+  // Mengganti %40 kembali menjadi @ setelah URL encoding
+  urlEncodedData = urlEncodedData.replace(/%40/g, "@");
 
   const response = await fetch(
     `${import.meta.env.VITE_API_URL}/api/auth/forgot-password`,
@@ -70,7 +70,7 @@ export const forgotPassword = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
+
   if (!response.ok) {
     throw new Error(result?.message);
   }
@@ -94,8 +94,7 @@ export const resetPassword = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }
@@ -106,7 +105,6 @@ export const resetPassword = async (request) => {
 export const verifOTP = async (request) => {
   // Mengonversi request body menjadi URL-encoded string
   const urlEncodedData = new URLSearchParams(request).toString();
-  console.log(urlEncodedData);
 
   const response = await fetch(
     `${import.meta.env.VITE_API_URL}/api/auth/verify-otp`,
@@ -120,8 +118,7 @@ export const verifOTP = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }
@@ -132,7 +129,6 @@ export const verifOTP = async (request) => {
 export const resendOTP = async (userId) => {
   // Mengonversi request body menjadi URL-encoded string
   const urlEncodedData = new URLSearchParams(userId).toString();
-  console.log("User Id: ",urlEncodedData);
 
   const response = await fetch(
     `${import.meta.env.VITE_API_URL}/api/auth/reset-otp`,
@@ -146,8 +142,7 @@ export const resendOTP = async (userId) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }

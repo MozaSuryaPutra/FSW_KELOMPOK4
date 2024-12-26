@@ -5,7 +5,6 @@ export const getTicket = async (transactionId) => {
 
   // URL API untuk mengambil tiket
   let url = `${import.meta.env.VITE_API_URL}/api/tickets/${transactionId}`;
-  console.log(url);
 
   try {
     const response = await axios.get(url, {
@@ -14,8 +13,6 @@ export const getTicket = async (transactionId) => {
       },
       responseType: "blob", // Agar response berupa file binari
     });
-
-    console.log("Status response:", response.status); // Log status code
 
     if (response.status === 200) {
       return response.data; // Mengembalikan Blob file PDF

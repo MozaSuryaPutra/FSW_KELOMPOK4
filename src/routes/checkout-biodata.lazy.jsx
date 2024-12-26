@@ -56,7 +56,7 @@ function Index() {
     passengers: [],
     seatIds: [],
   });
-  console.log("isi form data :", formData);
+
   const { selectedPassengers: passengers } = location.state || {};
   useEffect(() => {
     const generatePassengers = () => {

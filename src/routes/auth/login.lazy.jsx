@@ -30,18 +30,12 @@ function Login() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
 
-
   const { mutate: loginUser } = useMutation({
     mutationFn: (body) => {
-      console.log("Login mutation called with body:", body); // Debugging log
       return login(body);
     },
     onSuccess: (data) => {
-      console.log("Data on success:", data); // Debugging log
       if (data?.token) {
-        console.log("Data on success:", data?.token); // Debugging log
-        console.log("Data on success:", data?.user); // Debugging log
-
         dispatch(setToken(data?.token));
         dispatch(setUser(JSON.stringify(data?.user)));
         navigate({ to: "/" });
@@ -51,19 +45,18 @@ function Login() {
       setIsSubmitting(true);
     },
     onError: (error) => {
-// Cek apakah error memiliki properti details
-if (Array.isArray(error?.details)) {
-  // Iterasi dan tampilkan setiap error menggunakan toast
-  error.details.forEach((message) => {
-    toast.error(message); // Menampilkan pesan error
-  });
-} else {
-  // Tampilkan pesan error umum jika details tidak ada
-  const errorMessage = error?.message || "An unexpected error occurred.";
-  toast.error(`${errorMessage}`);
-}
-setIsSubmitting(false);
-
+      // Cek apakah error memiliki properti details
+      if (Array.isArray(error?.details)) {
+        // Iterasi dan tampilkan setiap error menggunakan toast
+        error.details.forEach((message) => {
+          toast.error(message); // Menampilkan pesan error
+        });
+      } else {
+        // Tampilkan pesan error umum jika details tidak ada
+        const errorMessage = error?.message || "An unexpected error occurred.";
+        toast.error(`${errorMessage}`);
+      }
+      setIsSubmitting(false);
     },
   });
 
@@ -81,7 +74,7 @@ setIsSubmitting(false);
       email,
       password,
     };
-    console.log(body);
+
     // hit the login API with the data
     loginUser(body);
   };

@@ -12,8 +12,7 @@ export const chooseCheckout = async (request) => {
   });
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }
@@ -26,8 +25,6 @@ export const getCheckoutByID = async (userid, transactionid) => {
 
   let url = `${import.meta.env.VITE_API_URL}/api/checkout/${userid}/${transactionid}`;
 
-  console.log(url);
-
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -35,10 +32,9 @@ export const getCheckoutByID = async (userid, transactionid) => {
     method: "GET",
   });
 
-  console.log(response);
   // get data
   const result = await response.json();
-  console.log(result?.data?.orderer?.bookingCode);
+
   return result?.data;
 };
 
@@ -55,9 +51,7 @@ export const updateCheckout = async (request) => {
     },
   });
   const result = await response.json();
-  console.log("INI url :", urlEncodedData);
-  console.log("INI RESULT :", result); // Debugging log
-  console.log("INI RESPONSE : ", response);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }

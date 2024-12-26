@@ -7,7 +7,7 @@ export const createPayment = async (request) => {
   }
 
   let url = `${import.meta.env.VITE_API_URL}/api/checkout/payment`;
-  console.log(url);
+
   const response = await fetch(url, {
     body: urlEncodedData,
     headers: {
@@ -20,8 +20,7 @@ export const createPayment = async (request) => {
 
   // get the data if fetching succeed!
   const result = await response.json();
-  console.log("ini response : ", response);
-  console.log("ini adalah result", result);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }

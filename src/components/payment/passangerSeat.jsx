@@ -16,7 +16,6 @@ const pasangerSeat = () => {
         key={start + index}
         className="button-seat text-center"
         style={{ margin: "2px", width: "30px", paddingRight: "20px" }}
-        onClick={() => console.log(`Seat ID: ${start + index}`)}
       >
         X
       </Button>

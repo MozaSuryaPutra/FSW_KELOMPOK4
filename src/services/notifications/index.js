@@ -10,7 +10,7 @@ export const getNotificationById = async (userId) => {
 
   // get data
   const result = await response.json();
-  console.log(result);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }
@@ -55,8 +55,7 @@ export const createNotification = async (request) => {
   );
 
   const result = await response.json();
-  console.log(result); // Debugging log
-  console.log(response);
+
   if (!response.ok) {
     throw new Error(result?.message);
   }
@@ -75,12 +74,12 @@ export const deleteNotification = async (notifId) => {
       method: "DELETE",
     }
   );
-  console.log(response);
+
   // get the data if fetching succeed!
   const result = await response.json();
   if (!response.ok) {
     throw new Error(result?.message);
   }
-  console.log(result);
+
   return result;
 };

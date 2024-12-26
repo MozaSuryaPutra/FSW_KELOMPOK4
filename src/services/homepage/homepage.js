@@ -46,14 +46,14 @@ export const getSearchedFlight = async (
   let url =
     `${import.meta.env.VITE_API_URL}/api/flights/search?` +
     new URLSearchParams(params);
-  console.log(url);
+
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
     },
     method: "GET",
   });
-  console.log(response);
+
   // get data
   if (!response.ok) {
     const errorResult = await response.json();
@@ -61,37 +61,31 @@ export const getSearchedFlight = async (
   }
 
   const result = await response.json();
-  console.log("RESULTTTTT : ",result);
-  return result?.data 
+
+  return result?.data;
 };
 
-export const getFavDestination = async (
-continent,
-
-) => {
-  console.log("ISI KONTINEN : ",continent)
+export const getFavDestination = async (continent) => {
   const token = localStorage.getItem("token");
   let params = {};
   if (continent) {
     params.continent = continent;
   }
 
-  
-
   let url =
     `${import.meta.env.VITE_API_URL}/api/flights/favorites?` +
     new URLSearchParams(params);
-  console.log(url);
+
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
     },
     method: "GET",
   });
-  console.log(response);
+
   // get data
   const result = await response.json();
-  console.log("RESULTTTTT : ",result);
+
   return result?.data;
 };
 

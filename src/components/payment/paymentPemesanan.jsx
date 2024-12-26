@@ -17,7 +17,7 @@ const BookingForm = ({ ordererData, handleOrdererChange }) => {
     // Sinkronkan perubahan ordererData ke DataOrderer
     setDataOrderer({ ...ordererData });
   }, [ordererData]);
-  console.log("Data orderer : ", DataOrderer);
+
   return (
     <Card
       className=""

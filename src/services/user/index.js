@@ -24,22 +24,20 @@ export const updateProfile = async (userId, request) => {
   return result;
 };
 
-
 export const getUserById = async (userId) => {
-    let url = `${import.meta.env.VITE_API_URL}/api/users/${userId}`;
-  
-    const response = await fetch(url, {
-      headers: {
-      },
-      method: "GET",
-    });
-  
-    // get data
-    const result = await response.json();
-    console.log(result)
-    if (!response.ok) {
-      throw new Error(result?.message);
-    }
-  
-    return result;
-  };
+  let url = `${import.meta.env.VITE_API_URL}/api/users/${userId}`;
+
+  const response = await fetch(url, {
+    headers: {},
+    method: "GET",
+  });
+
+  // get data
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result?.message);
+  }
+
+  return result;
+};

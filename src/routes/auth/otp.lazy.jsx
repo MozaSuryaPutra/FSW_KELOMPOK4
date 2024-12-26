@@ -16,7 +16,6 @@ export const Route = createLazyFileRoute("/auth/otp")({
 function OTPInputUI() {
   const navigate = useNavigate();
 
-
   const [isDisabled, setIsDisabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
   const [otp, setOtp] = useState("");
@@ -55,7 +54,6 @@ function OTPInputUI() {
     if (counter > 0) {
       const timer = setInterval(() => setCounter((prev) => prev - 1), 1000);
       return () => clearInterval(timer); // Cleanup timer when component unmounts
-
     }
   }, [counter]);
 
@@ -76,7 +74,6 @@ function OTPInputUI() {
       otp,
     };
 
-    console.log(body);
     // Call mutation to verify OTP
     VerifikasiOTP(body);
     setIsLoading(false);
@@ -172,7 +169,9 @@ function OTPInputUI() {
         }}
         disabled={isLoading || isResending || isSubmitting}
       >
-        {isLoading || isResending || isSubmitting ? "Memproses..." : "Verifikasi OTP"}
+        {isLoading || isResending || isSubmitting
+          ? "Memproses..."
+          : "Verifikasi OTP"}
       </button>
     </div>
   );
