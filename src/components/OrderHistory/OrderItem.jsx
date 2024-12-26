@@ -31,7 +31,7 @@ const OrderItem = ({ data, onSelectOrder }) => {
   };
 
   const formatTime = (dateString) => {
-    return format(new Date(dateString), "HH:mm"); // Contoh hasil: "06:00"
+    return format(new Date(dateString), "HH:mm");
   };
 
   const getBadgeClass = (status) => {

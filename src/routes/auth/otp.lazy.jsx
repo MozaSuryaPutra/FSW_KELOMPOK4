@@ -31,7 +31,7 @@ function OTPInputUI() {
     onSuccess: () => {
       toast.success("OTP berhasil diverifikasi!");
       navigate({ to: "/auth/login" }); // Redirect after success
-      setIsSubmitting(false);
+      setIsSubmitting(true);
     },
     onError: (error) => {
       toast.error(error?.message || "Verifikasi OTP gagal");
@@ -149,7 +149,8 @@ function OTPInputUI() {
       {counter === 0 && (
         <div
           style={{ marginTop: "20px", color: "red", cursor: "pointer" }}
-          onClick={handleResendOtp}
+          onClick={isDisabled ? null : handleResendOtp}
+          disabled={isLoading || isResending || isDisabled}
         >
           Kirim ulang OTP
         </div>

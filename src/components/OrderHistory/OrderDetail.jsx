@@ -1,12 +1,12 @@
 import PropTypes from "prop-types";
 import { Card, Row, Col, Button } from "react-bootstrap";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
 import { useState, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { getTicket } from "../../services/ticket";
 import { toast } from "react-toastify";
 import ReactLoading from "react-loading";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 const OrderDetail = ({ data }) => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState(data); // Menyimpan data dalam state

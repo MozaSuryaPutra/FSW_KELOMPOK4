@@ -44,7 +44,7 @@ function Register() {
     onSuccess: (result) => {
       dispatch(setUser(result?.user));
       navigate({ to: "/auth/otp" });
-      setIsSubmitting(false); // Set ulang state setelah selesai
+      setIsSubmitting(true);
     },
     onError: (error) => {
       if (Array.isArray(error?.details)) {

@@ -5,12 +5,14 @@ import {
   getFavDestination,
   getContinents,
 } from "../../services/homepage/homepage";
-import { format } from "date-fns";
 import PassengersPopup from "../PassengersPopup/PassengeresPopup"; // Import the PassengersPopup component
 import { chooseCheckout } from "../../services/checkout/checkout";
 import { toast } from "react-toastify";
 import { useNavigate } from "@tanstack/react-router";
 import { useSelector } from "react-redux";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
+
 
 const FavoriteDestination = () => {
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ const FavoriteDestination = () => {
     const user = userString ? JSON.parse(userString) : null; // Parse string menjadi objek
     return user?.id; // Kembalikan id jika user ada
   });
+  
   const [selectedContinent, setSelectedContinent] = useState([0]); // Default: Semua
   const [modalShow, setModalShow] = useState(false);
   const [selectedDestination, setSelectedDestination] = useState(null);
@@ -31,7 +34,7 @@ const FavoriteDestination = () => {
   const [isSubmitting, setIsSubmitting] = useState(false); // State untuk melacak proses
 
   const formatDate = (dateString) => {
-    return format(new Date(dateString), "d MMMM yyyy");
+    return format(new Date(dateString), "d MMMM yyyy", { locale: id });
   };
 
   const formatTime = (dateString) => {
@@ -58,6 +61,7 @@ const FavoriteDestination = () => {
       if (data) {
         toast.success("Berhasil Membuat Checkout Biodata");
         localStorage.removeItem("flightSearch"); // Menghapus item
+        setIsSubmitting(true); // Atur state menjadi true
         navigate({
           to: "/checkout-biodata",
           state: {
@@ -73,7 +77,6 @@ const FavoriteDestination = () => {
       } else {
         console.error("Token or user not found in response");
       }
-      setIsSubmitting(false); // Atur state menjadi true
     },
     onError: (err) => {
       if (err.message == "jwt malformed") {
