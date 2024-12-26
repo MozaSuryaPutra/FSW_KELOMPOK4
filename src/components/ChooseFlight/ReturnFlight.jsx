@@ -621,14 +621,23 @@ function ReturnFlight() {
             <ListGroup>
               {[
                 { label: "Termurah", value: "Harga - Termurah" },
-                { label: "Terpendek", value: "Durasi - Terpendek" },
-                { label: "Paling Awal", value: "Keberangkatan - Paling Awal" },
+                { label: "Durasi Terpendek", value: "Durasi - Terpendek" },
                 {
-                  label: "Paling Akhir",
+                  label: "Keberangkatan Paling Awal",
+                  value: "Keberangkatan - Paling Awal",
+                },
+                {
+                  label: "Keberangkatan Paling Akhir",
                   value: "Keberangkatan - Paling Akhir",
                 },
-                { label: "K. Awal", value: "Kedatangan - Paling Awal" },
-                { label: "K. Akhir", value: "Kedatangan - Paling Akhir" },
+                {
+                  label: "Kedatangan Paling Awal",
+                  value: "Kedatangan - Paling Awal",
+                },
+                {
+                  label: "Kedatangan Paling Akhir",
+                  value: "Kedatangan - Paling Akhir",
+                },
               ].map((sortOption, idx) => (
                 <ListGroup.Item
                   key={idx}
