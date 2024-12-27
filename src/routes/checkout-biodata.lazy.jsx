@@ -338,8 +338,13 @@ function Index() {
 
       // Jika ada penumpang dengan flightType 'return', validasi jumlah kursi dan penumpang
       if (details?.passengers?.length > 0) {
+        // Filter penumpang untuk mengecualikan bayi
+        const passengersWithoutBabies = details.passengers.filter(
+          (passenger) => passenger.passengerType !== "baby"
+        );
+
         const totalSeats = outboundSeatIds.length + returnSeatIds.length; // Jumlah kursi
-        const totalPassengers = details?.passengers?.length; // Jumlah penumpang total
+        const totalPassengers = passengersWithoutBabies.length; // Jumlah penumpang tanpa bayi
 
         // Jika jumlah kursi tidak sama dengan jumlah penumpang
         if (totalSeats !== totalPassengers) {
