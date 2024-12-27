@@ -239,7 +239,7 @@ function ChooseFlight() {
               style={{ backgroundColor: "rgba(160, 110, 206, 1)" }}
               className="me-3 w-100 d-flex float-start align-items-center"
             >
-              {"<-"} JKT {">"} MLB - 2 Penumpang - Economy
+              Penerbangan Anda
             </Button>
           </Col>
           <Col md={3} className="d-flex justify-content-end align-items-end ">
@@ -358,7 +358,7 @@ function ChooseFlight() {
 
                 return (
                   <>
-                    <h3>Departure Flight</h3>
+                    <h3>One Way Flight</h3>
                     <Accordion
                       key={flight.id}
                       defaultActiveKey="0"
