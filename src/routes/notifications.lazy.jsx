@@ -288,9 +288,7 @@ function NotificationsList() {
               backgroundColor: "#fff",
               border: "none",
             }}
-          >
-            <FaSearch className="fs-3" style={{ color: "#9b59b6" }} />
-          </Button>
+          ></Button>
         </Col>
       </Row>
 
