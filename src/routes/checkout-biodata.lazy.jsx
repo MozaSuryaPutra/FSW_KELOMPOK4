@@ -337,7 +337,7 @@ function Index() {
       );
 
       // Jika ada penumpang dengan flightType 'return', validasi jumlah kursi dan penumpang
-      if (passengersWithReturnFlight.length > 0) {
+      if (details?.passengers?.length > 0) {
         const totalSeats = outboundSeatIds.length + returnSeatIds.length; // Jumlah kursi
         const totalPassengers = details?.passengers?.length; // Jumlah penumpang total
 

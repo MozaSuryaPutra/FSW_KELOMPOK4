@@ -298,7 +298,9 @@ function OrderHistory() {
                 border: "none",
               }}
               onClick={() => setShowSearchModal(true)}
-            ></Button>
+            >
+              <FaSearch className="fs-3" style={{ color: "#9b59b6" }} />
+            </Button>
           </Col>
         </Row>
 
